@@ -16,18 +16,22 @@ class AnswerFeedback {
   final String canonical;
   final List<String> accepted;
   final String input;
+  final int? chosenIndex; // 選擇題模式：使用者點的選項
 
   const AnswerFeedback({
     required this.correct,
     required this.canonical,
     required this.accepted,
     required this.input,
+    this.chosenIndex,
   });
 }
 
 /// 練習 session 狀態。
 class PracticeState {
   final Kana current;
+  final List<String> options; // 4 選 1 選項（romaji）
+  final int correctIndex;
   final AnswerFeedback? feedback; // null = 等待作答
   final int streak;
   final int sessionTotal;
@@ -35,6 +39,8 @@ class PracticeState {
 
   const PracticeState({
     required this.current,
+    required this.options,
+    required this.correctIndex,
     this.feedback,
     this.streak = 0,
     this.sessionTotal = 0,
@@ -45,6 +51,8 @@ class PracticeState {
 
   PracticeState copyWith({
     Kana? current,
+    List<String>? options,
+    int? correctIndex,
     AnswerFeedback? feedback,
     bool clearFeedback = false,
     int? streak,
@@ -53,6 +61,8 @@ class PracticeState {
   }) {
     return PracticeState(
       current: current ?? this.current,
+      options: options ?? this.options,
+      correctIndex: correctIndex ?? this.correctIndex,
       feedback: clearFeedback ? null : (feedback ?? this.feedback),
       streak: streak ?? this.streak,
       sessionTotal: sessionTotal ?? this.sessionTotal,
@@ -75,24 +85,54 @@ class PracticeController
       // 錯題模式且無錯題時由 UI 擋掉；此為保險
       _pool = PracticeMode.mixed.buildPool(allKana);
     }
-    return PracticeState(current: _next(null));
+    return _question(null);
   }
 
-  Kana _next(Kana? previous) =>
-      _generator.next(_pool, ref.read(masteryProvider), previous: previous);
+  PracticeState _question(PracticeState? prev) {
+    final kana =
+        _generator.next(_pool, ref.read(masteryProvider), previous: prev?.current);
+    final (options, correctIndex) =
+        _generator.buildOptions(kana, _pool, fallback: allKana);
+    return PracticeState(
+      current: kana,
+      options: options,
+      correctIndex: correctIndex,
+      streak: prev?.streak ?? 0,
+      sessionTotal: prev?.sessionTotal ?? 0,
+      sessionCorrect: prev?.sessionCorrect ?? 0,
+    );
+  }
 
-  /// 作答。已有 feedback 時忽略（避免重複計分）。
+  /// 鍵盤輸入作答。已有 feedback 時忽略（避免重複計分）。
   void submit(String input) {
     if (state.feedback != null) return;
     if (input.trim().isEmpty) return;
     final settings = ref.read(settingsProvider);
-    final kana = state.current;
     final correct = AnswerChecker.check(
-      kana,
+      state.current,
       input,
       caseSensitive: settings.caseSensitive,
     );
+    _applyAnswer(correct: correct, input: input.trim());
+  }
 
+  /// 選擇題作答（點第 [index] 個選項）。
+  void choose(int index) {
+    if (state.feedback != null) return;
+    if (index < 0 || index >= state.options.length) return;
+    _applyAnswer(
+      correct: index == state.correctIndex,
+      input: state.options[index],
+      chosenIndex: index,
+    );
+  }
+
+  void _applyAnswer({
+    required bool correct,
+    required String input,
+    int? chosenIndex,
+  }) {
+    final kana = state.current;
     ref.read(masteryProvider.notifier).record(kana.kana, correct: correct);
     ref.read(statsProvider.notifier).record(correct: correct);
     if (correct) {
@@ -109,7 +149,8 @@ class PracticeController
         correct: correct,
         canonical: kana.romaji,
         accepted: kana.acceptedAnswers,
-        input: input.trim(),
+        input: input,
+        chosenIndex: chosenIndex,
       ),
       streak: correct ? state.streak + 1 : 0,
       sessionTotal: state.sessionTotal + 1,
@@ -119,10 +160,10 @@ class PracticeController
 
   /// 下一題。
   void nextQuestion() {
-    state = state.copyWith(current: _next(state.current), clearFeedback: true);
+    state = _question(state);
   }
 
-  /// 同一題再試一次（答錯後）。
+  /// 同一題再試一次（輸入模式答錯後）。
   void retry() {
     state = state.copyWith(clearFeedback: true);
   }

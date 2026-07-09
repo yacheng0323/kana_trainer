@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/kana_data.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
 import 'wrong_notifier.dart';
 
@@ -51,23 +52,53 @@ class WrongListPage extends ConsumerWidget {
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: entries.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, i) {
                 final entry = entries[i];
                 final kana = findKana(entry.key);
                 return ListTile(
+                  tileColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radius),
+                    side: const BorderSide(color: AppColors.indigo, width: 2),
+                  ),
                   leading: Text(
                     entry.key,
-                    style: const TextStyle(fontSize: 28),
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.indigo,
+                    ),
                   ),
-                  title: Text(kana?.romaji ?? ''),
+                  title: Text(
+                    kana?.romaji ?? '',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.indigo,
+                    ),
+                  ),
                   subtitle: kana != null && kana.aliases.isNotEmpty
                       ? Text('也可以：${kana.aliases.join(' / ')}')
                       : null,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Chip(label: Text('錯 ${entry.value} 次')),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.gold,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '錯 ${entry.value} 次',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.indigo,
+                          ),
+                        ),
+                      ),
                       IconButton(
                         tooltip: '移除此錯題',
                         icon: const Icon(Icons.close),
@@ -82,6 +113,11 @@ class WrongListPage extends ConsumerWidget {
       floatingActionButton: wrong.isEmpty
           ? null
           : FloatingActionButton.extended(
+              backgroundColor: AppColors.indigo,
+              foregroundColor: AppColors.gold,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radius),
+              ),
               icon: const Icon(Icons.replay),
               label: const Text('重新練習錯題'),
               onPressed: () => Navigator.of(context).push(

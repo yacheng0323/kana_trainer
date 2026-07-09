@@ -19,3 +19,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: ZenKakuGothicNew
+      fonts:
+        - asset: assets/fonts/ZenKakuGothicNew-400.ttf
+          weight: 400
+        - asset: assets/fonts/ZenKakuGothicNew-500.ttf
+          weight: 500
+        - asset: assets/fonts/ZenKakuGothicNew-700.ttf
+          weight: 700
+        - asset: assets/fonts/ZenKakuGothicNew-900.ttf
+          weight: 900

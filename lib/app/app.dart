@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/theme/app_theme.dart';
 import '../features/home/home_page.dart';
 
 class KanaTrainerApp extends StatelessWidget {
@@ -7,20 +8,11 @@ class KanaTrainerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const seed = Color(0xFF5C6BC0); // indigo
     return MaterialApp(
       title: '50音練習',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: seed),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme:
-            ColorScheme.fromSeed(seedColor: seed, brightness: Brightness.dark),
-        useMaterial3: true,
-      ),
-      themeMode: ThemeMode.system,
+      // 2c「深藍夜 x 金黃」為單一亮色設計，不做深色變體
+      theme: AppTheme.light,
       home: const HomePage(),
     );
   }
