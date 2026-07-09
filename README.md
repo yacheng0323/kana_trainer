@@ -1,6 +1,17 @@
 # kana_trainer — 日文 50 音練習 App
 
-看假名、打羅馬拼音、即時判斷對錯的初學者練習 App。Flutter + Riverpod + SharedPreferences。
+看假名、選（或打）羅馬拼音、即時判斷對錯的初學者練習 App。Flutter + Riverpod + SharedPreferences。
+
+## 設計風格：2c「深藍夜 x 金黃」
+
+依設計交付稿實作（高保真）：
+
+- **色票**：底色暖米白 `#F4E9DA`、深靛藍 `#22254A`（標題/邊框/主文字）、金黃 `#E8B04B`（強調）、答對綠 `#2E9E7C`、答錯紅 `#D65B5B`
+- **造型**：8px 方正圓角、3–4px 實線邊框、`6px 6px 0` 無模糊硬陰影（貼紙感）
+- **字體**：Zen Kaku Gothic New（400/500/700/900，bundled assets/fonts）
+- **作答方式**：預設 **4 選 1**（點選項即時回饋：對→綠✓、錯→紅✕晃動 + 揭示正解 + 其餘淡化），設定可切回鍵盤輸入模式
+- **動畫**：答錯 shake 0.4s、底部反饋橫幅上滑 0.25s、卡片邊框變色 0.2s
+- Design tokens 集中在 `lib/core/theme/app_theme.dart`
 
 ---
 
