@@ -8,6 +8,7 @@ import '../progress/mastery_notifier.dart';
 import '../progress/stats_notifier.dart';
 import '../progress/wrong_list_page.dart';
 import '../progress/wrong_notifier.dart';
+import '../settings/settings_page.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -34,6 +35,13 @@ class HomePage extends ConsumerWidget {
             ),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const WrongListPage()),
+            ),
+          ),
+          IconButton(
+            tooltip: '設定',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SettingsPage()),
             ),
           ),
         ],
