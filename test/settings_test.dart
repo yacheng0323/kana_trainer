@@ -9,13 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  test('預設值：不區分大小寫、自動下一題開', () async {
+  test('預設值：選擇題模式、不區分大小寫、自動下一題開', () async {
     final prefs = await SharedPreferences.getInstance();
     final c = ProviderContainer(
       overrides: [prefsProvider.overrideWithValue(prefs)],
     );
     addTearDown(c.dispose);
     final s = c.read(settingsProvider);
+    expect(s.answerMode, AnswerMode.choice);
     expect(s.caseSensitive, isFalse);
     expect(s.autoNext, isTrue);
     expect(s.showHint, isTrue);
@@ -23,13 +24,17 @@ void main() {
     expect(s.romajiHint, isFalse);
   });
 
-  test('update 持久化：重建後保留', () async {
+  test('update 持久化：重建後保留（含 answerMode）', () async {
     final prefs = await SharedPreferences.getInstance();
     final c1 = ProviderContainer(
       overrides: [prefsProvider.overrideWithValue(prefs)],
     );
     c1.read(settingsProvider.notifier).update(
-          (s) => s.copyWith(caseSensitive: true, autoNext: false),
+          (s) => s.copyWith(
+            answerMode: AnswerMode.input,
+            caseSensitive: true,
+            autoNext: false,
+          ),
         );
     c1.dispose();
 
@@ -38,24 +43,34 @@ void main() {
     );
     addTearDown(c2.dispose);
     final s = c2.read(settingsProvider);
+    expect(s.answerMode, AnswerMode.input);
     expect(s.caseSensitive, isTrue);
     expect(s.autoNext, isFalse);
   });
 
-  testWidgets('SettingsPage 切換開關即更新狀態', (tester) async {
+  testWidgets('SettingsPage：切輸入模式後才能開區分大小寫', (tester) async {
     final prefs = await SharedPreferences.getInstance();
-    late ProviderContainer container;
     await tester.pumpWidget(
       ProviderScope(
         overrides: [prefsProvider.overrideWithValue(prefs)],
         child: const MaterialApp(home: SettingsPage()),
       ),
     );
-    container = ProviderScope.containerOf(
+    final container = ProviderScope.containerOf(
       tester.element(find.byType(SettingsPage)),
     );
 
+    // 選擇題模式下輸入相關開關停用
+    expect(container.read(settingsProvider).answerMode, AnswerMode.choice);
+    await tester.tap(find.text('區分大小寫'));
+    await tester.pump();
     expect(container.read(settingsProvider).caseSensitive, isFalse);
+
+    // 切到鍵盤輸入 → 開關可用
+    await tester.tap(find.text('鍵盤輸入'));
+    await tester.pump();
+    expect(container.read(settingsProvider).answerMode, AnswerMode.input);
+
     await tester.tap(find.text('區分大小寫'));
     await tester.pump();
     expect(container.read(settingsProvider).caseSensitive, isTrue);

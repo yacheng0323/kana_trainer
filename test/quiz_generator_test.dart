@@ -60,4 +60,27 @@ void main() {
       gen.next(pool, {'か': 99, 'き': -3});
     });
   });
+
+  group('QuizGenerator.buildOptions', () {
+    test('回傳 4 個不重複選項且含正解', () {
+      final pool = PracticeMode.hiragana.buildPool(allKana);
+      final gen = QuizGenerator(Random(5));
+      for (var i = 0; i < 50; i++) {
+        final kana = gen.next(pool, {});
+        final (options, correctIndex) = gen.buildOptions(kana, pool);
+        expect(options.length, 4);
+        expect(options.toSet().length, 4); // 無重複
+        expect(options[correctIndex], kana.romaji);
+      }
+    });
+
+    test('題庫過小時從 fallback 補滿', () {
+      final ka = findKana('か')!;
+      final gen = QuizGenerator(Random(2));
+      final (options, correctIndex) =
+          gen.buildOptions(ka, [ka], fallback: allKana);
+      expect(options.length, 4);
+      expect(options[correctIndex], 'ka');
+    });
+  });
 }

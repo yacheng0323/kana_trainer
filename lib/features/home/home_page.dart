@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/kana_data.dart';
+import '../../core/models/kana.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
 import '../progress/mastery_notifier.dart';
 import '../progress/stats_notifier.dart';
@@ -17,59 +19,104 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final wrongCount = ref.watch(wrongProvider).length;
     final stats = ref.watch(statsProvider);
-    ref.watch(masteryProvider);
-    final progress = ref
-        .read(masteryProvider.notifier)
-        .progressOf(allKana.map((k) => k.kana));
+    final mastery = ref.watch(masteryProvider);
+    final masteryNotifier = ref.read(masteryProvider.notifier);
+    final learned = mastery.values.where((v) => v >= 4).length;
+
+    double catProgress(bool Function(Kana) where) => masteryNotifier
+        .progressOf(allKana.where(where).map((k) => k.kana));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('50音練習'),
-        actions: [
-          IconButton(
-            tooltip: '錯題本',
-            icon: Badge(
-              isLabelVisible: wrongCount > 0,
-              label: Text('$wrongCount'),
-              child: const Icon(Icons.menu_book_outlined),
-            ),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const WrongListPage()),
-            ),
-          ),
-          IconButton(
-            tooltip: '設定',
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SettingsPage()),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: AppColors.cream,
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.zero,
         children: [
-          _StatsCard(stats: stats, progress: progress),
-          const SizedBox(height: 20),
-          Text('選擇練習模式', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: 1.6,
-            children: [
-              for (final mode in PracticeMode.values)
-                _ModeCard(
-                  mode: mode,
-                  enabled: mode != PracticeMode.wrongReview || wrongCount > 0,
-                  badge: mode == PracticeMode.wrongReview && wrongCount > 0
-                      ? '$wrongCount'
-                      : null,
+          _Header(stats: stats, wrongCount: wrongCount),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _StatCard(
+                        value: stats.total == 0
+                            ? '—'
+                            : '${(stats.accuracy * 100).toStringAsFixed(0)}%',
+                        label: '正確率',
+                        color: AppColors.red,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _StatCard(
+                        value: '$learned',
+                        label: '已學會',
+                        color: AppColors.green,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _StatCard(
+                        value: '${stats.todayTotal}',
+                        label: '今日答題',
+                        color: AppColors.gold,
+                      ),
+                    ),
+                  ],
                 ),
-            ],
+                const SizedBox(height: 22),
+                const _SectionTitle('分類進度'),
+                const SizedBox(height: 10),
+                _CategoryRow(
+                  name: '清音',
+                  detail: 'あ〜ん・92 字',
+                  progress: catProgress((k) => k.category == KanaCategory.seion),
+                  color: AppColors.red,
+                ),
+                const SizedBox(height: 10),
+                _CategoryRow(
+                  name: '濁音／半濁音',
+                  detail: 'が〜ぽ・50 字',
+                  progress: catProgress((k) =>
+                      k.category == KanaCategory.dakuon ||
+                      k.category == KanaCategory.handakuon),
+                  color: AppColors.green,
+                ),
+                const SizedBox(height: 10),
+                _CategoryRow(
+                  name: '拗音',
+                  detail: 'きゃ〜ぴょ・66 字',
+                  progress:
+                      catProgress((k) => k.category == KanaCategory.youon),
+                  color: AppColors.gold,
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('選擇練習模式'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    for (final mode in PracticeMode.values)
+                      _ModeCard(
+                        mode: mode,
+                        enabled:
+                            mode != PracticeMode.wrongReview || wrongCount > 0,
+                        badge: mode == PracticeMode.wrongReview &&
+                                wrongCount > 0
+                            ? '$wrongCount'
+                            : null,
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -77,52 +124,68 @@ class HomePage extends ConsumerWidget {
   }
 }
 
-/// 今日答題數、正確率、總體熟練進度。
-class _StatsCard extends StatelessWidget {
+/// 深靛藍頭部：問候、最佳連對、錯題本/設定入口。
+class _Header extends StatelessWidget {
   final Stats stats;
-  final double progress;
+  final int wrongCount;
 
-  const _StatsCard({required this.stats, required this.progress});
+  const _Header({required this.stats, required this.wrongCount});
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      color: AppColors.indigo,
+      padding: const EdgeInsets.fromLTRB(20, 0, 8, 24),
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('學習進度', style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(4),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  const Text(
+                    'おかえり！',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '🔥 最佳連對 ${stats.bestStreak}・今日 ${stats.todayTotal} 題',
+                    style: const TextStyle(
+                      color: AppColors.gold,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              '熟練度 ${(progress * 100).toStringAsFixed(1)}%',
-              style: Theme.of(context).textTheme.bodySmall,
+            IconButton(
+              tooltip: '錯題本',
+              icon: Badge(
+                isLabelVisible: wrongCount > 0,
+                label: Text('$wrongCount'),
+                backgroundColor: AppColors.gold,
+                textColor: AppColors.indigo,
+                child: const Icon(Icons.menu_book_outlined,
+                    color: Colors.white),
+              ),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const WrongListPage()),
+              ),
             ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _StatItem(label: '今日答題', value: '${stats.todayTotal}'),
-                _StatItem(
-                  label: '今日正確率',
-                  value: stats.todayTotal == 0
-                      ? '—'
-                      : '${(stats.todayAccuracy * 100).toStringAsFixed(0)}%',
-                ),
-                _StatItem(label: '總答題', value: '${stats.total}'),
-                _StatItem(
-                  label: '最佳連對',
-                  value: '${stats.bestStreak}',
-                  color: scheme.primary,
-                ),
-              ],
+            IconButton(
+              tooltip: '設定',
+              icon: const Icon(Icons.settings_outlined, color: Colors.white),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
+              ),
             ),
           ],
         ),
@@ -131,26 +194,148 @@ class _StatsCard extends StatelessWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? color;
+class _SectionTitle extends StatelessWidget {
+  final String text;
 
-  const _StatItem({required this.label, required this.value, this.color});
+  const _SectionTitle(this.text);
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(color: color, fontWeight: FontWeight.bold),
-        ),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+        color: AppColors.indigo,
+      ),
+    );
+  }
+}
+
+/// 白底統計卡：8px 圓角、3px 靛藍邊框。
+class _StatCard extends StatelessWidget {
+  final String value;
+  final String label;
+  final Color color;
+
+  const _StatCard({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        border: Border.all(color: AppColors.indigo, width: 3),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: color,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppColors.indigoFaded,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 分類進度列：色塊百分比 + 名稱 + 進度條。
+class _CategoryRow extends StatelessWidget {
+  final String name;
+  final String detail;
+  final double progress; // 0..1
+  final Color color;
+
+  const _CategoryRow({
+    required this.name,
+    required this.detail,
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = (progress * 100).round();
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        border: Border.all(color: AppColors.indigo, width: 2),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              '$pct',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: color == AppColors.gold ? AppColors.indigo : Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.indigoFaded,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: const Color(0x1422254A),
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -173,36 +358,55 @@ class _ModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: enabled
-            ? () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => PracticePage(mode: mode),
-                  ),
-                )
-            : null,
-        child: Opacity(
-          opacity: enabled ? 1 : 0.4,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return Opacity(
+      opacity: enabled ? 1 : 0.4,
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: InkWell(
+          onTap: enabled
+              ? () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PracticePage(mode: mode),
+                    ),
+                  )
+              : null,
+          borderRadius: BorderRadius.circular(AppTheme.radius),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppTheme.radius),
+              border: Border.all(color: AppColors.indigo, width: 2),
+            ),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(_icons[mode], color: scheme.primary),
-                    if (badge != null) ...[
-                      const SizedBox(width: 6),
-                      Badge(label: Text(badge!)),
-                    ],
-                  ],
+                Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: AppColors.indigo,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(_icons[mode], color: AppColors.gold, size: 16),
                 ),
-                const SizedBox(height: 8),
-                Text(mode.label, textAlign: TextAlign.center),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    mode.label,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.indigo,
+                    ),
+                  ),
+                ),
+                if (badge != null)
+                  Badge(
+                    label: Text(badge!),
+                    backgroundColor: AppColors.gold,
+                    textColor: AppColors.indigo,
+                  ),
               ],
             ),
           ),
