@@ -97,6 +97,28 @@ abstract class AppTheme {
           (s) => s.contains(WidgetState.selected) ? AppColors.indigo : null,
         ),
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.indigo,
+        indicatorColor: AppColors.gold,
+        height: 68,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontFamily: fontFamily,
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            color: states.contains(WidgetState.selected)
+                ? AppColors.gold
+                : Colors.white70,
+          ),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? AppColors.indigo
+                : Colors.white70,
+          ),
+        ),
+      ),
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: AppColors.indigo,
         contentTextStyle: TextStyle(
