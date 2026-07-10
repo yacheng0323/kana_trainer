@@ -128,6 +128,11 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
                                 color: AppColors.indigoFaded,
                               ),
                             ),
+                            // 答題後可聽完整句發音
+                            if (answered) ...[
+                              const SizedBox(height: 12),
+                              SpeakButton(text: state.current.jp),
+                            ],
                           ],
                         ),
                       ),

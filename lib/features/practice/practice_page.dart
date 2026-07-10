@@ -149,6 +149,8 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                                   ),
                                 ),
                               ),
+                            const SizedBox(height: 14),
+                            SpeakButton(text: state.current.kana),
                           ],
                         ),
                       ),
