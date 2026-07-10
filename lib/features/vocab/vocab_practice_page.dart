@@ -10,7 +10,7 @@ import '../practice/widgets/quiz_widgets.dart';
 import '../settings/settings_notifier.dart';
 import 'vocab_practice_controller.dart';
 
-/// 單字練習頁（M1：日→中 4 選 1），沿用 2c 設計與假名練習互動。
+/// 單字練習頁：日→中 / 中→日 4 選 1、讀音輸入（M2），沿用 2c 設計。
 class VocabPracticePage extends ConsumerStatefulWidget {
   final VocabPool pool;
 
@@ -21,23 +21,35 @@ class VocabPracticePage extends ConsumerStatefulWidget {
 }
 
 class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
+  final _inputController = TextEditingController();
+  final _focusNode = FocusNode();
   Timer? _autoNextTimer;
 
   @override
   void dispose() {
     _autoNextTimer?.cancel();
+    _inputController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   void _next() {
     _autoNextTimer?.cancel();
+    _inputController.clear();
     ref.read(vocabPracticeProvider(widget.pool).notifier).nextQuestion();
+  }
+
+  void _retry() {
+    _inputController.clear();
+    ref.read(vocabPracticeProvider(widget.pool).notifier).retry();
+    _focusNode.requestFocus();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(vocabPracticeProvider(widget.pool));
     final settings = ref.watch(settingsProvider);
+    final mode = state.mode;
 
     ref.listen(vocabPracticeProvider(widget.pool), (prev, next) {
       final fb = next.feedback;
@@ -60,12 +72,16 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
         : feedback.correct
             ? AppColors.green
             : AppColors.red;
-    // 長字自動縮小，避免溢出卡片
-    final jpSize = state.current.jp.length <= 3
+
+    // 題目卡主文字與提示
+    final prompt = mode == VocabMode.zhJp ? state.current.zh : state.current.jp;
+    final promptSize = prompt.length <= 3
         ? 64.0
-        : state.current.jp.length <= 5
+        : prompt.length <= 5
             ? 48.0
-            : 36.0;
+            : 34.0;
+    final showReading = mode == VocabMode.jpZh &&
+        state.current.reading != state.current.jp;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -85,7 +101,11 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                   child: Column(
                     children: [
                       Text(
-                        '${state.current.topic.label}・這個單字是什麼意思？',
+                        '${state.current.topic.label}・${switch (mode) {
+                          VocabMode.jpZh => '這個單字是什麼意思？',
+                          VocabMode.zhJp => '日文怎麼說？',
+                          VocabMode.reading => '這個單字怎麼念？',
+                        }}',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -108,16 +128,16 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                         child: Column(
                           children: [
                             Text(
-                              state.current.jp,
+                              prompt,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: jpSize,
+                                fontSize: promptSize,
                                 height: 1.1,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.indigo,
                               ),
                             ),
-                            if (state.current.reading != state.current.jp)
+                            if (showReading)
                               Padding(
                                 padding: const EdgeInsets.only(top: 10),
                                 child: Text(
@@ -132,7 +152,7 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                             Padding(
                               padding: const EdgeInsets.only(top: 6),
                               child: Text(
-                                'N${state.current.jlpt}',
+                                'N${state.current.jlpt}・${mode.label}',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
@@ -144,28 +164,38 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      GridView.count(
-                        crossAxisCount: 2,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 2.2,
-                        children: [
-                          for (var i = 0; i < state.options.length; i++)
-                            OptionButton(
-                              label: state.options[i],
-                              fontSize: 16,
-                              state: _optionState(i, state),
-                              onTap: feedback == null
-                                  ? () => ref
-                                      .read(vocabPracticeProvider(widget.pool)
-                                          .notifier)
-                                      .choose(i)
-                                  : null,
-                            ),
-                        ],
-                      ),
+                      if (mode == VocabMode.reading)
+                        _ReadingInput(
+                          controller: _inputController,
+                          focusNode: _focusNode,
+                          enabled: !answered,
+                          onSubmit: () => ref
+                              .read(vocabPracticeProvider(widget.pool).notifier)
+                              .submitReading(_inputController.text),
+                        )
+                      else
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 2.2,
+                          children: [
+                            for (var i = 0; i < state.options.length; i++)
+                              OptionButton(
+                                label: state.options[i],
+                                fontSize: 16,
+                                state: _optionState(i, state),
+                                onTap: feedback == null
+                                    ? () => ref
+                                        .read(vocabPracticeProvider(widget.pool)
+                                            .notifier)
+                                        .choose(i)
+                                    : null,
+                              ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
@@ -189,6 +219,9 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                         subtitle:
                             '${state.current.jp}（${state.current.reading}）= '
                             '${state.current.zh}',
+                        showRetry:
+                            mode == VocabMode.reading && !feedback.correct,
+                        onRetry: _retry,
                         onNext: _next,
                       )
                     : const SizedBox(height: 0),
@@ -206,5 +239,64 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
     if (index == state.correctIndex) return OptionState.correct;
     if (index == fb.chosenIndex) return OptionState.wrong;
     return OptionState.dimmed;
+  }
+}
+
+/// 讀音輸入區（接受假名或羅馬拼音）。
+class _ReadingInput extends StatelessWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool enabled;
+  final VoidCallback onSubmit;
+
+  const _ReadingInput({
+    required this.controller,
+    required this.focusNode,
+    required this.enabled,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 3),
+          ),
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            enabled: enabled,
+            autofocus: true,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: AppColors.indigo,
+            ),
+            decoration: const InputDecoration(
+              hintText: '輸入讀音（假名或羅馬拼音）',
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(vertical: 14),
+            ),
+            onSubmitted: (_) => onSubmit(),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: enabled ? onSubmit : null,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text('確認', style: TextStyle(fontSize: 17)),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

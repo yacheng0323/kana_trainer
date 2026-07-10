@@ -8,10 +8,13 @@ import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
 import '../vocab/vocab_practice_page.dart';
+import '../../core/data/vocab_data.dart';
 import '../progress/mastery_notifier.dart';
+import '../progress/srs_notifier.dart';
 import '../progress/stats_notifier.dart';
 import '../progress/wrong_list_page.dart';
 import '../progress/wrong_notifier.dart';
+import '../settings/settings_notifier.dart';
 import '../settings/settings_page.dart';
 
 class HomePage extends ConsumerWidget {
@@ -28,6 +31,13 @@ class HomePage extends ConsumerWidget {
 
     double catProgress(bool Function(Kana) where) => masteryNotifier
         .progressOf(allKana.where(where).map((k) => k.kana));
+
+    ref.watch(srsProvider);
+    final dueCount = ref
+        .read(srsProvider.notifier)
+        .dueKeys(allVocab.map((w) => w.key))
+        .length;
+    final dailyGoal = ref.watch(settingsProvider).dailyGoal;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -69,6 +79,8 @@ class HomePage extends ConsumerWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                _GoalCard(stats: stats, goal: dailyGoal),
                 const SizedBox(height: 22),
                 const _SectionTitle('分類進度'),
                 const SizedBox(height: 10),
@@ -130,15 +142,76 @@ class HomePage extends ConsumerWidget {
                   childAspectRatio: 1.9,
                   children: [
                     for (final pool in VocabPool.values)
-                      if (pool != VocabPool.wrongReview ||
-                          ref.watch(vocabWrongProvider).isNotEmpty)
+                      if ((pool != VocabPool.wrongReview ||
+                              ref.watch(vocabWrongProvider).isNotEmpty) &&
+                          (pool != VocabPool.dueReview || dueCount > 0))
                         _VocabCard(
                           pool: pool,
                           badge: pool == VocabPool.wrongReview
                               ? '${ref.watch(vocabWrongProvider).length}'
-                              : null,
+                              : pool == VocabPool.dueReview
+                                  ? '$dueCount'
+                                  : null,
                         ),
                   ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 每日目標進度 + 連續達標天數。
+class _GoalCard extends StatelessWidget {
+  final Stats stats;
+  final int goal;
+
+  const _GoalCard({required this.stats, required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = goal == 0 ? 1.0 : (stats.todayTotal / goal).clamp(0.0, 1.0);
+    final done = stats.todayTotal >= goal;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        border: Border.all(
+          color: done ? AppColors.green : AppColors.indigo,
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(done ? '🎉' : '🎯', style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  done
+                      ? '今日目標達成！連續 ${stats.goalStreakDays} 天'
+                      : '今日目標 ${stats.todayTotal}/$goal 題',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: done ? AppColors.green : AppColors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: const Color(0x1422254A),
+                    color: done ? AppColors.green : AppColors.gold,
+                  ),
                 ),
               ],
             ),
@@ -165,6 +238,7 @@ class _VocabCard extends StatelessWidget {
     VocabPool.daily: Icons.home,
     VocabPool.work: Icons.work,
     VocabPool.wrongReview: Icons.replay,
+    VocabPool.dueReview: Icons.event_repeat,
   };
 
   @override
