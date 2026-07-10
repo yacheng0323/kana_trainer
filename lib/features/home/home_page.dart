@@ -8,6 +8,9 @@ import '../../core/data/grammar_data.dart';
 import '../../core/models/sentence.dart';
 import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
+import '../exam/exam_history_notifier.dart';
+import '../exam/exam_history_page.dart';
+import '../exam/exam_page.dart';
 import '../grammar/grammar_list_page.dart';
 import '../grammar/grammar_progress_notifier.dart';
 import '../listening/listening_page.dart';
@@ -192,10 +195,110 @@ class HomePage extends ConsumerWidget {
                   doneCount: ref.watch(grammarProgressProvider).length,
                   total: allGrammar.length,
                 ),
+                const SizedBox(height: 22),
+                const _SectionTitle('檢定'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    _EntryCard(
+                      icon: Icons.assignment,
+                      iconBg: AppColors.red,
+                      label: 'N5 模擬測驗',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ExamPage()),
+                      ),
+                    ),
+                    _EntryCard(
+                      icon: Icons.insights,
+                      iconBg: AppColors.green,
+                      label: '成績歷史',
+                      badge: ref.watch(examHistoryProvider).isEmpty
+                          ? null
+                          : '${ref.watch(examHistoryProvider).length}',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const ExamHistoryPage()),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 通用入口小卡。
+class _EntryCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final String label;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _EntryCard({
+    required this.icon,
+    required this.iconBg,
+    required this.label,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(icon, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Badge(
+                  label: Text(badge!),
+                  backgroundColor: AppColors.gold,
+                  textColor: AppColors.indigo,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
