@@ -4,12 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/storage/prefs_provider.dart';
 
-/// 作答方式：4 選 1（預設，設計稿 2c）或鍵盤輸入羅馬拼音。
+/// 假名作答方式：4 選 1（預設，設計稿 2c）或鍵盤輸入羅馬拼音。
 enum AnswerMode { choice, input }
+
+/// 單字題型（M2）。
+enum VocabMode {
+  jpZh('日 → 中'),
+  zhJp('中 → 日'),
+  reading('讀音輸入');
+
+  final String label;
+  const VocabMode(this.label);
+}
 
 /// App 設定。
 class Settings {
-  final AnswerMode answerMode; // 作答方式（預設選擇題）
+  final AnswerMode answerMode; // 假名作答方式（預設選擇題）
+  final VocabMode vocabMode; // 單字題型（預設日→中）
+  final int dailyGoal; // 每日目標題數
   final bool autoNext; // 答對後自動下一題
   final bool caseSensitive; // 區分大小寫（僅輸入模式，預設不區分）
   final bool showHint; // 顯示提示按鈕（僅輸入模式，首字母）
@@ -18,6 +30,8 @@ class Settings {
 
   const Settings({
     this.answerMode = AnswerMode.choice,
+    this.vocabMode = VocabMode.jpZh,
+    this.dailyGoal = 20,
     this.autoNext = true,
     this.caseSensitive = false,
     this.showHint = true,
@@ -27,6 +41,8 @@ class Settings {
 
   Map<String, dynamic> toJson() => {
         'answerMode': answerMode.name,
+        'vocabMode': vocabMode.name,
+        'dailyGoal': dailyGoal,
         'autoNext': autoNext,
         'caseSensitive': caseSensitive,
         'showHint': showHint,
@@ -37,6 +53,9 @@ class Settings {
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
         answerMode: AnswerMode.values.asNameMap()[json['answerMode']] ??
             AnswerMode.choice,
+        vocabMode:
+            VocabMode.values.asNameMap()[json['vocabMode']] ?? VocabMode.jpZh,
+        dailyGoal: json['dailyGoal'] as int? ?? 20,
         autoNext: json['autoNext'] as bool? ?? true,
         caseSensitive: json['caseSensitive'] as bool? ?? false,
         showHint: json['showHint'] as bool? ?? true,
@@ -46,6 +65,8 @@ class Settings {
 
   Settings copyWith({
     AnswerMode? answerMode,
+    VocabMode? vocabMode,
+    int? dailyGoal,
     bool? autoNext,
     bool? caseSensitive,
     bool? showHint,
@@ -54,6 +75,8 @@ class Settings {
   }) =>
       Settings(
         answerMode: answerMode ?? this.answerMode,
+        vocabMode: vocabMode ?? this.vocabMode,
+        dailyGoal: dailyGoal ?? this.dailyGoal,
         autoNext: autoNext ?? this.autoNext,
         caseSensitive: caseSensitive ?? this.caseSensitive,
         showHint: showHint ?? this.showHint,

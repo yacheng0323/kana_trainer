@@ -44,7 +44,8 @@ enum VocabPool {
   time('時間'),
   daily('日常'),
   work('職場'),
-  wrongReview('單字錯題複習');
+  wrongReview('單字錯題複習'),
+  dueReview('今日複習（SRS）');
 
   final String label;
   const VocabPool(this.label);
@@ -63,11 +64,14 @@ enum VocabPool {
   List<VocabWord> buildPool(
     List<VocabWord> allWords, {
     Set<String> wrongKeys = const {},
+    Set<String> dueKeys = const {},
   }) {
     return switch (this) {
       VocabPool.all => List.of(allWords),
       VocabPool.wrongReview =>
         allWords.where((w) => wrongKeys.contains(w.key)).toList(),
+      VocabPool.dueReview =>
+        allWords.where((w) => dueKeys.contains(w.key)).toList(),
       _ => allWords.where((w) => w.topic == topic).toList(),
     };
   }

@@ -51,6 +51,53 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Text(
+              '單字題型',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.indigo.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SegmentedButton<VocabMode>(
+              segments: [
+                for (final m in VocabMode.values)
+                  ButtonSegment(value: m, label: Text(m.label)),
+              ],
+              selected: {settings.vocabMode},
+              onSelectionChanged: (sel) =>
+                  notifier.update((s) => s.copyWith(vocabMode: sel.first)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ListTile(
+            title: const Text('每日目標題數'),
+            subtitle: Text('目前：${settings.dailyGoal} 題／天'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: settings.dailyGoal > 10
+                      ? () => notifier.update(
+                          (s) => s.copyWith(dailyGoal: s.dailyGoal - 10))
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: settings.dailyGoal < 200
+                      ? () => notifier.update(
+                          (s) => s.copyWith(dailyGoal: s.dailyGoal + 10))
+                      : null,
+                ),
+              ],
+            ),
+          ),
           const Divider(),
           SwitchListTile(
             title: const Text('答對自動下一題'),
