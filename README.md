@@ -2,6 +2,9 @@
 
 看假名、選（或打）羅馬拼音、即時判斷對錯的初學者練習 App。Flutter + Riverpod + SharedPreferences。
 
+> **v2 發展路線**（假名 → 單字 → 句子 → 文法 → N5 檢定）見 [docs/ROADMAP.md](docs/ROADMAP.md)。
+> **M1 已完成**：主題單字練習 — 7 主題 × 15 詞（N5），日→中 4 選 1，獨立單字錯題本（錯題頁雙 tab）。
+
 ## 設計風格：2c「深藍夜 x 金黃」
 
 依設計交付稿實作（高保真）：

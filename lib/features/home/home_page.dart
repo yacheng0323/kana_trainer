@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/data/kana_data.dart';
 import '../../core/models/kana.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
+import '../vocab/vocab_practice_page.dart';
 import '../progress/mastery_notifier.dart';
 import '../progress/stats_notifier.dart';
 import '../progress/wrong_list_page.dart';
@@ -17,7 +19,8 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wrongCount = ref.watch(wrongProvider).length;
+    final wrongCount =
+        ref.watch(wrongProvider).length + ref.watch(vocabWrongProvider).length;
     final stats = ref.watch(statsProvider);
     final mastery = ref.watch(masteryProvider);
     final masteryNotifier = ref.read(masteryProvider.notifier);
@@ -93,7 +96,7 @@ class HomePage extends ConsumerWidget {
                   color: AppColors.gold,
                 ),
                 const SizedBox(height: 22),
-                const _SectionTitle('選擇練習模式'),
+                const _SectionTitle('假名練習'),
                 const SizedBox(height: 10),
                 GridView.count(
                   crossAxisCount: 2,
@@ -106,19 +109,113 @@ class HomePage extends ConsumerWidget {
                     for (final mode in PracticeMode.values)
                       _ModeCard(
                         mode: mode,
-                        enabled:
-                            mode != PracticeMode.wrongReview || wrongCount > 0,
+                        enabled: mode != PracticeMode.wrongReview ||
+                            ref.watch(wrongProvider).isNotEmpty,
                         badge: mode == PracticeMode.wrongReview &&
-                                wrongCount > 0
-                            ? '$wrongCount'
+                                ref.watch(wrongProvider).isNotEmpty
+                            ? '${ref.watch(wrongProvider).length}'
                             : null,
                       ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('單字練習（N5）'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    for (final pool in VocabPool.values)
+                      if (pool != VocabPool.wrongReview ||
+                          ref.watch(vocabWrongProvider).isNotEmpty)
+                        _VocabCard(
+                          pool: pool,
+                          badge: pool == VocabPool.wrongReview
+                              ? '${ref.watch(vocabWrongProvider).length}'
+                              : null,
+                        ),
                   ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _VocabCard extends StatelessWidget {
+  final VocabPool pool;
+  final String? badge;
+
+  const _VocabCard({required this.pool, this.badge});
+
+  static const _icons = {
+    VocabPool.all: Icons.style,
+    VocabPool.travel: Icons.luggage,
+    VocabPool.transport: Icons.train,
+    VocabPool.food: Icons.ramen_dining,
+    VocabPool.shopping: Icons.shopping_bag,
+    VocabPool.time: Icons.schedule,
+    VocabPool.daily: Icons.home,
+    VocabPool.work: Icons.work,
+    VocabPool.wrongReview: Icons.replay,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => VocabPracticePage(pool: pool)),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.gold,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child:
+                    Icon(_icons[pool], color: AppColors.indigo, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  pool.label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Badge(
+                  label: Text(badge!),
+                  backgroundColor: AppColors.gold,
+                  textColor: AppColors.indigo,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

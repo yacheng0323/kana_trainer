@@ -20,7 +20,9 @@ void main() {
     expect(find.text('已學會'), findsOneWidget);
     expect(find.text('今日答題'), findsOneWidget);
     expect(find.text('分類進度'), findsOneWidget);
-    expect(find.text('選擇練習模式'), findsOneWidget);
+    expect(find.text('假名練習'), findsOneWidget);
+    expect(find.text('單字練習（N5）'), findsOneWidget);
+    expect(find.text('全部單字'), findsOneWidget);
     expect(find.text('平假名練習'), findsOneWidget);
     expect(find.text('片假名練習'), findsOneWidget);
     expect(find.text('濁音・半濁音練習'), findsOneWidget);
