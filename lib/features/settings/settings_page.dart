@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/ai/ai_quiz_service.dart';
 import '../../core/storage/backup_service.dart';
 import '../../core/storage/prefs_provider.dart';
 import '../../core/theme/app_theme.dart';
@@ -157,6 +158,17 @@ class SettingsPage extends ConsumerWidget {
           ),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.key, color: AppColors.indigo),
+            title: const Text('Claude API Key（AI 出題用）'),
+            subtitle: Text(
+              ref.watch(apiKeyProvider).isEmpty
+                  ? '未設定 — AI 出題功能需要'
+                  : '已設定（僅存本機，不會被備份匯出）',
+            ),
+            onTap: () => _showApiKeyDialog(context, ref),
+          ),
+          const Divider(),
+          ListTile(
             leading: const Icon(Icons.upload, color: AppColors.indigo),
             title: const Text('匯出學習資料'),
             subtitle: const Text('複製備份 JSON 到剪貼簿'),
@@ -179,6 +191,54 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _showApiKeyDialog(BuildContext context, WidgetRef ref) async {
+    final controller =
+        TextEditingController(text: ref.read(apiKeyProvider));
+    final key = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Claude API Key'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '到 platform.claude.com 建立 API Key 後貼上。\n'
+              '僅儲存在本機，清空後儲存即可移除。',
+              style: TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              obscureText: true,
+              decoration: const InputDecoration(
+                hintText: 'sk-ant-…',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text),
+            child: const Text('儲存'),
+          ),
+        ],
+      ),
+    );
+    if (key == null) return;
+    ref.read(apiKeyProvider.notifier).set(key);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(key.trim().isEmpty ? '已移除 API Key' : '已儲存 API Key')),
+      );
+    }
   }
 
   Future<void> _showImportDialog(BuildContext context, WidgetRef ref) async {
