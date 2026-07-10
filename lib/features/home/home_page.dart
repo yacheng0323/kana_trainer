@@ -4,9 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/data/kana_data.dart';
 import '../../core/models/kana.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/data/grammar_data.dart';
 import '../../core/models/sentence.dart';
 import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
+import '../grammar/grammar_list_page.dart';
+import '../grammar/grammar_progress_notifier.dart';
 import '../practice/practice_page.dart';
 import '../sentence/sentence_practice_page.dart';
 import '../vocab/vocab_practice_page.dart';
@@ -180,10 +183,96 @@ class HomePage extends ConsumerWidget {
                         ),
                   ],
                 ),
+                const SizedBox(height: 22),
+                const _SectionTitle('文法'),
+                const SizedBox(height: 10),
+                _GrammarEntryCard(
+                  doneCount: ref.watch(grammarProgressProvider).length,
+                  total: allGrammar.length,
+                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 文法課入口卡（顯示完成進度）。
+class _GrammarEntryCard extends StatelessWidget {
+  final int doneCount;
+  final int total;
+
+  const _GrammarEntryCard({required this.doneCount, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const GrammarListPage()),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.red,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.menu_book,
+                    color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'N5 文法課程',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.indigo,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: total == 0 ? 0 : doneCount / total,
+                        minHeight: 6,
+                        backgroundColor: const Color(0x1422254A),
+                        color: AppColors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '$doneCount/$total',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.indigo,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
