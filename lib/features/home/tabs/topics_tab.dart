@@ -6,6 +6,7 @@ import '../../../core/data/vocab_data.dart';
 import '../../../core/models/sentence.dart';
 import '../../../core/models/vocab.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../ai_quiz/ai_quiz_page.dart';
 import '../../grammar/grammar_list_page.dart';
 import '../../grammar/grammar_progress_notifier.dart';
 import '../../listening/listening_page.dart';
@@ -129,6 +130,22 @@ class TopicsTab extends ConsumerWidget {
               _GrammarEntryCard(
                 doneCount: grammarDone,
                 total: allGrammar.length,
+              ),
+              const SizedBox(height: 22),
+              const SectionTitle('AI 出題'),
+              const SizedBox(height: 10),
+              EntryGrid(
+                children: [
+                  EntryCard(
+                    icon: Icons.auto_awesome,
+                    iconBg: AppColors.gold,
+                    iconColor: AppColors.indigo,
+                    label: 'AI 全新題目',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AiQuizPage()),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
