@@ -63,3 +63,9 @@ final wrongProvider = NotifierProvider<WrongNotifier, Map<String, int>>(
 final vocabWrongProvider = NotifierProvider<WrongNotifier, Map<String, int>>(
   () => WrongNotifier('vocab_wrong'),
 );
+
+/// 句子錯題本（M3）。
+final sentenceWrongProvider =
+    NotifierProvider<WrongNotifier, Map<String, int>>(
+  () => WrongNotifier('sentence_wrong'),
+);

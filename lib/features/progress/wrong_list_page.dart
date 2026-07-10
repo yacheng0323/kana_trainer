@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/kana_data.dart';
+import '../../core/data/sentence_data.dart';
 import '../../core/data/vocab_data.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/models/sentence.dart';
 import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
+import '../sentence/sentence_practice_page.dart';
 import '../vocab/vocab_practice_page.dart';
 import 'wrong_notifier.dart';
 
-/// 錯題本：假名 / 單字 雙 tab，各自可重練、單筆移除、全部清除。
+/// 錯題本：假名 / 單字 / 句子 三 tab，各自可重練、單筆移除、全部清除。
 class WrongListPage extends ConsumerWidget {
   const WrongListPage({super.key});
 
@@ -18,9 +21,10 @@ class WrongListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final kanaWrong = ref.watch(wrongProvider);
     final vocabWrong = ref.watch(vocabWrongProvider);
+    final sentenceWrong = ref.watch(sentenceWrongProvider);
 
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         backgroundColor: AppColors.cream,
         appBar: AppBar(
@@ -36,6 +40,7 @@ class WrongListPage extends ConsumerWidget {
             tabs: [
               Tab(text: '假名（${kanaWrong.length}）'),
               Tab(text: '單字（${vocabWrong.length}）'),
+              Tab(text: '句子（${sentenceWrong.length}）'),
             ],
           ),
         ),
@@ -72,6 +77,19 @@ class WrongListPage extends ConsumerWidget {
                 MaterialPageRoute(
                   builder: (_) =>
                       const VocabPracticePage(pool: VocabPool.wrongReview),
+                ),
+              ),
+            ),
+            _WrongList(
+              entries: sentenceWrong,
+              provider: sentenceWrongProvider,
+              titleOf: (key) => findSentence(key)?.jp ?? key,
+              subtitleOf: (key) => findSentence(key)?.zh,
+              leadingOf: (key) => findSentence(key)?.scene.label ?? '句',
+              onRetrain: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const SentencePracticePage(pool: ScenePool.wrongReview),
                 ),
               ),
             ),
