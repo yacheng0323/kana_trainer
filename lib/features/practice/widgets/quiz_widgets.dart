@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/audio/tts_service.dart';
 import '../../../core/theme/app_theme.dart';
 import 'shake.dart';
+
+/// 發音按鈕（設計稿 2c：深靛藍方塊 + 金黃喇叭）。
+class SpeakButton extends ConsumerWidget {
+  final String text;
+  final double size;
+
+  const SpeakButton({super.key, required this.text, this.size = 38});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Material(
+      color: AppColors.indigo,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => ref.read(ttsProvider).speak(text),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Icon(Icons.volume_up, color: AppColors.gold, size: size * .5),
+        ),
+      ),
+    );
+  }
+}
 
 /// 深靛藍頂部：返回、標題、連對火焰、session 分數、5 段進度。
 /// 假名與單字練習頁共用。

@@ -10,6 +10,7 @@ import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
 import '../grammar/grammar_list_page.dart';
 import '../grammar/grammar_progress_notifier.dart';
+import '../listening/listening_page.dart';
 import '../practice/practice_page.dart';
 import '../sentence/sentence_practice_page.dart';
 import '../vocab/vocab_practice_page.dart';
@@ -147,6 +148,7 @@ class HomePage extends ConsumerWidget {
                   crossAxisSpacing: 12,
                   childAspectRatio: 1.9,
                   children: [
+                    const _ListeningCard(),
                     for (final pool in VocabPool.values)
                       if ((pool != VocabPool.wrongReview ||
                               ref.watch(vocabWrongProvider).isNotEmpty) &&
@@ -194,6 +196,58 @@ class HomePage extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 聽力測驗入口卡。
+class _ListeningCard extends StatelessWidget {
+  const _ListeningCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ListeningPage()),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.indigo,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.headphones,
+                    color: AppColors.gold, size: 16),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  '聽力測驗',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

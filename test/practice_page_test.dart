@@ -44,7 +44,10 @@ void main() {
       }
       expect(find.byType(TextField), findsNothing); // 選擇題模式無輸入框
 
-      await tester.tap(find.text(state.options[state.correctIndex]));
+      final correctOption = find.text(state.options[state.correctIndex]);
+      await tester.ensureVisible(correctOption);
+      await tester.pump();
+      await tester.tap(correctOption);
       await tester.pump();
 
       expect(find.text('答對了！'), findsOneWidget);
@@ -63,7 +66,10 @@ void main() {
       final state = container.read(practiceProvider(PracticeMode.katakana));
       final wrongIndex = state.correctIndex == 0 ? 1 : 0;
 
-      await tester.tap(find.text(state.options[wrongIndex]));
+      final wrongOption = find.text(state.options[wrongIndex]);
+      await tester.ensureVisible(wrongOption);
+      await tester.pump();
+      await tester.tap(wrongOption);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500)); // shake 結束
 
@@ -89,7 +95,10 @@ void main() {
       final state = container.read(practiceProvider(PracticeMode.hiragana));
       final wrongIndex = state.correctIndex == 0 ? 1 : 0;
 
-      await tester.tap(find.text(state.options[wrongIndex]));
+      final wrongOption = find.text(state.options[wrongIndex]);
+      await tester.ensureVisible(wrongOption);
+      await tester.pump();
+      await tester.tap(wrongOption);
       await tester.pump(const Duration(milliseconds: 500));
       await tester.tap(find.text(state.options[state.correctIndex]),
           warnIfMissed: false);

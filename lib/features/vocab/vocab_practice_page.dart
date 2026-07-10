@@ -160,6 +160,11 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                                 ),
                               ),
                             ),
+                            // 讀音輸入模式聽發音等於作弊，答題後才顯示
+                            if (mode != VocabMode.reading || answered) ...[
+                              const SizedBox(height: 12),
+                              SpeakButton(text: state.current.jp),
+                            ],
                           ],
                         ),
                       ),
