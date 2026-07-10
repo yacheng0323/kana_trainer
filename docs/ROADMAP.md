@@ -35,6 +35,9 @@
 | **M6** | N5 模擬測驗（20 題/10 分計時）、成績歷史、**本機備份匯出/匯入**（範圍調整：雲端同步→本機備份，開 Supabase 需使用者帳號與費用決策，列入後續） | ✅ 2026-07-10 |
 
 > **v2.0.0（2026-07-10）＝ M1~M6 全部完成。** 75 tests 全綠。
+> **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
+> （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
+> 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。
 > 未落地項（需使用者決策）：Supabase 雲端同步、Google Play 上架（正式 keystore、隱私權政策）。
 
 ---

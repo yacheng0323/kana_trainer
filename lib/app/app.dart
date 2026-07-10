@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
-import '../features/home/home_page.dart';
+import 'main_shell.dart';
 
 class KanaTrainerApp extends StatelessWidget {
   const KanaTrainerApp({super.key});
@@ -13,7 +13,7 @@ class KanaTrainerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       // 2c「深藍夜 x 金黃」為單一亮色設計，不做深色變體
       theme: AppTheme.light,
-      home: const HomePage(),
+      home: const MainShell(),
     );
   }
 }
