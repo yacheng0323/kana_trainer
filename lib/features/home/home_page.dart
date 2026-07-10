@@ -4,12 +4,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/data/kana_data.dart';
 import '../../core/models/kana.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/data/grammar_data.dart';
+import '../../core/models/sentence.dart';
+import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
+import '../exam/exam_history_notifier.dart';
+import '../exam/exam_history_page.dart';
+import '../exam/exam_page.dart';
+import '../grammar/grammar_list_page.dart';
+import '../grammar/grammar_progress_notifier.dart';
+import '../listening/listening_page.dart';
 import '../practice/practice_page.dart';
+import '../sentence/sentence_practice_page.dart';
+import '../vocab/vocab_practice_page.dart';
+import '../../core/data/vocab_data.dart';
 import '../progress/mastery_notifier.dart';
+import '../progress/srs_notifier.dart';
 import '../progress/stats_notifier.dart';
 import '../progress/wrong_list_page.dart';
 import '../progress/wrong_notifier.dart';
+import '../settings/settings_notifier.dart';
 import '../settings/settings_page.dart';
 
 class HomePage extends ConsumerWidget {
@@ -17,7 +31,9 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wrongCount = ref.watch(wrongProvider).length;
+    final wrongCount = ref.watch(wrongProvider).length +
+        ref.watch(vocabWrongProvider).length +
+        ref.watch(sentenceWrongProvider).length;
     final stats = ref.watch(statsProvider);
     final mastery = ref.watch(masteryProvider);
     final masteryNotifier = ref.read(masteryProvider.notifier);
@@ -25,6 +41,13 @@ class HomePage extends ConsumerWidget {
 
     double catProgress(bool Function(Kana) where) => masteryNotifier
         .progressOf(allKana.where(where).map((k) => k.kana));
+
+    ref.watch(srsProvider);
+    final dueCount = ref
+        .read(srsProvider.notifier)
+        .dueKeys(allVocab.map((w) => w.key))
+        .length;
+    final dailyGoal = ref.watch(settingsProvider).dailyGoal;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -66,6 +89,8 @@ class HomePage extends ConsumerWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                _GoalCard(stats: stats, goal: dailyGoal),
                 const SizedBox(height: 22),
                 const _SectionTitle('分類進度'),
                 const SizedBox(height: 10),
@@ -93,7 +118,7 @@ class HomePage extends ConsumerWidget {
                   color: AppColors.gold,
                 ),
                 const SizedBox(height: 22),
-                const _SectionTitle('選擇練習模式'),
+                const _SectionTitle('假名練習'),
                 const SizedBox(height: 10),
                 GridView.count(
                   crossAxisCount: 2,
@@ -106,19 +131,505 @@ class HomePage extends ConsumerWidget {
                     for (final mode in PracticeMode.values)
                       _ModeCard(
                         mode: mode,
-                        enabled:
-                            mode != PracticeMode.wrongReview || wrongCount > 0,
+                        enabled: mode != PracticeMode.wrongReview ||
+                            ref.watch(wrongProvider).isNotEmpty,
                         badge: mode == PracticeMode.wrongReview &&
-                                wrongCount > 0
-                            ? '$wrongCount'
+                                ref.watch(wrongProvider).isNotEmpty
+                            ? '${ref.watch(wrongProvider).length}'
                             : null,
                       ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('單字練習（N5）'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    const _ListeningCard(),
+                    for (final pool in VocabPool.values)
+                      if ((pool != VocabPool.wrongReview ||
+                              ref.watch(vocabWrongProvider).isNotEmpty) &&
+                          (pool != VocabPool.dueReview || dueCount > 0))
+                        _VocabCard(
+                          pool: pool,
+                          badge: pool == VocabPool.wrongReview
+                              ? '${ref.watch(vocabWrongProvider).length}'
+                              : pool == VocabPool.dueReview
+                                  ? '$dueCount'
+                                  : null,
+                        ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('情境句子'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    for (final pool in ScenePool.values)
+                      if (pool != ScenePool.wrongReview ||
+                          ref.watch(sentenceWrongProvider).isNotEmpty)
+                        _SceneCard(
+                          pool: pool,
+                          badge: pool == ScenePool.wrongReview
+                              ? '${ref.watch(sentenceWrongProvider).length}'
+                              : null,
+                        ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('文法'),
+                const SizedBox(height: 10),
+                _GrammarEntryCard(
+                  doneCount: ref.watch(grammarProgressProvider).length,
+                  total: allGrammar.length,
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle('檢定'),
+                const SizedBox(height: 10),
+                GridView.count(
+                  crossAxisCount: 2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: 1.9,
+                  children: [
+                    _EntryCard(
+                      icon: Icons.assignment,
+                      iconBg: AppColors.red,
+                      label: 'N5 模擬測驗',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const ExamPage()),
+                      ),
+                    ),
+                    _EntryCard(
+                      icon: Icons.insights,
+                      iconBg: AppColors.green,
+                      label: '成績歷史',
+                      badge: ref.watch(examHistoryProvider).isEmpty
+                          ? null
+                          : '${ref.watch(examHistoryProvider).length}',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const ExamHistoryPage()),
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 通用入口小卡。
+class _EntryCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final String label;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _EntryCard({
+    required this.icon,
+    required this.iconBg,
+    required this.label,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(icon, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Badge(
+                  label: Text(badge!),
+                  backgroundColor: AppColors.gold,
+                  textColor: AppColors.indigo,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 聽力測驗入口卡。
+class _ListeningCard extends StatelessWidget {
+  const _ListeningCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const ListeningPage()),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.indigo,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.headphones,
+                    color: AppColors.gold, size: 16),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  '聽力測驗',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 文法課入口卡（顯示完成進度）。
+class _GrammarEntryCard extends StatelessWidget {
+  final int doneCount;
+  final int total;
+
+  const _GrammarEntryCard({required this.doneCount, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const GrammarListPage()),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.red,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.menu_book,
+                    color: Colors.white, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'N5 文法課程',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.indigo,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: total == 0 ? 0 : doneCount / total,
+                        minHeight: 6,
+                        backgroundColor: const Color(0x1422254A),
+                        color: AppColors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '$doneCount/$total',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.indigo,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SceneCard extends StatelessWidget {
+  final ScenePool pool;
+  final String? badge;
+
+  const _SceneCard({required this.pool, this.badge});
+
+  static const _icons = {
+    ScenePool.all: Icons.forum,
+    ScenePool.airport: Icons.flight,
+    ScenePool.train: Icons.directions_subway,
+    ScenePool.hotel: Icons.hotel,
+    ScenePool.restaurant: Icons.restaurant,
+    ScenePool.shopping: Icons.storefront,
+    ScenePool.wrongReview: Icons.replay,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => SentencePracticePage(pool: pool)),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.green,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(_icons[pool], color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  pool.label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Badge(
+                  label: Text(badge!),
+                  backgroundColor: AppColors.gold,
+                  textColor: AppColors.indigo,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 每日目標進度 + 連續達標天數。
+class _GoalCard extends StatelessWidget {
+  final Stats stats;
+  final int goal;
+
+  const _GoalCard({required this.stats, required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = goal == 0 ? 1.0 : (stats.todayTotal / goal).clamp(0.0, 1.0);
+    final done = stats.todayTotal >= goal;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        border: Border.all(
+          color: done ? AppColors.green : AppColors.indigo,
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(done ? '🎉' : '🎯', style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  done
+                      ? '今日目標達成！連續 ${stats.goalStreakDays} 天'
+                      : '今日目標 ${stats.todayTotal}/$goal 題',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: done ? AppColors.green : AppColors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: const Color(0x1422254A),
+                    color: done ? AppColors.green : AppColors.gold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VocabCard extends StatelessWidget {
+  final VocabPool pool;
+  final String? badge;
+
+  const _VocabCard({required this.pool, this.badge});
+
+  static const _icons = {
+    VocabPool.all: Icons.style,
+    VocabPool.travel: Icons.luggage,
+    VocabPool.transport: Icons.train,
+    VocabPool.food: Icons.ramen_dining,
+    VocabPool.shopping: Icons.shopping_bag,
+    VocabPool.time: Icons.schedule,
+    VocabPool.daily: Icons.home,
+    VocabPool.work: Icons.work,
+    VocabPool.wrongReview: Icons.replay,
+    VocabPool.dueReview: Icons.event_repeat,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(AppTheme.radius),
+      child: InkWell(
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => VocabPracticePage(pool: pool)),
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+            border: Border.all(color: AppColors.indigo, width: 2),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.gold,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child:
+                    Icon(_icons[pool], color: AppColors.indigo, size: 16),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  pool.label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.indigo,
+                  ),
+                ),
+              ),
+              if (badge != null)
+                Badge(
+                  label: Text(badge!),
+                  backgroundColor: AppColors.gold,
+                  textColor: AppColors.indigo,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

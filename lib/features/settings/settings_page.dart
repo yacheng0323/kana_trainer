@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/storage/backup_service.dart';
+import '../../core/storage/prefs_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../exam/exam_history_notifier.dart';
+import '../grammar/grammar_progress_notifier.dart';
+import '../progress/mastery_notifier.dart';
+import '../progress/srs_notifier.dart';
+import '../progress/stats_notifier.dart';
+import '../progress/wrong_notifier.dart';
 import 'settings_notifier.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -51,6 +60,53 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Text(
+              '單字題型',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.indigo.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SegmentedButton<VocabMode>(
+              segments: [
+                for (final m in VocabMode.values)
+                  ButtonSegment(value: m, label: Text(m.label)),
+              ],
+              selected: {settings.vocabMode},
+              onSelectionChanged: (sel) =>
+                  notifier.update((s) => s.copyWith(vocabMode: sel.first)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          ListTile(
+            title: const Text('每日目標題數'),
+            subtitle: Text('目前：${settings.dailyGoal} 題／天'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: settings.dailyGoal > 10
+                      ? () => notifier.update(
+                          (s) => s.copyWith(dailyGoal: s.dailyGoal - 10))
+                      : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: settings.dailyGoal < 200
+                      ? () => notifier.update(
+                          (s) => s.copyWith(dailyGoal: s.dailyGoal + 10))
+                      : null,
+                ),
+              ],
+            ),
+          ),
           const Divider(),
           SwitchListTile(
             title: const Text('答對自動下一題'),
@@ -99,8 +155,85 @@ class SettingsPage extends ConsumerWidget {
                 ? (v) => notifier.update((s) => s.copyWith(romajiHint: v))
                 : null,
           ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.upload, color: AppColors.indigo),
+            title: const Text('匯出學習資料'),
+            subtitle: const Text('複製備份 JSON 到剪貼簿'),
+            onTap: () async {
+              final json = BackupService.export(ref.read(prefsProvider));
+              await Clipboard.setData(ClipboardData(text: json));
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('已複製到剪貼簿，貼到記事本保存即可')),
+                );
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.download, color: AppColors.indigo),
+            title: const Text('匯入學習資料'),
+            subtitle: const Text('貼上先前匯出的備份 JSON（覆蓋現有進度）'),
+            onTap: () => _showImportDialog(context, ref),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _showImportDialog(BuildContext context, WidgetRef ref) async {
+    final controller = TextEditingController();
+    final json = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('匯入學習資料'),
+        content: TextField(
+          controller: controller,
+          maxLines: 6,
+          decoration: const InputDecoration(
+            hintText: '貼上備份 JSON…',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, controller.text),
+            child: const Text('匯入'),
+          ),
+        ],
+      ),
+    );
+    if (json == null || json.trim().isEmpty) return;
+
+    try {
+      final count =
+          await BackupService.import(ref.read(prefsProvider), json.trim());
+      // 重建所有讀 prefs 的 provider，讓匯入立即生效
+      ref
+        ..invalidate(settingsProvider)
+        ..invalidate(masteryProvider)
+        ..invalidate(wrongProvider)
+        ..invalidate(vocabWrongProvider)
+        ..invalidate(sentenceWrongProvider)
+        ..invalidate(srsProvider)
+        ..invalidate(statsProvider)
+        ..invalidate(grammarProgressProvider)
+        ..invalidate(examHistoryProvider);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('匯入完成（$count 項資料）')),
+        );
+      }
+    } on FormatException catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('匯入失敗：${e.message}')),
+        );
+      }
+    }
   }
 }

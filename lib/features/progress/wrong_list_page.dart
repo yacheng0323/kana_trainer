@@ -2,60 +2,137 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/data/kana_data.dart';
+import '../../core/data/sentence_data.dart';
+import '../../core/data/vocab_data.dart';
 import '../../core/models/practice_mode.dart';
+import '../../core/models/sentence.dart';
+import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
 import '../practice/practice_page.dart';
+import '../sentence/sentence_practice_page.dart';
+import '../vocab/vocab_practice_page.dart';
 import 'wrong_notifier.dart';
 
+/// 錯題本：假名 / 單字 / 句子 三 tab，各自可重練、單筆移除、全部清除。
 class WrongListPage extends ConsumerWidget {
   const WrongListPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final wrong = ref.watch(wrongProvider);
-    final entries = wrong.entries.toList()
+    final kanaWrong = ref.watch(wrongProvider);
+    final vocabWrong = ref.watch(vocabWrongProvider);
+    final sentenceWrong = ref.watch(sentenceWrongProvider);
+
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: AppColors.cream,
+        appBar: AppBar(
+          title: const Text('錯題本'),
+          bottom: TabBar(
+            indicatorColor: AppColors.gold,
+            labelColor: AppColors.gold,
+            unselectedLabelColor: Colors.white70,
+            labelStyle: const TextStyle(
+              fontFamily: AppTheme.fontFamily,
+              fontWeight: FontWeight.w800,
+            ),
+            tabs: [
+              Tab(text: '假名（${kanaWrong.length}）'),
+              Tab(text: '單字（${vocabWrong.length}）'),
+              Tab(text: '句子（${sentenceWrong.length}）'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _WrongList(
+              entries: kanaWrong,
+              provider: wrongProvider,
+              titleOf: (key) => findKana(key)?.romaji ?? '',
+              subtitleOf: (key) {
+                final k = findKana(key);
+                return k != null && k.aliases.isNotEmpty
+                    ? '也可以：${k.aliases.join(' / ')}'
+                    : null;
+              },
+              leadingOf: (key) => key,
+              onRetrain: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const PracticePage(mode: PracticeMode.wrongReview),
+                ),
+              ),
+            ),
+            _WrongList(
+              entries: vocabWrong,
+              provider: vocabWrongProvider,
+              titleOf: (key) {
+                final w = findVocab(key);
+                return w == null ? '' : '${w.reading}・${w.zh}';
+              },
+              subtitleOf: (key) => findVocab(key)?.topic.label,
+              leadingOf: (key) => findVocab(key)?.jp ?? key,
+              onRetrain: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const VocabPracticePage(pool: VocabPool.wrongReview),
+                ),
+              ),
+            ),
+            _WrongList(
+              entries: sentenceWrong,
+              provider: sentenceWrongProvider,
+              titleOf: (key) => findSentence(key)?.jp ?? key,
+              subtitleOf: (key) => findSentence(key)?.zh,
+              leadingOf: (key) => findSentence(key)?.scene.label ?? '句',
+              onRetrain: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const SentencePracticePage(pool: ScenePool.wrongReview),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WrongList extends ConsumerWidget {
+  final Map<String, int> entries;
+  final NotifierProvider<WrongNotifier, Map<String, int>> provider;
+  final String Function(String key) titleOf;
+  final String? Function(String key) subtitleOf;
+  final String Function(String key) leadingOf;
+  final VoidCallback onRetrain;
+
+  const _WrongList({
+    required this.entries,
+    required this.provider,
+    required this.titleOf,
+    required this.subtitleOf,
+    required this.leadingOf,
+    required this.onRetrain,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sorted = entries.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value)); // 錯最多在前
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('錯題本'),
-        actions: [
-          if (wrong.isNotEmpty)
-            IconButton(
-              tooltip: '清除錯題',
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    title: const Text('清除所有錯題？'),
-                    content: const Text('此動作無法復原。'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text('取消'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text('清除'),
-                      ),
-                    ],
-                  ),
-                );
-                if (ok == true) ref.read(wrongProvider.notifier).clear();
-              },
-            ),
-        ],
-      ),
-      body: wrong.isEmpty
+      backgroundColor: AppColors.cream,
+      body: entries.isEmpty
           ? const Center(child: Text('目前沒有錯題，太棒了！'))
           : ListView.separated(
               padding: const EdgeInsets.all(16),
-              itemCount: entries.length,
+              itemCount: sorted.length,
               separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, i) {
-                final entry = entries[i];
-                final kana = findKana(entry.key);
+                final entry = sorted[i];
+                final subtitle = subtitleOf(entry.key);
                 return ListTile(
                   tileColor: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -63,23 +140,21 @@ class WrongListPage extends ConsumerWidget {
                     side: const BorderSide(color: AppColors.indigo, width: 2),
                   ),
                   leading: Text(
-                    entry.key,
+                    leadingOf(entry.key),
                     style: const TextStyle(
-                      fontSize: 28,
+                      fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: AppColors.indigo,
                     ),
                   ),
                   title: Text(
-                    kana?.romaji ?? '',
+                    titleOf(entry.key),
                     style: const TextStyle(
                       fontWeight: FontWeight.w800,
                       color: AppColors.indigo,
                     ),
                   ),
-                  subtitle: kana != null && kana.aliases.isNotEmpty
-                      ? Text('也可以：${kana.aliases.join(' / ')}')
-                      : null,
+                  subtitle: subtitle != null ? Text(subtitle) : null,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -103,29 +178,61 @@ class WrongListPage extends ConsumerWidget {
                         tooltip: '移除此錯題',
                         icon: const Icon(Icons.close),
                         onPressed: () =>
-                            ref.read(wrongProvider.notifier).remove(entry.key),
+                            ref.read(provider.notifier).remove(entry.key),
                       ),
                     ],
                   ),
                 );
               },
             ),
-      floatingActionButton: wrong.isEmpty
+      floatingActionButton: entries.isEmpty
           ? null
-          : FloatingActionButton.extended(
-              backgroundColor: AppColors.indigo,
-              foregroundColor: AppColors.gold,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radius),
-              ),
-              icon: const Icon(Icons.replay),
-              label: const Text('重新練習錯題'),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) =>
-                      const PracticePage(mode: PracticeMode.wrongReview),
+          : Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton.small(
+                  heroTag: null,
+                  backgroundColor: AppColors.red,
+                  foregroundColor: Colors.white,
+                  tooltip: '清除全部',
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radius),
+                  ),
+                  child: const Icon(Icons.delete_outline),
+                  onPressed: () async {
+                    final ok = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Text('清除所有錯題？'),
+                        content: const Text('此動作無法復原。'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('取消'),
+                          ),
+                          FilledButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('清除'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (ok == true) ref.read(provider.notifier).clear();
+                  },
                 ),
-              ),
+                const SizedBox(width: 10),
+                FloatingActionButton.extended(
+                  heroTag: null,
+                  backgroundColor: AppColors.indigo,
+                  foregroundColor: AppColors.gold,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.radius),
+                  ),
+                  icon: const Icon(Icons.replay),
+                  label: const Text('重新練習'),
+                  onPressed: onRetrain,
+                ),
+              ],
             ),
     );
   }

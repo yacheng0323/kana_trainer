@@ -4,27 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/kana.dart';
-import '../../core/models/practice_mode.dart';
+import '../../core/models/vocab.dart';
 import '../../core/theme/app_theme.dart';
+import '../practice/widgets/quiz_widgets.dart';
 import '../settings/settings_notifier.dart';
-import 'practice_controller.dart';
-import 'widgets/quiz_widgets.dart';
+import 'vocab_practice_controller.dart';
 
-class PracticePage extends ConsumerStatefulWidget {
-  final PracticeMode mode;
+/// 單字練習頁：日→中 / 中→日 4 選 1、讀音輸入（M2），沿用 2c 設計。
+class VocabPracticePage extends ConsumerStatefulWidget {
+  final VocabPool pool;
 
-  const PracticePage({super.key, required this.mode});
+  const VocabPracticePage({super.key, required this.pool});
 
   @override
-  ConsumerState<PracticePage> createState() => _PracticePageState();
+  ConsumerState<VocabPracticePage> createState() => _VocabPracticePageState();
 }
 
-class _PracticePageState extends ConsumerState<PracticePage> {
+class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
   final _inputController = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _autoNextTimer;
-  bool _hintShown = false;
 
   @override
   void dispose() {
@@ -37,31 +36,22 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   void _next() {
     _autoNextTimer?.cancel();
     _inputController.clear();
-    setState(() => _hintShown = false);
-    ref.read(practiceProvider(widget.mode).notifier).nextQuestion();
+    ref.read(vocabPracticeProvider(widget.pool).notifier).nextQuestion();
   }
 
   void _retry() {
     _inputController.clear();
-    ref.read(practiceProvider(widget.mode).notifier).retry();
+    ref.read(vocabPracticeProvider(widget.pool).notifier).retry();
     _focusNode.requestFocus();
   }
 
-  static String _categoryLabel(KanaCategory c) => switch (c) {
-        KanaCategory.seion => '清音',
-        KanaCategory.dakuon => '濁音',
-        KanaCategory.handakuon => '半濁音',
-        KanaCategory.youon => '拗音',
-      };
-
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(practiceProvider(widget.mode));
+    final state = ref.watch(vocabPracticeProvider(widget.pool));
     final settings = ref.watch(settingsProvider);
-    final isChoice = settings.answerMode == AnswerMode.choice;
+    final mode = state.mode;
 
-    // 作答後音效/震動/自動下一題
-    ref.listen(practiceProvider(widget.mode), (prev, next) {
+    ref.listen(vocabPracticeProvider(widget.pool), (prev, next) {
       final fb = next.feedback;
       if (fb == null || prev?.feedback != null) return;
       if (settings.sound) {
@@ -82,8 +72,16 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         : feedback.correct
             ? AppColors.green
             : AppColors.red;
-    final others =
-        feedback == null ? const <String>[] : feedback.accepted.skip(1).toList();
+
+    // 題目卡主文字與提示
+    final prompt = mode == VocabMode.zhJp ? state.current.zh : state.current.jp;
+    final promptSize = prompt.length <= 3
+        ? 64.0
+        : prompt.length <= 5
+            ? 48.0
+            : 34.0;
+    final showReading = mode == VocabMode.jpZh &&
+        state.current.reading != state.current.jp;
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -92,7 +90,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
           Column(
             children: [
               PracticeHeader(
-                title: widget.mode.label,
+                title: '單字・${widget.pool.label}',
                 streak: state.streak,
                 sessionCorrect: state.sessionCorrect,
                 sessionTotal: state.sessionTotal,
@@ -103,7 +101,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                   child: Column(
                     children: [
                       Text(
-                        '${_categoryLabel(state.current.category)}・這個假名怎麼念？',
+                        '${state.current.topic.label}・${switch (mode) {
+                          VocabMode.jpZh => '這個單字是什麼意思？',
+                          VocabMode.zhJp => '日文怎麼說？',
+                          VocabMode.reading => '這個單字怎麼念？',
+                        }}',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -112,12 +114,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // 假名卡片：白底、8px 圓角、4px 狀態邊框、硬陰影
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                            vertical: 32, horizontal: 16),
+                            vertical: 36, horizontal: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -127,21 +128,20 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         child: Column(
                           children: [
                             Text(
-                              state.current.kana,
-                              style: const TextStyle(
-                                fontSize: 92,
-                                height: 1,
+                              prompt,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: promptSize,
+                                height: 1.1,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.indigo,
                               ),
                             ),
-                            if (!isChoice && (settings.romajiHint || _hintShown))
+                            if (showReading)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.only(top: 10),
                                 child: Text(
-                                  settings.romajiHint
-                                      ? state.current.romaji
-                                      : '提示：${state.current.romaji[0]}...',
+                                  state.current.reading,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
@@ -149,13 +149,36 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                                   ),
                                 ),
                               ),
-                            const SizedBox(height: 14),
-                            SpeakButton(text: state.current.kana),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                'N${state.current.jlpt}・${mode.label}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.indigoFaded,
+                                ),
+                              ),
+                            ),
+                            // 讀音輸入模式聽發音等於作弊，答題後才顯示
+                            if (mode != VocabMode.reading || answered) ...[
+                              const SizedBox(height: 12),
+                              SpeakButton(text: state.current.jp),
+                            ],
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
-                      if (isChoice)
+                      if (mode == VocabMode.reading)
+                        _ReadingInput(
+                          controller: _inputController,
+                          focusNode: _focusNode,
+                          enabled: !answered,
+                          onSubmit: () => ref
+                              .read(vocabPracticeProvider(widget.pool).notifier)
+                              .submitReading(_inputController.text),
+                        )
+                      else
                         GridView.count(
                           crossAxisCount: 2,
                           shrinkWrap: true,
@@ -167,27 +190,16 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                             for (var i = 0; i < state.options.length; i++)
                               OptionButton(
                                 label: state.options[i],
+                                fontSize: 16,
                                 state: _optionState(i, state),
                                 onTap: feedback == null
                                     ? () => ref
-                                        .read(practiceProvider(widget.mode)
+                                        .read(vocabPracticeProvider(widget.pool)
                                             .notifier)
                                         .choose(i)
                                     : null,
                               ),
                           ],
-                        )
-                      else
-                        _InputArea(
-                          controller: _inputController,
-                          focusNode: _focusNode,
-                          enabled: !answered,
-                          showHintButton:
-                              settings.showHint && !settings.romajiHint,
-                          onHint: () => setState(() => _hintShown = true),
-                          onSubmit: () => ref
-                              .read(practiceProvider(widget.mode).notifier)
-                              .submit(_inputController.text),
                         ),
                     ],
                   ),
@@ -195,7 +207,6 @@ class _PracticePageState extends ConsumerState<PracticePage> {
               ),
             ],
           ),
-          // 底部反饋橫幅
           Positioned(
             left: 18,
             right: 18,
@@ -210,11 +221,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 child: answered
                     ? FeedbackBanner(
                         correct: feedback.correct,
-                        subtitle: feedback.correct
-                            ? '讀音：${feedback.canonical}'
-                                '${others.isNotEmpty ? '（也可以 ${others.join('/')}）' : ''}'
-                            : '正確答案：${feedback.canonical}',
-                        showRetry: !isChoice && !feedback.correct,
+                        subtitle:
+                            '${state.current.jp}（${state.current.reading}）= '
+                            '${state.current.zh}',
+                        showRetry:
+                            mode == VocabMode.reading && !feedback.correct,
                         onRetry: _retry,
                         onNext: _next,
                       )
@@ -227,7 +238,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
     );
   }
 
-  OptionState _optionState(int index, PracticeState state) {
+  OptionState _optionState(int index, VocabPracticeState state) {
     final fb = state.feedback;
     if (fb == null) return OptionState.idle;
     if (index == state.correctIndex) return OptionState.correct;
@@ -236,21 +247,17 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   }
 }
 
-/// 鍵盤輸入模式的輸入區。
-class _InputArea extends StatelessWidget {
+/// 讀音輸入區（接受假名或羅馬拼音）。
+class _ReadingInput extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool enabled;
-  final bool showHintButton;
-  final VoidCallback onHint;
   final VoidCallback onSubmit;
 
-  const _InputArea({
+  const _ReadingInput({
     required this.controller,
     required this.focusNode,
     required this.enabled,
-    required this.showHintButton,
-    required this.onHint,
     required this.onSubmit,
   });
 
@@ -271,12 +278,12 @@ class _InputArea extends StatelessWidget {
             autofocus: true,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
               color: AppColors.indigo,
             ),
             decoration: const InputDecoration(
-              hintText: '輸入羅馬拼音',
+              hintText: '輸入讀音（假名或羅馬拼音）',
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 14),
             ),
@@ -284,33 +291,15 @@ class _InputArea extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        Row(
-          children: [
-            if (showHintButton) ...[
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.indigo,
-                  borderRadius: BorderRadius.circular(AppTheme.radius),
-                ),
-                child: IconButton(
-                  tooltip: '提示',
-                  onPressed: onHint,
-                  icon: const Icon(Icons.lightbulb_outline,
-                      color: AppColors.gold),
-                ),
-              ),
-              const SizedBox(width: 10),
-            ],
-            Expanded(
-              child: FilledButton(
-                onPressed: enabled ? onSubmit : null,
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14),
-                  child: Text('確認', style: TextStyle(fontSize: 17)),
-                ),
-              ),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: enabled ? onSubmit : null,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text('確認', style: TextStyle(fontSize: 17)),
             ),
-          ],
+          ),
         ),
       ],
     );
