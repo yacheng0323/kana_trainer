@@ -74,7 +74,7 @@ class PracticeState {
 /// 練習 session 控制器（family per 模式，離開頁面自動釋放）。
 class PracticeController
     extends AutoDisposeFamilyNotifier<PracticeState, PracticeMode> {
-  final QuizGenerator _generator = QuizGenerator();
+  final QuizGenerator<Kana> _generator = QuizGenerator(keyOf: (k) => k.kana);
   late List<Kana> _pool;
 
   @override
@@ -91,8 +91,12 @@ class PracticeController
   PracticeState _question(PracticeState? prev) {
     final kana =
         _generator.next(_pool, ref.read(masteryProvider), previous: prev?.current);
-    final (options, correctIndex) =
-        _generator.buildOptions(kana, _pool, fallback: allKana);
+    final (options, correctIndex) = _generator.buildOptions(
+      kana,
+      _pool,
+      valueOf: (k) => k.romaji,
+      fallback: allKana,
+    );
     return PracticeState(
       current: kana,
       options: options,

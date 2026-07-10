@@ -9,7 +9,7 @@ import '../../core/models/practice_mode.dart';
 import '../../core/theme/app_theme.dart';
 import '../settings/settings_notifier.dart';
 import 'practice_controller.dart';
-import 'widgets/shake.dart';
+import 'widgets/quiz_widgets.dart';
 
 class PracticePage extends ConsumerStatefulWidget {
   final PracticeMode mode;
@@ -82,6 +82,8 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         : feedback.correct
             ? AppColors.green
             : AppColors.red;
+    final others =
+        feedback == null ? const <String>[] : feedback.accepted.skip(1).toList();
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -89,7 +91,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         children: [
           Column(
             children: [
-              _Header(mode: widget.mode, state: state),
+              PracticeHeader(
+                title: widget.mode.label,
+                streak: state.streak,
+                sessionCorrect: state.sessionCorrect,
+                sessionTotal: state.sessionTotal,
+              ),
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(18, 20, 18, 110),
@@ -147,7 +154,27 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       ),
                       const SizedBox(height: 20),
                       if (isChoice)
-                        _OptionsGrid(mode: widget.mode, state: state)
+                        GridView.count(
+                          crossAxisCount: 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                          childAspectRatio: 2.2,
+                          children: [
+                            for (var i = 0; i < state.options.length; i++)
+                              OptionButton(
+                                label: state.options[i],
+                                state: _optionState(i, state),
+                                onTap: feedback == null
+                                    ? () => ref
+                                        .read(practiceProvider(widget.mode)
+                                            .notifier)
+                                        .choose(i)
+                                    : null,
+                              ),
+                          ],
+                        )
                       else
                         _InputArea(
                           controller: _inputController,
@@ -179,8 +206,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 opacity: answered ? 1 : 0,
                 duration: const Duration(milliseconds: 250),
                 child: answered
-                    ? _FeedbackBanner(
-                        feedback: feedback,
+                    ? FeedbackBanner(
+                        correct: feedback.correct,
+                        subtitle: feedback.correct
+                            ? '讀音：${feedback.canonical}'
+                                '${others.isNotEmpty ? '（也可以 ${others.join('/')}）' : ''}'
+                            : '正確答案：${feedback.canonical}',
                         showRetry: !isChoice && !feedback.correct,
                         onRetry: _retry,
                         onNext: _next,
@@ -193,218 +224,13 @@ class _PracticePageState extends ConsumerState<PracticePage> {
       ),
     );
   }
-}
 
-/// 深靛藍頂部：返回、模式、連對火焰、5 段進度。
-class _Header extends StatelessWidget {
-  final PracticeMode mode;
-  final PracticeState state;
-
-  const _Header({required this.mode, required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    final filled = state.sessionTotal % 5;
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.indigo,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
-      padding: const EdgeInsets.fromLTRB(6, 0, 18, 22),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.arrow_back_ios_new,
-                      color: Colors.white, size: 20),
-                ),
-                Expanded(
-                  child: Text(
-                    mode.label,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ),
-                Text(
-                  '🔥 ${state.streak}',
-                  style: const TextStyle(
-                    color: AppColors.gold,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Text(
-                  '${state.sessionCorrect}/${state.sessionTotal}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Row(
-                children: [
-                  for (var i = 0; i < 5; i++) ...[
-                    Expanded(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        height: 5,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(2),
-                          color: i < (filled == 0 && state.sessionTotal > 0
-                                  ? 5
-                                  : filled)
-                              ? AppColors.gold
-                              : Colors.white24,
-                        ),
-                      ),
-                    ),
-                    if (i < 4) const SizedBox(width: 5),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// 2×2 四選一按鈕格。
-class _OptionsGrid extends ConsumerWidget {
-  final PracticeMode mode;
-  final PracticeState state;
-
-  const _OptionsGrid({required this.mode, required this.state});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  OptionState _optionState(int index, PracticeState state) {
     final fb = state.feedback;
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 10,
-      crossAxisSpacing: 10,
-      childAspectRatio: 2.2,
-      children: [
-        for (var i = 0; i < state.options.length; i++)
-          _OptionButton(
-            label: state.options[i],
-            state: _stateFor(i, fb),
-            onTap: fb == null
-                ? () => ref.read(practiceProvider(mode).notifier).choose(i)
-                : null,
-          ),
-      ],
-    );
-  }
-
-  _OptionState _stateFor(int index, AnswerFeedback? fb) {
-    if (fb == null) return _OptionState.idle;
-    if (index == state.correctIndex) return _OptionState.correct;
-    if (index == fb.chosenIndex) return _OptionState.wrong;
-    return _OptionState.dimmed;
-  }
-}
-
-enum _OptionState { idle, correct, wrong, dimmed }
-
-class _OptionButton extends StatelessWidget {
-  final String label;
-  final _OptionState state;
-  final VoidCallback? onTap;
-
-  const _OptionButton({
-    required this.label,
-    required this.state,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final (bg, fg, border, icon) = switch (state) {
-      _OptionState.idle => (
-          Colors.white,
-          AppColors.indigo,
-          AppColors.indigo,
-          null
-        ),
-      _OptionState.correct => (
-          AppColors.green,
-          Colors.white,
-          AppColors.green,
-          '✓'
-        ),
-      _OptionState.wrong => (AppColors.red, Colors.white, AppColors.red, '✕'),
-      _OptionState.dimmed => (
-          Colors.white,
-          AppColors.indigo,
-          AppColors.indigo,
-          null
-        ),
-    };
-
-    return Shake(
-      active: state == _OptionState.wrong,
-      child: AnimatedOpacity(
-        opacity: state == _OptionState.dimmed ? 0.35 : 1,
-        duration: const Duration(milliseconds: 200),
-        child: Material(
-          color: bg,
-          borderRadius: BorderRadius.circular(AppTheme.radius),
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(AppTheme.radius),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppTheme.radius),
-                border: Border.all(color: border, width: 3),
-              ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: fg,
-                    ),
-                  ),
-                  if (icon != null)
-                    Positioned(
-                      top: 4,
-                      right: 8,
-                      child: Text(
-                        icon,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w900,
-                          color: fg,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    if (fb == null) return OptionState.idle;
+    if (index == state.correctIndex) return OptionState.correct;
+    if (index == fb.chosenIndex) return OptionState.wrong;
+    return OptionState.dimmed;
   }
 }
 
@@ -485,102 +311,6 @@ class _InputArea extends StatelessWidget {
           ],
         ),
       ],
-    );
-  }
-}
-
-/// 底部反饋橫幅：綠答對 / 紅答錯 + 下一題。
-class _FeedbackBanner extends StatelessWidget {
-  final AnswerFeedback feedback;
-  final bool showRetry;
-  final VoidCallback onRetry;
-  final VoidCallback onNext;
-
-  const _FeedbackBanner({
-    required this.feedback,
-    required this.showRetry,
-    required this.onRetry,
-    required this.onNext,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final correct = feedback.correct;
-    final others = feedback.accepted.skip(1).toList();
-    return Container(
-      padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
-      decoration: BoxDecoration(
-        color: correct ? AppColors.green : AppColors.red,
-        borderRadius: BorderRadius.circular(AppTheme.radius),
-        boxShadow: const [
-          BoxShadow(color: Color(0x4022254A), offset: Offset(6, 6)),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  correct ? '答對了！' : '再試一次，你可以的！',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                Text(
-                  correct
-                      ? '讀音：${feedback.canonical}'
-                          '${others.isNotEmpty ? '（也可以 ${others.join('/')}）' : ''}'
-                      : '正確答案：${feedback.canonical}',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (showRetry) ...[
-            _BannerButton(label: '再試一次', onTap: onRetry),
-            const SizedBox(width: 8),
-          ],
-          _BannerButton(label: '下一題', onTap: onNext),
-        ],
-      ),
-    );
-  }
-}
-
-class _BannerButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onTap;
-
-  const _BannerButton({required this.label, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white24,
-      borderRadius: BorderRadius.circular(6),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
