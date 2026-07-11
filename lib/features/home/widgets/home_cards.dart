@@ -1,6 +1,66 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../progress/stats_notifier.dart';
+
+/// 每日目標進度 + 連續達標天數（今日 tab 與我的 tab 共用）。
+class GoalCard extends StatelessWidget {
+  final Stats stats;
+  final int goal;
+
+  const GoalCard({super.key, required this.stats, required this.goal});
+
+  @override
+  Widget build(BuildContext context) {
+    final progress =
+        goal == 0 ? 1.0 : (stats.todayTotal / goal).clamp(0.0, 1.0);
+    final done = stats.todayTotal >= goal;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppTheme.radius),
+        border: Border.all(
+          color: done ? AppColors.green : AppColors.indigo,
+          width: 2,
+        ),
+      ),
+      child: Row(
+        children: [
+          Text(done ? '🎉' : '🎯', style: const TextStyle(fontSize: 22)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  done
+                      ? '今日目標達成！連續 ${stats.goalStreakDays} 天'
+                      : '今日目標 ${stats.todayTotal}/$goal 題',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: done ? AppColors.green : AppColors.indigo,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: const Color(0x1422254A),
+                    color: done ? AppColors.green : AppColors.gold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// 各 tab 頂部深靛藍 header（2c 設計）。
 class TabHeader extends StatelessWidget {

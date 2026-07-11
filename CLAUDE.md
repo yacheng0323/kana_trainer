@@ -28,6 +28,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.0.0 | M1~M6：105 單字×7主題（日中/中日/讀音輸入+SRS+聽力）、40 情境句（克漏字/重組）、N5 文法 12 課（線性解鎖）、模擬測驗+成績歷史、TTS、每日目標、備份匯出/匯入 |
 | v2.1.0 | 資訊架構重構：Bottom NavigationBar 四 tab（50音基礎/主題學習/檢定/我的），IndexedStack 保留各 tab 狀態 |
 | v2.2.0 | M7 AI 出題：Claude API（`claude-opus-4-8` + structured outputs）依主題生成 N5 題目，快取離線重玩；API Key 僅存本機且排除在備份外 |
+| v2.3.0 | M8 習慣養成：今日菜單（SRS+錯題+新內容 15 題一鍵 session，「今日」tab，五 tab）、每日提醒（flutter_local_notifications，inexact 排程）、學習熱力圖（`daily_history`） |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -120,7 +121,7 @@ lib/
 
 | Key | 內容 | 備份？ |
 |-----|------|--------|
-| `settings` / `mastery` / `wrong` / `vocab_wrong` / `sentence_wrong` / `srs` / `stats` / `grammar_done` / `exam_history` | 學習資料（JSON） | ✅ `BackupService.backupKeys` |
+| `settings` / `mastery` / `wrong` / `vocab_wrong` / `sentence_wrong` / `srs` / `stats` / `grammar_done` / `exam_history` / `daily_history` / `menu_done` | 學習資料（JSON） | ✅ `BackupService.backupKeys` |
 | `claude_api_key` | Claude API Key | ❌ **刻意排除**（測試有斷言） |
 | `ai_cache_<主題>` | AI 題組快取 | ❌ |
 
