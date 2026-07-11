@@ -6,8 +6,11 @@ import '../../../core/data/vocab_data.dart';
 import '../../../core/models/sentence.dart';
 import '../../../core/models/vocab.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../ai_analysis/ai_analysis_page.dart';
+import '../../ai_chat/ai_chat_page.dart';
 import '../../ai_quiz/ai_quiz_page.dart';
 import '../../grammar/grammar_list_page.dart';
+import '../../verb/verb_drill_page.dart';
 import '../../grammar/grammar_progress_notifier.dart';
 import '../../listening/listening_page.dart';
 import '../../progress/srs_notifier.dart';
@@ -131,8 +134,21 @@ class TopicsTab extends ConsumerWidget {
                 doneCount: grammarDone,
                 total: allGrammar.length,
               ),
+              const SizedBox(height: 10),
+              EntryGrid(
+                children: [
+                  EntryCard(
+                    icon: Icons.fitness_center,
+                    iconBg: AppColors.red,
+                    label: '動詞變化訓練',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const VerbDrillPage()),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 22),
-              const SectionTitle('AI 出題'),
+              const SectionTitle('AI 功能'),
               const SizedBox(height: 10),
               EntryGrid(
                 children: [
@@ -143,6 +159,23 @@ class TopicsTab extends ConsumerWidget {
                     label: 'AI 全新題目',
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const AiQuizPage()),
+                    ),
+                  ),
+                  EntryCard(
+                    icon: Icons.forum,
+                    iconBg: AppColors.indigo,
+                    iconColor: AppColors.gold,
+                    label: 'AI 情境對話',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AiChatPage()),
+                    ),
+                  ),
+                  EntryCard(
+                    icon: Icons.psychology,
+                    iconBg: AppColors.green,
+                    label: 'AI 弱點分析',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const AiAnalysisPage()),
                     ),
                   ),
                 ],
