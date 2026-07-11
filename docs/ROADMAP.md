@@ -40,6 +40,11 @@
 > API Key 在設定頁輸入、僅存本機且**排除在備份匯出之外**；題組快取可離線重玩。
 > 選型說明：公開字典 API（Jisho/JMdict）僅日英、無繁中且無法控制題型，故採
 > AI 生成 + 靜態題庫（離線基底）雙軌。
+> **v2.3.0（2026-07-11）＝ M8 習慣養成三件套**：
+> ① 今日菜單 — SRS 到期＋三本錯題＋新內容組成 15 題一鍵 session，完成打卡（新
+> 「今日」tab，bottom bar 變五 tab）；② 每日提醒 — flutter_local_notifications
+> 本機推播（設定開關＋時間，inexact 排程免特殊權限，開機自動恢復）；③ 學習熱
+> 力圖 — 新增 `daily_history` 每日答題數（進備份），GitHub-style 15 週日曆格。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

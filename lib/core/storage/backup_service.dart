@@ -19,6 +19,8 @@ class BackupService {
     'stats',
     'grammar_done',
     'exam_history',
+    'daily_history',
+    'menu_done',
   ];
 
   static String export(SharedPreferences prefs) {
