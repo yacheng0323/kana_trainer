@@ -29,6 +29,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.1.0 | 資訊架構重構：Bottom NavigationBar 四 tab（50音基礎/主題學習/檢定/我的），IndexedStack 保留各 tab 狀態 |
 | v2.2.0 | M7 AI 出題：Claude API（`claude-opus-4-8` + structured outputs）依主題生成 N5 題目，快取離線重玩；API Key 僅存本機且排除在備份外 |
 | v2.3.0 | M8 習慣養成：今日菜單（SRS+錯題+新內容 15 題一鍵 session，「今日」tab，五 tab）、每日提醒（flutter_local_notifications，inexact 排程）、學習熱力圖（`daily_history`） |
+| v2.3.1 | fix：Android release build 需 core library desugaring（flutter_local_notifications） |
+| v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 `core/ai/claude_client.dart` |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -154,6 +156,7 @@ lib/
 3. **widget 測試頁面比視窗長** — tap 選項前先 `tester.ensureVisible(...)`；題目文字可能與選項同字（如「出口」jp=zh），用 `find.descendant(of: find.byType(OptionButton), ...)` 鎖定。
 4. **grammar_data 的 quiz `correctIndex` 全是 0** — 這是刻意的（資料好維護），顯示時由 `GrammarLessonPage`/`ExamController` 打亂順序。新增資料照做即可。
 5. **flutter_tts 有 KGP 棄用警告** — 未來 Flutter 版本才會 break，等套件更新。
+5b. **release APK 需 core library desugaring**（`android/app/build.gradle.kts`：`isCoreLibraryDesugaringEnabled = true` + `desugar_jdk_libs`）— flutter_local_notifications 要求；拿掉會在 CheckAarMetadata 炸掉。另注意：build 失敗時 `build\...\app-release.apk` 仍是**上一次成功的舊檔**，複製前先確認 build 成功。
 6. **APK 是 debug key 簽名** — 自用 OK；上 Google Play 前要建正式 keystore。
 7. **假名/單字/句子資料維護**：假名只改平假名表（片假名自動生成）；句子只改 chunks + blankIndex；jp/key 全庫唯一由測試把關。
 
