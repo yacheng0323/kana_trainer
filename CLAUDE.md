@@ -30,6 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.2.0 | M7 AI 出題：Claude API（`claude-opus-4-8` + structured outputs）依主題生成 N5 題目，快取離線重玩；API Key 僅存本機且排除在備份外 |
 | v2.3.0 | M8 習慣養成：今日菜單（SRS+錯題+新內容 15 題一鍵 session，「今日」tab，五 tab）、每日提醒（flutter_local_notifications，inexact 排程）、學習熱力圖（`daily_history`） |
 | v2.3.1 | fix：Android release build 需 core library desugaring（flutter_local_notifications） |
+| v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 `core/ai/claude_client.dart` |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
