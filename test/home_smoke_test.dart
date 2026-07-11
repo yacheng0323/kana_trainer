@@ -16,14 +16,21 @@ void main() {
       ),
     );
 
-    // Bottom bar 四個目的地
+    // Bottom bar 五個目的地
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.text('50音基礎'), findsWidgets); // bar + header
+    expect(find.text('今日'), findsWidgets); // bar + header
     expect(find.text('主題學習'), findsOneWidget);
     expect(find.text('檢定'), findsOneWidget);
     expect(find.text('我的'), findsOneWidget);
 
-    // Tab 1：50音基礎（預設）
+    // Tab 1：今日（預設）
+    expect(find.text('📋 今日任務'), findsOneWidget);
+    expect(find.text('開始今日任務'), findsOneWidget);
+    expect(find.textContaining('學習足跡'), findsOneWidget);
+
+    // Tab 2：50音基礎
+    await tester.tap(find.text('50音基礎'));
+    await tester.pumpAndSettle();
     expect(find.text('分類進度'), findsOneWidget);
     expect(find.text('平假名練習'), findsOneWidget);
     expect(find.text('混合練習'), findsOneWidget);

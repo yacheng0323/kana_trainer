@@ -27,6 +27,9 @@ class Settings {
   final bool showHint; // 顯示提示按鈕（僅輸入模式，首字母）
   final bool sound; // 音效/震動回饋
   final bool romajiHint; // 題目下方直接顯示羅馬拼音（僅輸入模式）
+  final bool reminderEnabled; // 每日提醒
+  final int reminderHour; // 提醒時間（24h）
+  final int reminderMinute;
 
   const Settings({
     this.answerMode = AnswerMode.choice,
@@ -37,6 +40,9 @@ class Settings {
     this.showHint = true,
     this.sound = true,
     this.romajiHint = false,
+    this.reminderEnabled = false,
+    this.reminderHour = 20,
+    this.reminderMinute = 0,
   });
 
   Map<String, dynamic> toJson() => {
@@ -48,6 +54,9 @@ class Settings {
         'showHint': showHint,
         'sound': sound,
         'romajiHint': romajiHint,
+        'reminderEnabled': reminderEnabled,
+        'reminderHour': reminderHour,
+        'reminderMinute': reminderMinute,
       };
 
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
@@ -61,6 +70,9 @@ class Settings {
         showHint: json['showHint'] as bool? ?? true,
         sound: json['sound'] as bool? ?? true,
         romajiHint: json['romajiHint'] as bool? ?? false,
+        reminderEnabled: json['reminderEnabled'] as bool? ?? false,
+        reminderHour: json['reminderHour'] as int? ?? 20,
+        reminderMinute: json['reminderMinute'] as int? ?? 0,
       );
 
   Settings copyWith({
@@ -72,6 +84,9 @@ class Settings {
     bool? showHint,
     bool? sound,
     bool? romajiHint,
+    bool? reminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
   }) =>
       Settings(
         answerMode: answerMode ?? this.answerMode,
@@ -82,6 +97,9 @@ class Settings {
         showHint: showHint ?? this.showHint,
         sound: sound ?? this.sound,
         romajiHint: romajiHint ?? this.romajiHint,
+        reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+        reminderHour: reminderHour ?? this.reminderHour,
+        reminderMinute: reminderMinute ?? this.reminderMinute,
       );
 }
 

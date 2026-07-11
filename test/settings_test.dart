@@ -49,6 +49,10 @@ void main() {
   });
 
   testWidgets('SettingsPage：切輸入模式後才能開區分大小寫', (tester) async {
+    // 設定頁很長，放大視窗讓所有開關都在畫面內
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
@@ -62,15 +66,18 @@ void main() {
 
     // 選擇題模式下輸入相關開關停用
     expect(container.read(settingsProvider).answerMode, AnswerMode.choice);
+    await tester.ensureVisible(find.text('區分大小寫'));
     await tester.tap(find.text('區分大小寫'));
     await tester.pump();
     expect(container.read(settingsProvider).caseSensitive, isFalse);
 
     // 切到鍵盤輸入 → 開關可用
+    await tester.ensureVisible(find.text('鍵盤輸入'));
     await tester.tap(find.text('鍵盤輸入'));
     await tester.pump();
     expect(container.read(settingsProvider).answerMode, AnswerMode.input);
 
+    await tester.ensureVisible(find.text('區分大小寫'));
     await tester.tap(find.text('區分大小寫'));
     await tester.pump();
     expect(container.read(settingsProvider).caseSensitive, isTrue);

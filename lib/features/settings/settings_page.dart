@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ai/ai_quiz_service.dart';
+import '../../core/notifications/notification_service.dart';
 import '../../core/storage/backup_service.dart';
 import '../../core/storage/prefs_provider.dart';
 import '../../core/theme/app_theme.dart';
@@ -120,6 +121,32 @@ class SettingsPage extends ConsumerWidget {
             value: settings.sound,
             onChanged: (v) => notifier.update((s) => s.copyWith(sound: v)),
           ),
+          SwitchListTile(
+            title: const Text('每日提醒'),
+            subtitle: Text(
+              settings.reminderEnabled
+                  ? '每天 ${settings.reminderHour.toString().padLeft(2, '0')}:'
+                      '${settings.reminderMinute.toString().padLeft(2, '0')} 提醒學習'
+                  : '固定時間推播提醒，別讓連續達標斷掉',
+            ),
+            value: settings.reminderEnabled,
+            onChanged: (v) => _toggleReminder(context, ref, v),
+          ),
+          if (settings.reminderEnabled)
+            ListTile(
+              leading: const Icon(Icons.schedule, color: AppColors.indigo),
+              title: const Text('提醒時間'),
+              trailing: Text(
+                '${settings.reminderHour.toString().padLeft(2, '0')}:'
+                '${settings.reminderMinute.toString().padLeft(2, '0')}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.indigo,
+                ),
+              ),
+              onTap: () => _pickReminderTime(context, ref),
+            ),
           const Divider(),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
@@ -191,6 +218,50 @@ class SettingsPage extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _toggleReminder(
+    BuildContext context,
+    WidgetRef ref,
+    bool enable,
+  ) async {
+    final notifier = ref.read(settingsProvider.notifier);
+    final service = ref.read(notificationServiceProvider);
+    if (!enable) {
+      notifier.update((s) => s.copyWith(reminderEnabled: false));
+      await service.cancel();
+      return;
+    }
+    final granted = await service.requestPermission();
+    if (!granted) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('未取得通知權限，請到系統設定開啟')),
+        );
+      }
+      return;
+    }
+    notifier.update((s) => s.copyWith(reminderEnabled: true));
+    final s = ref.read(settingsProvider);
+    await service.scheduleDaily(hour: s.reminderHour, minute: s.reminderMinute);
+  }
+
+  Future<void> _pickReminderTime(BuildContext context, WidgetRef ref) async {
+    final s = ref.read(settingsProvider);
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: s.reminderHour, minute: s.reminderMinute),
+    );
+    if (picked == null) return;
+    ref.read(settingsProvider.notifier).update(
+          (x) => x.copyWith(
+            reminderHour: picked.hour,
+            reminderMinute: picked.minute,
+          ),
+        );
+    await ref
+        .read(notificationServiceProvider)
+        .scheduleDaily(hour: picked.hour, minute: picked.minute);
   }
 
   Future<void> _showApiKeyDialog(BuildContext context, WidgetRef ref) async {

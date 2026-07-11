@@ -1,21 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/notifications/notification_service.dart';
 import '../features/home/tabs/exam_tab.dart';
 import '../features/home/tabs/kana_tab.dart';
 import '../features/home/tabs/profile_tab.dart';
+import '../features/home/tabs/today_tab.dart';
 import '../features/home/tabs/topics_tab.dart';
+import '../features/settings/settings_notifier.dart';
 
-/// Bottom navigation 殼：50音基礎 / 主題學習 / 檢定 / 我的。
+/// Bottom navigation 殼：今日 / 50音基礎 / 主題學習 / 檢定 / 我的。
 /// IndexedStack 保留各 tab 捲動與狀態。
-class MainShell extends StatefulWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => _MainShellState();
+  ConsumerState<MainShell> createState() => _MainShellState();
 }
 
-class _MainShellState extends State<MainShell> {
+class _MainShellState extends ConsumerState<MainShell> {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // App 啟動時重排每日提醒（idempotent，排程可能被系統清掉）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final s = ref.read(settingsProvider);
+      if (s.reminderEnabled) {
+        ref
+            .read(notificationServiceProvider)
+            .scheduleDaily(hour: s.reminderHour, minute: s.reminderMinute);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +41,7 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _index,
         children: const [
+          TodayTab(),
           KanaTab(),
           TopicsTab(),
           ExamTab(),
@@ -33,6 +52,10 @@ class _MainShellState extends State<MainShell> {
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),
         destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.today),
+            label: '今日',
+          ),
           NavigationDestination(
             icon: Icon(Icons.translate),
             label: '50音基礎',

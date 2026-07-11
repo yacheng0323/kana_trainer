@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -66,7 +66,7 @@ class ProfileTab extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              _GoalCard(stats: stats, goal: dailyGoal),
+              GoalCard(stats: stats, goal: dailyGoal),
               const SizedBox(height: 22),
               const SectionTitle('學習管理'),
               const SizedBox(height: 10),
@@ -96,7 +96,7 @@ class ProfileTab extends ConsumerWidget {
               const SizedBox(height: 30),
               const Center(
                 child: Text(
-                  'kana_trainer v2.2.0',
+                  'kana_trainer v2.3.0',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -148,65 +148,6 @@ class _StatCard extends StatelessWidget {
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: AppColors.indigoFaded,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// 每日目標進度 + 連續達標天數。
-class _GoalCard extends StatelessWidget {
-  final Stats stats;
-  final int goal;
-
-  const _GoalCard({required this.stats, required this.goal});
-
-  @override
-  Widget build(BuildContext context) {
-    final progress =
-        goal == 0 ? 1.0 : (stats.todayTotal / goal).clamp(0.0, 1.0);
-    final done = stats.todayTotal >= goal;
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppTheme.radius),
-        border: Border.all(
-          color: done ? AppColors.green : AppColors.indigo,
-          width: 2,
-        ),
-      ),
-      child: Row(
-        children: [
-          Text(done ? '🎉' : '🎯', style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  done
-                      ? '今日目標達成！連續 ${stats.goalStreakDays} 天'
-                      : '今日目標 ${stats.todayTotal}/$goal 題',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: done ? AppColors.green : AppColors.indigo,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    minHeight: 6,
-                    backgroundColor: const Color(0x1422254A),
-                    color: done ? AppColors.green : AppColors.gold,
-                  ),
-                ),
-              ],
             ),
           ),
         ],

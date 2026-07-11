@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/storage/prefs_provider.dart';
 import '../settings/settings_notifier.dart';
+import 'daily_history_notifier.dart';
 
 /// 累計統計。今日計數以日期字串滾動，跨日自動歸零。
 /// M2 新增：每日目標達標連續天數（goalStreakDays）。
@@ -141,6 +142,8 @@ class StatsNotifier extends Notifier<Stats> {
     }
     state = s;
     ref.read(prefsProvider).setString(storageKey, jsonEncode(s.toJson()));
+    // 熱力圖歷史（單一寫入點）
+    ref.read(dailyHistoryProvider.notifier).increment(s.todayDate);
   }
 }
 
