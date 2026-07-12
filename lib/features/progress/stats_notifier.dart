@@ -1,87 +1,12 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/prefs_provider.dart';
-import '../settings/settings_notifier.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'daily_history_notifier.dart';
-
-/// 累計統計。今日計數以日期字串滾動，跨日自動歸零。
-/// M2 新增：每日目標達標連續天數（goalStreakDays）。
-class Stats {
-  final int total;
-  final int correct;
-  final int bestStreak;
-  final int currentStreak;
-  final String todayDate; // yyyy-MM-dd
-  final int todayTotal;
-  final int todayCorrect;
-  final int goalStreakDays; // 連續達成每日目標天數
-  final String lastGoalDate; // 最後一次達標日期
-
-  const Stats({
-    this.total = 0,
-    this.correct = 0,
-    this.bestStreak = 0,
-    this.currentStreak = 0,
-    this.todayDate = '',
-    this.todayTotal = 0,
-    this.todayCorrect = 0,
-    this.goalStreakDays = 0,
-    this.lastGoalDate = '',
-  });
-
-  int get wrong => total - correct;
-  double get accuracy => total == 0 ? 0 : correct / total;
-  double get todayAccuracy => todayTotal == 0 ? 0 : todayCorrect / todayTotal;
-
-  Map<String, dynamic> toJson() => {
-        'total': total,
-        'correct': correct,
-        'bestStreak': bestStreak,
-        'currentStreak': currentStreak,
-        'todayDate': todayDate,
-        'todayTotal': todayTotal,
-        'todayCorrect': todayCorrect,
-        'goalStreakDays': goalStreakDays,
-        'lastGoalDate': lastGoalDate,
-      };
-
-  factory Stats.fromJson(Map<String, dynamic> json) => Stats(
-        total: json['total'] as int? ?? 0,
-        correct: json['correct'] as int? ?? 0,
-        bestStreak: json['bestStreak'] as int? ?? 0,
-        currentStreak: json['currentStreak'] as int? ?? 0,
-        todayDate: json['todayDate'] as String? ?? '',
-        todayTotal: json['todayTotal'] as int? ?? 0,
-        todayCorrect: json['todayCorrect'] as int? ?? 0,
-        goalStreakDays: json['goalStreakDays'] as int? ?? 0,
-        lastGoalDate: json['lastGoalDate'] as String? ?? '',
-      );
-
-  Stats copyWith({
-    int? total,
-    int? correct,
-    int? bestStreak,
-    int? currentStreak,
-    String? todayDate,
-    int? todayTotal,
-    int? todayCorrect,
-    int? goalStreakDays,
-    String? lastGoalDate,
-  }) =>
-      Stats(
-        total: total ?? this.total,
-        correct: correct ?? this.correct,
-        bestStreak: bestStreak ?? this.bestStreak,
-        currentStreak: currentStreak ?? this.currentStreak,
-        todayDate: todayDate ?? this.todayDate,
-        todayTotal: todayTotal ?? this.todayTotal,
-        todayCorrect: todayCorrect ?? this.todayCorrect,
-        goalStreakDays: goalStreakDays ?? this.goalStreakDays,
-        lastGoalDate: lastGoalDate ?? this.lastGoalDate,
-      );
-}
+import 'package:kana_trainer/domain/models/stats.dart';
+export 'package:kana_trainer/domain/models/stats.dart';
 
 class StatsNotifier extends Notifier<Stats> {
   static const storageKey = 'stats';
@@ -106,7 +31,7 @@ class StatsNotifier extends Notifier<Stats> {
 
   @override
   Stats build() {
-    final raw = ref.read(prefsProvider).getString(storageKey);
+    final raw = ref.read(keyValueStoreProvider).getString(storageKey);
     var stats = raw == null
         ? const Stats()
         : Stats.fromJson(jsonDecode(raw) as Map<String, dynamic>);
@@ -141,7 +66,7 @@ class StatsNotifier extends Notifier<Stats> {
       s = s.copyWith(goalStreakDays: streakDays, lastGoalDate: s.todayDate);
     }
     state = s;
-    ref.read(prefsProvider).setString(storageKey, jsonEncode(s.toJson()));
+    ref.read(keyValueStoreProvider).setString(storageKey, jsonEncode(s.toJson()));
     // 熱力圖歷史（單一寫入點）
     ref.read(dailyHistoryProvider.notifier).increment(s.todayDate);
   }

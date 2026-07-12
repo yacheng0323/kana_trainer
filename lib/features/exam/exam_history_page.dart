@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_theme.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'exam_history_notifier.dart';
-import 'exam_models.dart';
+import 'package:kana_trainer/domain/models/exam_models.dart';
 
 /// 成績歷史：最近成績長條趨勢 + 紀錄列表。
 class ExamHistoryPage extends ConsumerWidget {

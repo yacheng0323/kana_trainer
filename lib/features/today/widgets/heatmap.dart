@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_theme.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
 
 /// GitHub-style 學習熱力圖：最近 15 週，每格一天，顏色深淺 = 當日答題數。
 class StudyHeatmap extends StatelessWidget {

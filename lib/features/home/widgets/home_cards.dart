@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../progress/stats_notifier.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
 
 /// 每日目標進度 + 連續達標天數（今日 tab 與我的 tab 共用）。
 class GoalCard extends StatelessWidget {

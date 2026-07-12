@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,12 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:kana_trainer/core/ai/ai_analysis_service.dart';
-import 'package:kana_trainer/core/ai/ai_chat_service.dart';
-import 'package:kana_trainer/core/ai/claude_client.dart';
-import 'package:kana_trainer/core/data/verb_data.dart';
-import 'package:kana_trainer/core/models/verb.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/ai/ai_analysis_service.dart';
+import 'package:kana_trainer/data/ai/ai_chat_service.dart';
+import 'package:kana_trainer/data/ai/claude_client.dart';
+import 'package:kana_trainer/data/static/verb_data.dart';
+import 'package:kana_trainer/domain/entities/verb.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/verb/verb_drill_page.dart';

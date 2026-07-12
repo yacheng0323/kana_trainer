@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/data/kana_data.dart';
-import '../../../core/models/kana.dart';
-import '../../../core/models/practice_mode.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../practice/practice_page.dart';
-import '../../progress/mastery_notifier.dart';
-import '../../progress/wrong_notifier.dart';
-import '../widgets/home_cards.dart';
+import 'package:kana_trainer/data/static/kana_data.dart';
+import 'package:kana_trainer/domain/entities/kana.dart';
+import 'package:kana_trainer/domain/entities/practice_mode.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/practice_page.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 1：50音基礎 — 分類進度 + 六種假名練習。
 class KanaTab extends ConsumerWidget {

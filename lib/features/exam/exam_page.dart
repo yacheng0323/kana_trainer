@@ -1,10 +1,10 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_theme.dart';
-import 'exam_controller.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'exam_view_model.dart';
 
 /// N5 模擬測驗頁：20 題 / 10 分鐘 / 交卷評分 + 錯題檢討。
 class ExamPage extends ConsumerStatefulWidget {
@@ -16,7 +16,7 @@ class ExamPage extends ConsumerStatefulWidget {
 
 class _ExamPageState extends ConsumerState<ExamPage> {
   Timer? _timer;
-  int _remaining = ExamController.examSeconds;
+  int _remaining = ExamViewModel.examSeconds;
   bool _started = false;
 
   @override

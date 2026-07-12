@@ -30,7 +30,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.2.0 | M7 AI 出題：Claude API（`claude-opus-4-8` + structured outputs）依主題生成 N5 題目，快取離線重玩；API Key 僅存本機且排除在備份外 |
 | v2.3.0 | M8 習慣養成：今日菜單（SRS+錯題+新內容 15 題一鍵 session，「今日」tab，五 tab）、每日提醒（flutter_local_notifications，inexact 排程）、學習熱力圖（`daily_history`） |
 | v2.3.1 | fix：Android release build 需 core library desugaring（flutter_local_notifications） |
-| v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 `core/ai/claude_client.dart` |
+| v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 ClaudeClient |
+| v2.5.0 | MVVM 架構重構：domain/data/features 分層、model 類別全數移出 ViewModel/service、抽象介面 KeyValueStore + AiClient、controller 更名 ViewModel、全面 package imports。零行為變更，103 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -65,44 +66,45 @@ flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.ap
 flutter build web --release
 ```
 
-## 架構
+## 架構（MVVM，v2.5.0 起）
+
+**分層規則（新增程式碼必守）：**
+- **Model 類別一律放 `domain/`** — 不准把 state/feedback/report class 寫在 ViewModel 或 service 檔內
+- **ViewModel 只依賴抽象**：儲存走 `KeyValueStore`（不直接碰 SharedPreferences）、AI 走 `AiClient`（不直接碰 HTTP）
+- 依賴方向：`features → domain ← data`（domain 不 import data/features；data 實作 domain 介面）
+- ViewModel 檔名 `*_view_model.dart`、類名 `XxxViewModel`；View 檔名 `*_page.dart`
 
 ```
 lib/
-├── main.dart                    # prefs 注入 + ProviderScope
-├── app/
-│   ├── app.dart                 # MaterialApp（AppTheme.light，鎖亮色）
-│   └── main_shell.dart          # Bottom NavigationBar 四 tab（IndexedStack）
-├── core/
-│   ├── ai/ai_quiz_service.dart  # Claude API 出題（raw HTTP）+ apiKeyProvider
-│   ├── audio/tts_service.dart   # TtsService 抽象（flutter_tts ja-JP，無引擎靜默）
-│   ├── data/                    # 全部靜態資料（單一事實來源）
-│   │   ├── kana_data.dart       # 208 假名：只維護平假名表，片假名 codepoint +0x60 生成
-│   │   ├── vocab_data.dart      # 105 詞（7 主題×15，N5）
-│   │   ├── sentence_data.dart   # 40 句（5 情境×8，語塊化）
-│   │   └── grammar_data.dart    # 12 課（每課 3 題 quiz，選項顯示時打亂）
-│   ├── logic/
-│   │   ├── quiz_generator.dart  # 泛型出題引擎：加權隨機（weight=6-熟練度）+ 4選1選項生成
-│   │   ├── answer_checker.dart  # trim/大小寫/別名（shi=si 等）
-│   │   └── romaji_converter.dart# 平假名→Hepburn（拗音/促音/長音）
-│   ├── models/                  # Kana, VocabWord, Sentence, GrammarPoint + Pool enums
-│   ├── storage/
-│   │   ├── prefs_provider.dart  # SharedPreferences 單例（main override）
-│   │   └── backup_service.dart  # 備份匯出/匯入（⚠️ backupKeys 刻意不含 claude_api_key）
-│   └── theme/app_theme.dart     # 2c design tokens（見下）
-└── features/
-    ├── home/tabs/               # kana_tab / topics_tab / exam_tab / profile_tab
-    │   └── widgets/home_cards.dart  # TabHeader / EntryCard / EntryGrid（共用）
-    ├── practice/                # 假名練習（controller + page + widgets/quiz_widgets.dart 共用元件）
-    ├── vocab/                   # 單字（日中/中日/讀音輸入三題型 family by VocabPool）
-    ├── sentence/                # 句子（克漏字/重組隨機）
-    ├── grammar/                 # 文法課（線性解鎖，全對標完成）
-    ├── listening/               # 聽力測驗（TTS 播音 4 選 1）
-    ├── exam/                    # 模擬測驗（20題/10分計時）+ 成績歷史
-    ├── ai_quiz/                 # AI 出題頁（主題選擇→quiz 流程→快取）
-    ├── progress/                # mastery / wrong×3 / stats / srs notifiers + 錯題頁（三 tab）
-    └── settings/                # 設定 + API Key + 備份 UI
+├── main.dart                     # prefs 注入 + ProviderScope
+├── app/                          # MaterialApp + MainShell（五 tab IndexedStack）
+├── core/theme/app_theme.dart     # 2c design tokens（跨層 UI 常數）
+├── domain/                       # ═ Model 層 ═
+│   ├── entities/                 # Kana / VocabWord / Sentence / GrammarPoint / Verb + Pool enums
+│   ├── models/                   # 狀態與值物件：practice/vocab/sentence/listening/exam/menu/verb/ai
+│   │                             #   models、Stats、Settings（app_settings）、MenuDone
+│   ├── logic/                    # QuizGenerator（泛型）/ AnswerChecker / RomajiConverter
+│   └── repositories/             # 抽象介面：KeyValueStore（+InMemory 測試版）、AiClient、AiException
+├── data/                         # ═ Model 實作層 ═
+│   ├── static/                   # 靜態資料源：kana/vocab/sentence/grammar/verb_data
+│   ├── storage/                  # prefs_provider（SharedPreferences 單例）、
+│   │                             #   prefs_store（SharedPrefsStore 實作 + keyValueStoreProvider）、
+│   │                             #   backup_service（⚠️ backupKeys 刻意不含 claude_api_key）
+│   ├── ai/                       # ClaudeClient（實作 AiClient）+ quiz/chat/analysis services
+│   └── services/                 # TtsService、NotificationService（平台服務，皆有抽象+fake）
+└── features/                     # ═ View + ViewModel ═
+    ├── home/tabs/                # today/kana/topics/exam/profile_tab + widgets/home_cards
+    ├── practice/                 # practice_view_model + practice_page + widgets/quiz_widgets（共用）
+    ├── vocab/                    # vocab_view_model（三題型 family by VocabPool）
+    ├── sentence/                 # sentence_view_model（克漏字/重組）
+    ├── listening/                # listening_view_model
+    ├── exam/                     # exam_view_model + 成績歷史
+    ├── grammar/ today/ verb/ ai_quiz/ ai_chat/ ai_analysis/
+    ├── progress/                 # mastery/wrong×3/stats/srs/daily_history notifiers + 錯題頁
+    └── settings/                 # settings_notifier + 設定/API Key/備份/提醒 UI
 ```
+
+**測試注入方式**：override `keyValueStoreProvider`（InMemoryKeyValueStore）或維持舊路徑 override `prefsProvider`（兩者相容，keyValueStore 預設由 prefs 組出）；AI service 建構子注入 `aiClient:`（FakeAiClient）或 `client:`（http MockClient）。範例見 `test/architecture_test.dart`。
 
 ### 2c 設計系統（依設計交付稿，高保真）
 

@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/verb.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../progress/mastery_notifier.dart';
-import '../progress/stats_notifier.dart';
-import '../settings/settings_notifier.dart';
+import 'package:kana_trainer/domain/entities/verb.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'verb_quiz_builder.dart';
 
 /// 動詞變化訓練器（N5 大魔王）：辭書形 → ます/て/ない/た形，10 題一輪。

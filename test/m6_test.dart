@@ -1,12 +1,12 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/storage/backup_service.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
-import 'package:kana_trainer/features/exam/exam_controller.dart';
+import 'package:kana_trainer/data/storage/backup_service.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
+import 'package:kana_trainer/features/exam/exam_view_model.dart';
 import 'package:kana_trainer/features/exam/exam_history_notifier.dart';
 import 'package:kana_trainer/features/exam/exam_page.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
@@ -15,10 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
-  group('ExamController.buildQuestions', () {
+  group('ExamViewModel.buildQuestions', () {
     test('20 題：單字10+假名5+文法5、選項4、correctIndex 合法', () {
       for (var seed = 0; seed < 5; seed++) {
-        final qs = ExamController.buildQuestions(Random(seed));
+        final qs = ExamViewModel.buildQuestions(Random(seed));
         expect(qs.length, 20);
         expect(qs.where((q) => q.sub!.startsWith('單字')).length, 10);
         expect(qs.where((q) => q.sub!.startsWith('假名')).length, 5);

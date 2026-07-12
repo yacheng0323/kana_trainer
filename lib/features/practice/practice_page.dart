@@ -1,14 +1,14 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/kana.dart';
-import '../../core/models/practice_mode.dart';
-import '../../core/theme/app_theme.dart';
-import '../settings/settings_notifier.dart';
-import 'practice_controller.dart';
+import 'package:kana_trainer/domain/entities/kana.dart';
+import 'package:kana_trainer/domain/entities/practice_mode.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'practice_view_model.dart';
 import 'widgets/quiz_widgets.dart';
 
 class PracticePage extends ConsumerStatefulWidget {

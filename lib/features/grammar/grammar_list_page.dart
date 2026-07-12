@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/data/grammar_data.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:kana_trainer/data/static/grammar_data.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'grammar_lesson_page.dart';
 import 'grammar_progress_notifier.dart';
 

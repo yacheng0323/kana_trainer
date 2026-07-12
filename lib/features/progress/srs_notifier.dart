@@ -1,8 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
 
 /// SRS 間隔複習：key（`v_<jp>` 等）→ 下次到期時間 epoch millis。
 /// 間隔依熟練度：0=立即、1=1天、2=3天、3=7天、4=14天、5=30天；答錯歸零立即到期。
@@ -16,7 +16,7 @@ class SrsNotifier extends Notifier<Map<String, int>> {
 
   @override
   Map<String, int> build() {
-    final raw = ref.read(prefsProvider).getString(storageKey);
+    final raw = ref.read(keyValueStoreProvider).getString(storageKey);
     if (raw == null) return {};
     final decoded = jsonDecode(raw) as Map<String, dynamic>;
     return decoded.map((k, v) => MapEntry(k, v as int));
@@ -27,7 +27,7 @@ class SrsNotifier extends Notifier<Map<String, int>> {
     final days = correct ? _intervalDays[masteryAfter.clamp(0, 5)] : 0;
     final due = now().add(Duration(days: days)).millisecondsSinceEpoch;
     state = {...state, key: due};
-    ref.read(prefsProvider).setString(storageKey, jsonEncode(state));
+    ref.read(keyValueStoreProvider).setString(storageKey, jsonEncode(state));
   }
 
   /// 目前到期（待複習）的 key，僅限出現在 [candidates] 的。

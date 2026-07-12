@@ -1,14 +1,14 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/vocab.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../settings/settings_notifier.dart';
-import 'vocab_practice_controller.dart';
+import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'vocab_view_model.dart';
 
 /// 單字練習頁：日→中 / 中→日 4 選 1、讀音輸入（M2），沿用 2c 設計。
 class VocabPracticePage extends ConsumerStatefulWidget {
