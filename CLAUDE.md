@@ -32,6 +32,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.3.1 | fix：Android release build 需 core library desugaring（flutter_local_notifications） |
 | v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 ClaudeClient |
 | v2.5.0 | MVVM 架構重構：domain/data/features 分層、model 類別全數移出 ViewModel/service、抽象介面 KeyValueStore + AiClient、controller 更名 ViewModel、全面 package imports。零行為變更，103 tests |
+| v2.5.1 | 防禦性強化：GitHub Actions CI（analyze+test）、API Key 移入 flutter_secure_storage（Keystore 加密，啟動時自動搬移舊明文並刪除）、備份匯入版本檢查（過新拒絕）。109 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -42,6 +43,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | `main` | 穩定版，只接受 `dev` merge，每次 release 打 tag（`vX.Y.Z`） |
 | `dev` | 主開發分支 |
 | `feature/*` | 單一功能，完成後 `merge --no-ff` 回 dev |
+
+> Push 後 GitHub Actions CI 自動跑 analyze + test（`.github/workflows/ci.yml`，main/dev/feature/** 均觸發）。
 
 **Release checklist（合 main 前）：**
 1. `dart analyze lib test` 零 issue
@@ -61,7 +64,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 83 tests
+flutter test                 # 109 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
@@ -76,7 +79,7 @@ flutter build web --release
 
 ```
 lib/
-├── main.dart                     # prefs 注入 + ProviderScope
+├── main.dart                     # prefs + SecureStore 注入 + ProviderScope
 ├── app/                          # MaterialApp + MainShell（五 tab IndexedStack）
 ├── core/theme/app_theme.dart     # 2c design tokens（跨層 UI 常數）
 ├── domain/                       # ═ Model 層 ═
@@ -89,6 +92,7 @@ lib/
 │   ├── static/                   # 靜態資料源：kana/vocab/sentence/grammar/verb_data
 │   ├── storage/                  # prefs_provider（SharedPreferences 單例）、
 │   │                             #   prefs_store（SharedPrefsStore 實作 + keyValueStoreProvider）、
+│   │                             #   secure_store（SecureStore 實作，API Key 走 Keystore 加密）、
 │   │                             #   backup_service（⚠️ backupKeys 刻意不含 claude_api_key）
 │   ├── ai/                       # ClaudeClient（實作 AiClient）+ quiz/chat/analysis services
 │   └── services/                 # TtsService、NotificationService（平台服務，皆有抽象+fake）
@@ -126,7 +130,7 @@ lib/
 | Key | 內容 | 備份？ |
 |-----|------|--------|
 | `settings` / `mastery` / `wrong` / `vocab_wrong` / `sentence_wrong` / `srs` / `stats` / `grammar_done` / `exam_history` / `daily_history` / `menu_done` | 學習資料（JSON） | ✅ `BackupService.backupKeys` |
-| `claude_api_key` | Claude API Key | ❌ **刻意排除**（測試有斷言） |
+| `claude_api_key` | ~~Claude API Key~~ **v2.5.1 起移入 flutter_secure_storage（Keystore）**，不在 prefs；啟動時舊明文自動搬移＋刪除 | ❌ **刻意排除**（測試有斷言） |
 | `ai_cache_<主題>` | AI 題組快取 | ❌ |
 
 ### AI 出題（`core/ai/ai_quiz_service.dart`)

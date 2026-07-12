@@ -1,7 +1,7 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:kana_trainer/data/storage/prefs_store.dart';
+import 'package:kana_trainer/data/storage/secure_store.dart';
 import 'claude_client.dart';
 import 'package:kana_trainer/domain/models/ai_models.dart';
 export 'package:kana_trainer/domain/models/ai_models.dart';
@@ -86,17 +86,18 @@ class AiQuizService {
 
 final aiQuizServiceProvider = Provider<AiQuizService>((ref) => AiQuizService());
 
-/// Claude API Key。獨立儲存（不在 settings JSON 內），
-/// 因此**不會**被備份匯出（BackupService.backupKeys 未包含此 key）。
+/// Claude API Key。存加密儲存（secureStoreProvider → Android Keystore），
+/// 不落 SharedPreferences 明文，也**不會**被備份匯出
+/// （BackupService.backupKeys 未包含此 key）。
 class ApiKeyNotifier extends Notifier<String> {
   static const storageKey = 'claude_api_key';
 
   @override
-  String build() => ref.read(keyValueStoreProvider).getString(storageKey) ?? '';
+  String build() => ref.read(secureStoreProvider).getString(storageKey) ?? '';
 
   void set(String key) {
     state = key.trim();
-    ref.read(keyValueStoreProvider).setString(storageKey, state);
+    ref.read(secureStoreProvider).setString(storageKey, state);
   }
 }
 
