@@ -1,10 +1,10 @@
-import 'dart:math';
+﻿import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/data/kana_data.dart';
-import 'package:kana_trainer/core/logic/quiz_generator.dart';
-import 'package:kana_trainer/core/models/kana.dart';
-import 'package:kana_trainer/core/models/practice_mode.dart';
+import 'package:kana_trainer/data/static/kana_data.dart';
+import 'package:kana_trainer/domain/logic/quiz_generator.dart';
+import 'package:kana_trainer/domain/entities/kana.dart';
+import 'package:kana_trainer/domain/entities/practice_mode.dart';
 
 QuizGenerator<Kana> kanaGen([int? seed]) => QuizGenerator(
       keyOf: (k) => k.kana,

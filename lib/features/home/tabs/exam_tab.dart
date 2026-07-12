@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../exam/exam_history_notifier.dart';
-import '../../exam/exam_history_page.dart';
-import '../../exam/exam_page.dart';
-import '../widgets/home_cards.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/exam/exam_history_notifier.dart';
+import 'package:kana_trainer/features/exam/exam_history_page.dart';
+import 'package:kana_trainer/features/exam/exam_page.dart';
+import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 3：檢定 — 模擬測驗入口 + 最佳/最近成績摘要 + 歷史。
 class ExamTab extends ConsumerWidget {

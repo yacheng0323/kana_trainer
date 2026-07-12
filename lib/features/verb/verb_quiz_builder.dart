@@ -1,22 +1,9 @@
-import 'dart:math';
+﻿import 'dart:math';
 
-import '../../core/data/verb_data.dart';
-import '../../core/models/verb.dart';
-
-/// 動詞變化題：辭書形 → 目標變化形，4 選 1。
-class VerbQuestion {
-  final Verb verb;
-  final VerbForm form;
-  final List<String> options;
-  final int correctIndex;
-
-  const VerbQuestion({
-    required this.verb,
-    required this.form,
-    required this.options,
-    required this.correctIndex,
-  });
-}
+import 'package:kana_trainer/data/static/verb_data.dart';
+import 'package:kana_trainer/domain/entities/verb.dart';
+import 'package:kana_trainer/domain/models/verb_models.dart';
+export 'package:kana_trainer/domain/models/verb_models.dart';
 
 /// 出一輪動詞變化題。
 /// 干擾項 = 同動詞的其他變化形（最混淆）+ 其他動詞的同變化形。

@@ -1,4 +1,4 @@
-# kana_trainer v2 Roadmap — 從 50 音到實用日語學習 App
+﻿# kana_trainer v2 Roadmap — 從 50 音到實用日語學習 App
 
 > 需求規劃文件。v1.0.0（假名 4 選 1 + 2c 設計）為基礎版本，以下里程碑依序疊加。
 > 每個里程碑 = 一條 `feature/*` 分支，完成後合回 `dev`，穩定後 merge `main` + tag。
@@ -51,6 +51,11 @@
 > 等 5 情境，N5 日語回覆＋繁中翻譯＋錯誤糾正，聊天泡泡 UI＋TTS；③ AI 弱點分析
 > — 錯題本＋統計丟 Claude 產出弱點模式與練習建議，結果快取離線回看。
 > 技術：抽出共用 `ClaudeClient`（三個 AI 功能共用 HTTP/錯誤處理）。
+> **v2.5.0（2026-07-11）＝ MVVM 架構重構**（使用者要求）：domain（entities/
+> models/logic/repositories 抽象）/ data（static/storage/ai/services 實作）/
+> features（View+ViewModel）三層；model 類別全數移出 controller；新增抽象介面
+> KeyValueStore（+InMemoryKeyValueStore）與 AiClient（ClaudeClient 實作）；
+> controller 更名 *_view_model / XxxViewModel。零行為變更，103 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

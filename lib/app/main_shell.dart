@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/notifications/notification_service.dart';
-import '../features/home/tabs/exam_tab.dart';
-import '../features/home/tabs/kana_tab.dart';
-import '../features/home/tabs/profile_tab.dart';
-import '../features/home/tabs/today_tab.dart';
-import '../features/home/tabs/topics_tab.dart';
-import '../features/settings/settings_notifier.dart';
+import 'package:kana_trainer/data/services/notification_service.dart';
+import 'package:kana_trainer/features/home/tabs/exam_tab.dart';
+import 'package:kana_trainer/features/home/tabs/kana_tab.dart';
+import 'package:kana_trainer/features/home/tabs/profile_tab.dart';
+import 'package:kana_trainer/features/home/tabs/today_tab.dart';
+import 'package:kana_trainer/features/home/tabs/topics_tab.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 
 /// Bottom navigation 殼：今日 / 50音基礎 / 主題學習 / 檢定 / 我的。
 /// IndexedStack 保留各 tab 捲動與狀態。

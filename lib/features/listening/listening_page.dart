@@ -1,14 +1,14 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/audio/tts_service.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../settings/settings_notifier.dart';
-import 'listening_controller.dart';
+import 'package:kana_trainer/data/services/tts_service.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'listening_view_model.dart';
 
 /// 聽力測驗（M5）：自動播放發音 → 4 選 1 選出聽到的單字。
 class ListeningPage extends ConsumerStatefulWidget {

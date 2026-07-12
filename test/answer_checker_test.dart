@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/data/kana_data.dart';
-import 'package:kana_trainer/core/logic/answer_checker.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:kana_trainer/data/static/kana_data.dart';
+import 'package:kana_trainer/domain/logic/answer_checker.dart';
 
 void main() {
   group('AnswerChecker', () {

@@ -1,15 +1,15 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ai/ai_quiz_service.dart';
-import '../../core/storage/prefs_provider.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../progress/stats_notifier.dart';
-import '../settings/settings_page.dart';
+import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_page.dart';
 
 const aiQuizTopics = ['旅遊', '交通', '餐飲', '購物', '時間', '日常', '職場', '綜合'];
 
@@ -42,7 +42,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
       _error = null;
     });
 
-    final prefs = ref.read(prefsProvider);
+    final prefs = ref.read(keyValueStoreProvider);
 
     // 先看快取（除非要求重新出題）
     if (!forceRefresh) {

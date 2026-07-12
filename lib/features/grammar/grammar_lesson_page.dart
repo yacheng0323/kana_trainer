@@ -1,12 +1,12 @@
-import 'dart:math';
+﻿import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/grammar.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../progress/stats_notifier.dart';
+import 'package:kana_trainer/domain/entities/grammar.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'grammar_progress_notifier.dart';
 
 /// 文法課頁：說明卡 + 例句 → 3 題練習 → 全對標記完成。

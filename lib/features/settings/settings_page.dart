@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ai/ai_quiz_service.dart';
-import '../../core/notifications/notification_service.dart';
-import '../../core/storage/backup_service.dart';
-import '../../core/storage/prefs_provider.dart';
-import '../../core/theme/app_theme.dart';
-import '../exam/exam_history_notifier.dart';
-import '../grammar/grammar_progress_notifier.dart';
-import '../progress/mastery_notifier.dart';
-import '../progress/srs_notifier.dart';
-import '../progress/stats_notifier.dart';
-import '../progress/wrong_notifier.dart';
+import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
+import 'package:kana_trainer/data/services/notification_service.dart';
+import 'package:kana_trainer/data/storage/backup_service.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/exam/exam_history_notifier.dart';
+import 'package:kana_trainer/features/grammar/grammar_progress_notifier.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/srs_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
 import 'settings_notifier.dart';
 
 class SettingsPage extends ConsumerWidget {

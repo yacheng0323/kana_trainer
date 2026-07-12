@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/data/kana_data.dart';
-import '../../core/data/sentence_data.dart';
-import '../../core/data/vocab_data.dart';
-import '../../core/models/practice_mode.dart';
-import '../../core/models/sentence.dart';
-import '../../core/models/vocab.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/practice_page.dart';
-import '../sentence/sentence_practice_page.dart';
-import '../vocab/vocab_practice_page.dart';
+import 'package:kana_trainer/data/static/kana_data.dart';
+import 'package:kana_trainer/data/static/sentence_data.dart';
+import 'package:kana_trainer/data/static/vocab_data.dart';
+import 'package:kana_trainer/domain/entities/practice_mode.dart';
+import 'package:kana_trainer/domain/entities/sentence.dart';
+import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/practice_page.dart';
+import 'package:kana_trainer/features/sentence/sentence_practice_page.dart';
+import 'package:kana_trainer/features/vocab/vocab_practice_page.dart';
 import 'wrong_notifier.dart';
 
 /// 錯題本：假名 / 單字 / 句子 三 tab，各自可重練、單筆移除、全部清除。

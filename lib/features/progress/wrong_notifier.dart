@@ -1,8 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
 
 /// 錯題紀錄：key = 題目 key（假名字元 / 單字 `v_<jp>`），value = 答錯次數。
 /// storage key 參數化：假名與單字各自獨立一本錯題本。
@@ -13,7 +13,7 @@ class WrongNotifier extends Notifier<Map<String, int>> {
 
   @override
   Map<String, int> build() {
-    final raw = ref.read(prefsProvider).getString(storageKey);
+    final raw = ref.read(keyValueStoreProvider).getString(storageKey);
     if (raw == null) return {};
     final decoded = jsonDecode(raw) as Map<String, dynamic>;
     return decoded.map((k, v) => MapEntry(k, v as int));
@@ -50,7 +50,7 @@ class WrongNotifier extends Notifier<Map<String, int>> {
   }
 
   void _save() {
-    ref.read(prefsProvider).setString(storageKey, jsonEncode(state));
+    ref.read(keyValueStoreProvider).setString(storageKey, jsonEncode(state));
   }
 }
 

@@ -1,23 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/data/grammar_data.dart';
-import '../../../core/data/vocab_data.dart';
-import '../../../core/models/sentence.dart';
-import '../../../core/models/vocab.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../ai_analysis/ai_analysis_page.dart';
-import '../../ai_chat/ai_chat_page.dart';
-import '../../ai_quiz/ai_quiz_page.dart';
-import '../../grammar/grammar_list_page.dart';
-import '../../verb/verb_drill_page.dart';
-import '../../grammar/grammar_progress_notifier.dart';
-import '../../listening/listening_page.dart';
-import '../../progress/srs_notifier.dart';
-import '../../progress/wrong_notifier.dart';
-import '../../sentence/sentence_practice_page.dart';
-import '../../vocab/vocab_practice_page.dart';
-import '../widgets/home_cards.dart';
+import 'package:kana_trainer/data/static/grammar_data.dart';
+import 'package:kana_trainer/data/static/vocab_data.dart';
+import 'package:kana_trainer/domain/entities/sentence.dart';
+import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/ai_analysis/ai_analysis_page.dart';
+import 'package:kana_trainer/features/ai_chat/ai_chat_page.dart';
+import 'package:kana_trainer/features/ai_quiz/ai_quiz_page.dart';
+import 'package:kana_trainer/features/grammar/grammar_list_page.dart';
+import 'package:kana_trainer/features/verb/verb_drill_page.dart';
+import 'package:kana_trainer/features/grammar/grammar_progress_notifier.dart';
+import 'package:kana_trainer/features/listening/listening_page.dart';
+import 'package:kana_trainer/features/progress/srs_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/sentence/sentence_practice_page.dart';
+import 'package:kana_trainer/features/vocab/vocab_practice_page.dart';
+import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 2：主題學習 — 單字（含 SRS 複習、聽力）、情境句子、文法課。
 class TopicsTab extends ConsumerWidget {
