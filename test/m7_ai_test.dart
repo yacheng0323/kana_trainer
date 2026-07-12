@@ -8,6 +8,7 @@ import 'package:http/testing.dart';
 import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
 import 'package:kana_trainer/data/storage/backup_service.dart';
 import 'package:kana_trainer/data/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/storage/secure_store.dart';
 import 'package:kana_trainer/features/ai_quiz/ai_quiz_page.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,15 +110,21 @@ void main() {
   });
 
   group('API Key 儲存', () {
-    test('持久化且不在備份範圍', () async {
+    test('存加密儲存、不落 prefs 明文、不在備份範圍', () async {
       final prefs = await SharedPreferences.getInstance();
+      final secure = InMemoryKeyValueStore();
       final c = ProviderContainer(
-        overrides: [prefsProvider.overrideWithValue(prefs)],
+        overrides: [
+          prefsProvider.overrideWithValue(prefs),
+          secureStoreProvider.overrideWithValue(secure),
+        ],
       );
       addTearDown(c.dispose);
       c.read(apiKeyProvider.notifier).set('  sk-ant-secret  ');
       expect(c.read(apiKeyProvider), 'sk-ant-secret'); // trim
-      expect(prefs.getString(ApiKeyNotifier.storageKey), 'sk-ant-secret');
+      expect(secure.getString(ApiKeyNotifier.storageKey), 'sk-ant-secret');
+      // 安全：不落 SharedPreferences 明文
+      expect(prefs.getString(ApiKeyNotifier.storageKey), isNull);
       // 安全：備份匯出不得包含 API Key
       expect(
         BackupService.backupKeys.contains(ApiKeyNotifier.storageKey),
@@ -134,13 +141,15 @@ void main() {
       MockClient? client,
     }) async {
       final prefs = await SharedPreferences.getInstance();
+      final secure = InMemoryKeyValueStore();
       if (apiKey.isNotEmpty) {
-        await prefs.setString(ApiKeyNotifier.storageKey, apiKey);
+        await secure.setString(ApiKeyNotifier.storageKey, apiKey);
       }
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
             prefsProvider.overrideWithValue(prefs),
+            secureStoreProvider.overrideWithValue(secure),
             if (client != null)
               aiQuizServiceProvider
                   .overrideWithValue(AiQuizService(client: client)),
