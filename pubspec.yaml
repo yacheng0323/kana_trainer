@@ -1,7 +1,7 @@
 ﻿name: kana_trainer
 description: "Japanese kana (50-on) practice app: see a kana, type its romaji."
 publish_to: 'none'
-version: 2.5.0+8
+version: 2.5.1+9
 
 environment:
   sdk: ^3.12.1
@@ -11,6 +11,7 @@ dependencies:
     sdk: flutter
   flutter_local_notifications: ^18.0.1
   flutter_riverpod: ^2.6.1
+  flutter_secure_storage: ^9.2.2
   flutter_timezone: ^4.1.0
   flutter_tts: ^4.2.0
   http: ^1.2.0

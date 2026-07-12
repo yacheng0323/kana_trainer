@@ -56,6 +56,11 @@
 > features（View+ViewModel）三層；model 類別全數移出 controller；新增抽象介面
 > KeyValueStore（+InMemoryKeyValueStore）與 AiClient（ClaudeClient 實作）；
 > controller 更名 *_view_model / XxxViewModel。零行為變更，103 tests。
+> **v2.5.1（2026-07-12）＝ 防禦性強化**：① GitHub Actions CI（push/PR 自動
+> analyze + test）；② Claude API Key 移入 flutter_secure_storage（Android
+> Keystore 加密），啟動時自動搬移 prefs 舊明文並刪除，新增 SecureStore（實作
+> KeyValueStore，secureStoreProvider）；③ 備份匯入版本檢查（無 version 視為
+> v1、過新拒絕並提示更新 App）。109 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

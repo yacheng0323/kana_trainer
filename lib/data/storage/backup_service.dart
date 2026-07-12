@@ -48,6 +48,13 @@ class BackupService {
     if (decoded['app'] != 'kana_trainer' || decoded['data'] is! Map) {
       throw const FormatException('不是 kana_trainer 的備份檔');
     }
+    // 舊備份檔（無 version 欄位）視為 v1。
+    final raw = decoded['version'];
+    final fileVersion = raw is int ? raw : 1;
+    if (fileVersion > version) {
+      throw FormatException('備份檔版本過新（v$fileVersion），請先更新 App 再匯入');
+    }
+    // fileVersion < version 時在此加入逐版 migration；目前僅有 v1。
     final data = decoded['data'] as Map<String, dynamic>;
     var count = 0;
     for (final key in backupKeys) {
