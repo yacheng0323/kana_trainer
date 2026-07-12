@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ai/ai_chat_service.dart';
-import '../../core/ai/ai_quiz_service.dart';
-import '../../core/ai/claude_client.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../settings/settings_page.dart';
+import 'package:kana_trainer/data/ai/ai_chat_service.dart';
+import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
+import 'package:kana_trainer/data/ai/claude_client.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/settings/settings_page.dart';
 
 const chatScenarios = [
   ('✈️', '機場報到櫃檯'),

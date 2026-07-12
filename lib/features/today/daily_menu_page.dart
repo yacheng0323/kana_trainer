@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../progress/mastery_notifier.dart';
-import '../progress/srs_notifier.dart';
-import '../progress/stats_notifier.dart';
-import '../progress/wrong_notifier.dart';
-import '../settings/settings_notifier.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/srs_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'daily_menu_builder.dart';
 import 'menu_done_notifier.dart';
 

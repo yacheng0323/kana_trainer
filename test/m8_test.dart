@@ -1,11 +1,11 @@
-import 'dart:math';
+﻿import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/notifications/notification_service.dart';
-import 'package:kana_trainer/core/storage/backup_service.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/services/notification_service.dart';
+import 'package:kana_trainer/data/storage/backup_service.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/features/progress/daily_history_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';

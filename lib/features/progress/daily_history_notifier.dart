@@ -1,8 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
 
 /// 每日答題數歷史：{'2026-07-10': 42, ...}，熱力圖資料來源。
 /// 由 StatsNotifier.record 呼叫 increment（單一寫入點）。
@@ -11,7 +11,7 @@ class DailyHistoryNotifier extends Notifier<Map<String, int>> {
 
   @override
   Map<String, int> build() {
-    final raw = ref.read(prefsProvider).getString(storageKey);
+    final raw = ref.read(keyValueStoreProvider).getString(storageKey);
     if (raw == null) return {};
     final decoded = jsonDecode(raw) as Map<String, dynamic>;
     return decoded.map((k, v) => MapEntry(k, v as int));
@@ -19,7 +19,7 @@ class DailyHistoryNotifier extends Notifier<Map<String, int>> {
 
   void increment(String date) {
     state = {...state, date: (state[date] ?? 0) + 1};
-    ref.read(prefsProvider).setString(storageKey, jsonEncode(state));
+    ref.read(keyValueStoreProvider).setString(storageKey, jsonEncode(state));
   }
 }
 

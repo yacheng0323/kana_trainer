@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../core/theme/app_theme.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'main_shell.dart';
 
 class KanaTrainerApp extends StatelessWidget {

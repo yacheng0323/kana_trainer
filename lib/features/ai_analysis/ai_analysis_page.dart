@@ -1,20 +1,20 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ai/ai_analysis_service.dart';
-import '../../core/ai/ai_quiz_service.dart';
-import '../../core/ai/claude_client.dart';
-import '../../core/data/kana_data.dart';
-import '../../core/data/sentence_data.dart';
-import '../../core/data/vocab_data.dart';
-import '../../core/storage/prefs_provider.dart';
-import '../../core/theme/app_theme.dart';
-import '../progress/mastery_notifier.dart';
-import '../progress/stats_notifier.dart';
-import '../progress/wrong_notifier.dart';
-import '../settings/settings_page.dart';
+import 'package:kana_trainer/data/ai/ai_analysis_service.dart';
+import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
+import 'package:kana_trainer/data/ai/claude_client.dart';
+import 'package:kana_trainer/data/static/kana_data.dart';
+import 'package:kana_trainer/data/static/sentence_data.dart';
+import 'package:kana_trainer/data/static/vocab_data.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_page.dart';
 
 /// AI 弱點分析：把錯題本＋統計整理給 Claude，產出弱點模式與練習建議。
 /// 結果快取（ai_analysis），可離線回看，隨時重新分析。
@@ -40,7 +40,7 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
   }
 
   void _loadCache() {
-    final raw = ref.read(prefsProvider).getString(_cacheKey);
+    final raw = ref.read(keyValueStoreProvider).getString(_cacheKey);
     if (raw == null) return;
     try {
       final json = jsonDecode(raw) as Map<String, dynamic>;
@@ -85,7 +85,7 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
             learnerData: _buildLearnerData(),
           );
       final date = StatsNotifier.today();
-      await ref.read(prefsProvider).setString(
+      await ref.read(keyValueStoreProvider).setString(
             _cacheKey,
             jsonEncode({'date': date, 'report': report.toJson()}),
           );

@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../progress/daily_history_notifier.dart';
-import '../../progress/mastery_notifier.dart';
-import '../../progress/srs_notifier.dart';
-import '../../progress/stats_notifier.dart';
-import '../../progress/wrong_notifier.dart';
-import '../../settings/settings_notifier.dart';
-import '../../today/daily_menu_builder.dart';
-import '../../today/daily_menu_page.dart';
-import '../../today/menu_done_notifier.dart';
-import '../../today/widgets/heatmap.dart';
-import '../widgets/home_cards.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/progress/daily_history_notifier.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/srs_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'package:kana_trainer/features/today/daily_menu_builder.dart';
+import 'package:kana_trainer/features/today/daily_menu_page.dart';
+import 'package:kana_trainer/features/today/menu_done_notifier.dart';
+import 'package:kana_trainer/features/today/widgets/heatmap.dart';
+import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 1：今日 — 一鍵開始今日任務 + 每日目標 + 學習熱力圖。
 class TodayTab extends ConsumerWidget {

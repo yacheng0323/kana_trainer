@@ -1,9 +1,9 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/storage/prefs_provider.dart';
-import 'exam_models.dart';
+import 'package:kana_trainer/data/storage/prefs_store.dart';
+import 'package:kana_trainer/domain/models/exam_models.dart';
 
 /// 模擬測驗成績歷史（新的在前）。
 class ExamHistoryNotifier extends Notifier<List<ExamRecord>> {
@@ -11,7 +11,7 @@ class ExamHistoryNotifier extends Notifier<List<ExamRecord>> {
 
   @override
   List<ExamRecord> build() {
-    final raw = ref.read(prefsProvider).getString(storageKey);
+    final raw = ref.read(keyValueStoreProvider).getString(storageKey);
     if (raw == null) return [];
     return (jsonDecode(raw) as List)
         .map((e) => ExamRecord.fromJson(e as Map<String, dynamic>))
@@ -20,7 +20,7 @@ class ExamHistoryNotifier extends Notifier<List<ExamRecord>> {
 
   void add(ExamRecord record) {
     state = [record, ...state];
-    ref.read(prefsProvider).setString(
+    ref.read(keyValueStoreProvider).setString(
           storageKey,
           jsonEncode(state.map((r) => r.toJson()).toList()),
         );

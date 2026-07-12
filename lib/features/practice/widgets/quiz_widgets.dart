@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/audio/tts_service.dart';
-import '../../../core/theme/app_theme.dart';
+import 'package:kana_trainer/data/services/tts_service.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'shake.dart';
 
 /// 發音按鈕（設計稿 2c：深靛藍方塊 + 金黃喇叭）。

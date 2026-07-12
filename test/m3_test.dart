@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/data/sentence_data.dart';
-import 'package:kana_trainer/core/models/sentence.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/static/sentence_data.dart';
+import 'package:kana_trainer/domain/entities/sentence.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
-import 'package:kana_trainer/features/sentence/sentence_practice_controller.dart';
+import 'package:kana_trainer/features/sentence/sentence_view_model.dart';
 import 'package:kana_trainer/features/sentence/sentence_practice_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,8 +31,8 @@ void main() {
     });
   });
 
-  group('SentencePracticeController', () {
-    Future<(ProviderContainer, SentencePracticeController)> pump(
+  group('SentenceViewModel', () {
+    Future<(ProviderContainer, SentenceViewModel)> pump(
       WidgetTester tester,
       ScenePool pool,
     ) async {

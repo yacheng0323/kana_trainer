@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../progress/mastery_notifier.dart';
-import '../../progress/stats_notifier.dart';
-import '../../progress/wrong_list_page.dart';
-import '../../progress/wrong_notifier.dart';
-import '../../settings/settings_notifier.dart';
-import '../../settings/settings_page.dart';
-import '../widgets/home_cards.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/progress/mastery_notifier.dart';
+import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/progress/wrong_list_page.dart';
+import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_page.dart';
+import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 4：我的 — 學習統計、每日目標、錯題本、設定。
 class ProfileTab extends ConsumerWidget {
@@ -96,7 +96,7 @@ class ProfileTab extends ConsumerWidget {
               const SizedBox(height: 30),
               const Center(
                 child: Text(
-                  'kana_trainer v2.4.0',
+                  'kana_trainer v2.5.0',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,

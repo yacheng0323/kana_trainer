@@ -1,14 +1,14 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/models/sentence.dart';
-import '../../core/theme/app_theme.dart';
-import '../practice/widgets/quiz_widgets.dart';
-import '../settings/settings_notifier.dart';
-import 'sentence_practice_controller.dart';
+import 'package:kana_trainer/domain/entities/sentence.dart';
+import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
+import 'sentence_view_model.dart';
 
 /// 句子練習頁：克漏字 4 選 1 / 語塊重組（M3），沿用 2c 設計。
 class SentencePracticePage extends ConsumerStatefulWidget {
@@ -205,7 +205,7 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
 /// 重組：已排入的語塊列（點擊移除）。
 class _ReorderSlots extends StatelessWidget {
   final SentencePracticeState state;
-  final SentencePracticeController notifier;
+  final SentenceViewModel notifier;
 
   const _ReorderSlots({required this.state, required this.notifier});
 
@@ -259,7 +259,7 @@ class _ReorderSlots extends StatelessWidget {
 /// 重組：可選語塊池（已選的變淡不可點）。
 class _ChunkPool extends StatelessWidget {
   final SentencePracticeState state;
-  final SentencePracticeController notifier;
+  final SentenceViewModel notifier;
 
   const _ChunkPool({required this.state, required this.notifier});
 

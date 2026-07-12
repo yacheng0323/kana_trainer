@@ -1,13 +1,13 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:kana_trainer/core/ai/ai_quiz_service.dart';
-import 'package:kana_trainer/core/storage/backup_service.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
+import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
+import 'package:kana_trainer/data/storage/backup_service.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/features/ai_quiz/ai_quiz_page.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';

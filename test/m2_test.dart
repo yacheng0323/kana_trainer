@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kana_trainer/core/logic/romaji_converter.dart';
-import 'package:kana_trainer/core/models/vocab.dart';
-import 'package:kana_trainer/core/storage/prefs_provider.dart';
+import 'package:kana_trainer/domain/logic/romaji_converter.dart';
+import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/features/progress/srs_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
-import 'package:kana_trainer/features/vocab/vocab_practice_controller.dart';
+import 'package:kana_trainer/features/vocab/vocab_view_model.dart';
 import 'package:kana_trainer/features/vocab/vocab_practice_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
