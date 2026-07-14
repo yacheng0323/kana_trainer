@@ -8,6 +8,7 @@ import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/srs_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'daily_menu_builder.dart';
 import 'menu_done_notifier.dart';
@@ -37,6 +38,8 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
       kanaWrong: ref.read(wrongProvider),
       vocabWrong: ref.read(vocabWrongProvider),
       sentenceWrong: ref.read(sentenceWrongProvider),
+      vocabPool: ref.read(contentRepositoryProvider).vocab(),
+      sentencePool: ref.read(contentRepositoryProvider).sentences(),
     );
   }
 

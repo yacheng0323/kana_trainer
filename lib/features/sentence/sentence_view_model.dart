@@ -2,7 +2,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:kana_trainer/data/static/sentence_data.dart';
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/domain/logic/quiz_generator.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
@@ -15,14 +15,16 @@ class SentenceViewModel
     extends AutoDisposeFamilyNotifier<SentencePracticeState, ScenePool> {
   final QuizGenerator<Sentence> _generator = QuizGenerator(keyOf: (s) => s.key);
   final Random _rng = Random();
+  late List<Sentence> _all; // 靜態 + 動態合併池
   late List<Sentence> _pool;
 
   @override
   SentencePracticeState build(ScenePool arg) {
+    _all = ref.read(contentRepositoryProvider).sentences();
     final wrongKeys = ref.read(sentenceWrongProvider).keys.toSet();
-    _pool = arg.buildPool(allSentences, wrongKeys: wrongKeys);
+    _pool = arg.buildPool(_all, wrongKeys: wrongKeys);
     if (_pool.isEmpty) {
-      _pool = List.of(allSentences);
+      _pool = List.of(_all);
     }
     return _question(null);
   }
@@ -44,7 +46,7 @@ class SentenceViewModel
         sentence,
         _pool,
         valueOf: (s) => s.blank,
-        fallback: allSentences,
+        fallback: _all,
       );
       return SentencePracticeState(
         current: sentence,

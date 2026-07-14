@@ -1,6 +1,6 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:kana_trainer/data/static/vocab_data.dart';
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/domain/logic/quiz_generator.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
@@ -18,19 +18,19 @@ class ListeningViewModel extends AutoDisposeNotifier<ListeningState> {
   ListeningState build() => _question(null);
 
   ListeningState _question(ListeningState? prev) {
+    final all = ref.read(contentRepositoryProvider).vocab();
     final word = _generator.next(
-      allVocab,
+      all,
       ref.read(masteryProvider),
       previous: prev?.current,
     );
     // 干擾項同主題優先，聽感混淆度較高
-    final samesTopic =
-        allVocab.where((w) => w.topic == word.topic).toList();
+    final samesTopic = all.where((w) => w.topic == word.topic).toList();
     final (options, correctIndex) = _generator.buildOptions(
       word,
       samesTopic,
       valueOf: (w) => w.jp,
-      fallback: allVocab,
+      fallback: all,
     );
     return ListeningState(
       current: word,

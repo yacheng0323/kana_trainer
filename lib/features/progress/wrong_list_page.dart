@@ -1,9 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/data/static/kana_data.dart';
-import 'package:kana_trainer/data/static/sentence_data.dart';
-import 'package:kana_trainer/data/static/vocab_data.dart';
 import 'package:kana_trainer/domain/entities/practice_mode.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
@@ -22,6 +21,7 @@ class WrongListPage extends ConsumerWidget {
     final kanaWrong = ref.watch(wrongProvider);
     final vocabWrong = ref.watch(vocabWrongProvider);
     final sentenceWrong = ref.watch(sentenceWrongProvider);
+    final repo = ref.watch(contentRepositoryProvider); // 動態題錯題也查得到字面
 
     return DefaultTabController(
       length: 3,
@@ -68,11 +68,11 @@ class WrongListPage extends ConsumerWidget {
               entries: vocabWrong,
               provider: vocabWrongProvider,
               titleOf: (key) {
-                final w = findVocab(key);
+                final w = repo.findVocab(key);
                 return w == null ? '' : '${w.reading}・${w.zh}';
               },
-              subtitleOf: (key) => findVocab(key)?.topic.label,
-              leadingOf: (key) => findVocab(key)?.jp ?? key,
+              subtitleOf: (key) => repo.findVocab(key)?.topic.label,
+              leadingOf: (key) => repo.findVocab(key)?.jp ?? key,
               onRetrain: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) =>
@@ -83,9 +83,9 @@ class WrongListPage extends ConsumerWidget {
             _WrongList(
               entries: sentenceWrong,
               provider: sentenceWrongProvider,
-              titleOf: (key) => findSentence(key)?.jp ?? key,
-              subtitleOf: (key) => findSentence(key)?.zh,
-              leadingOf: (key) => findSentence(key)?.scene.label ?? '句',
+              titleOf: (key) => repo.findSentence(key)?.jp ?? key,
+              subtitleOf: (key) => repo.findSentence(key)?.zh,
+              leadingOf: (key) => repo.findSentence(key)?.scene.label ?? '句',
               onRetrain: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) =>

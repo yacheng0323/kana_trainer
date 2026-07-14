@@ -7,7 +7,9 @@ import 'package:kana_trainer/data/services/notification_service.dart';
 import 'package:kana_trainer/data/storage/backup_service.dart';
 import 'package:kana_trainer/data/storage/prefs_provider.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/domain/logic/expansion_policy.dart';
 import 'package:kana_trainer/features/exam/exam_history_notifier.dart';
+import 'package:kana_trainer/features/expansion/expansion_notifier.dart';
 import 'package:kana_trainer/features/grammar/grammar_progress_notifier.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/srs_notifier.dart';
@@ -193,6 +195,17 @@ class SettingsPage extends ConsumerWidget {
                   : '已設定（僅存本機，不會被備份匯出）',
             ),
             onTap: () => _showApiKeyDialog(context, ref),
+          ),
+          SwitchListTile(
+            title: const Text('AI 自動擴充題庫'),
+            subtitle: Text(
+              '單字/句子/文法題快輪完時自動生成新題'
+              '（今日已生成 ${ref.watch(expansionProvider).todayCount}/'
+              '${ExpansionPolicy.dailyLimit} 批）',
+            ),
+            value: settings.autoExpand,
+            onChanged: (v) =>
+                notifier.update((s) => s.copyWith(autoExpand: v)),
           ),
           const Divider(),
           ListTile(
