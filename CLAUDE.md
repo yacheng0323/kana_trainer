@@ -35,6 +35,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.5.1 | 防禦性強化：GitHub Actions CI（analyze+test）、API Key 移入 flutter_secure_storage（Keystore 加密，啟動時自動搬移舊明文並刪除）、備份匯入版本檢查（過新拒絕）。109 tests |
 | v2.6.0 | 動態題庫池：單字/句子/文法題 AI 批次生成擴充（`ContentRepository` 合併靜態+動態、`DynamicContentStore` 持久化、`ExpansionNotifier` 自動補貨、每日 5 批上限、動態池進備份）。50 音維持固定。140 tests |
 | v2.6.1 | 單字日→中出題防洩題：答題前題目卡顯示假名（漢字常＝中文答案），作答後才揭曉漢字；今日菜單單字題同步。讀音輸入/中→日模式不變。141 tests |
+| v2.6.2 | 詞彙量成長加速：補貨門檻 5→10、每日上限 5→20 批、單字一批 15→20；`QuizGenerator.freshWeight`（單字未見過權重 12，新字優先出）；擴充完成即時併入當前練習池（`refreshPool`，session 不重置）。145 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 

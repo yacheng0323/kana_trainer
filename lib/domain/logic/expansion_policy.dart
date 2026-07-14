@@ -3,10 +3,12 @@ class ExpansionPolicy {
   const ExpansionPolicy._();
 
   /// 範圍內「未見過」（熟練度 0）項目低於此值時觸發補貨。
-  static const unseenThreshold = 5;
+  /// v2.6.2 調高：使用者要持續長詞彙量，池子要永遠領先練習進度。
+  static const unseenThreshold = 10;
 
   /// 每日 AI 生成批數上限（一批一次 API 呼叫）。
-  static const dailyLimit = 5;
+  /// 20 批 ≈ 最多 $0.4/天（實際觸發遠低於此）。
+  static const dailyLimit = 20;
 
   static bool shouldExpand({
     required bool enabled,

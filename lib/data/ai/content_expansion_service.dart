@@ -9,7 +9,7 @@ import 'package:kana_trainer/domain/models/dynamic_content.dart';
 /// AI 題庫擴充：一次生成一批，本地驗證（AI 回傳不可信）+ 去重後回傳。
 /// 整批全滅回空 list（呼叫端視為失敗批，仍計入每日批數避免壞回應重試迴圈）。
 class ContentExpansionService {
-  static const vocabBatch = 15;
+  static const vocabBatch = 20;
   static const sentenceBatch = 8;
   static const grammarBatch = 5;
 

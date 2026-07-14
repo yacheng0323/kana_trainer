@@ -14,13 +14,19 @@ export 'package:kana_trainer/domain/models/vocab_models.dart';
 
 class VocabViewModel
     extends AutoDisposeFamilyNotifier<VocabPracticeState, VocabPool> {
+  // freshWeight 12：沒見過的新字出現機率加倍，詞彙量持續往前推
   final QuizGenerator<VocabWord> _generator =
-      QuizGenerator(keyOf: (w) => w.key);
+      QuizGenerator(keyOf: (w) => w.key, freshWeight: 12);
   late List<VocabWord> _all; // 靜態 + 動態合併池
   late List<VocabWord> _pool;
 
   @override
   VocabPracticeState build(VocabPool arg) {
+    _rebuildPool();
+    return _question(null);
+  }
+
+  void _rebuildPool() {
     _all = ref.read(contentRepositoryProvider).vocab();
     final wrongKeys = ref.read(vocabWrongProvider).keys.toSet();
     final dueKeys =
@@ -29,7 +35,11 @@ class VocabViewModel
     if (_pool.isEmpty) {
       _pool = List.of(_all); // 保險：空池由 UI 擋掉
     }
-    return _question(null);
+  }
+
+  /// 題庫擴充完成後呼叫：把新題併入當前池，session（連對/統計）不重置。
+  void refreshPool() {
+    _rebuildPool();
   }
 
   VocabPracticeState _question(VocabPracticeState? prev) {

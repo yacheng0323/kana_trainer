@@ -35,4 +35,39 @@ void main() {
     expect(c.read(vocabWrongProvider)['v_搭乗券'], 1);
     expect(repo.findVocab('v_搭乗券')!.zh, '登機證');
   });
+
+  test('refreshPool：擴充後併入新題、session 不重置', () async {
+    final kv = InMemoryKeyValueStore();
+    final store = DynamicContentStore(kv);
+    final c = ProviderContainer(overrides: [
+      keyValueStoreProvider.overrideWithValue(kv),
+      dynamicContentStoreProvider.overrideWithValue(store),
+    ]);
+    addTearDown(c.dispose);
+    // 保持 provider 存活（autoDispose）
+    final sub = c.listen(vocabPracticeProvider(VocabPool.travel), (_, _) {});
+    addTearDown(sub.close);
+
+    final notifier = c.read(vocabPracticeProvider(VocabPool.travel).notifier);
+    var state = c.read(vocabPracticeProvider(VocabPool.travel));
+    notifier.choose(state.correctIndex); // 答對 → streak 1
+    expect(c.read(vocabPracticeProvider(VocabPool.travel)).streak, 1);
+
+    // 模擬背景擴充完成 → refreshPool
+    const w = VocabWord(
+        jp: '免税店', reading: 'めんぜいてん', zh: '免稅店', topic: VocabTopic.travel);
+    await store.addVocab([w], existingKeys: {});
+    notifier.refreshPool();
+
+    // session 保留、新字已可被抽出
+    state = c.read(vocabPracticeProvider(VocabPool.travel));
+    expect(state.streak, 1);
+    expect(
+        c
+            .read(contentRepositoryProvider)
+            .vocab()
+            .where((x) => x.topic == VocabTopic.travel)
+            .any((x) => x.jp == '免税店'),
+        isTrue);
+  });
 }
