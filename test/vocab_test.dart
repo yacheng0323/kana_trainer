@@ -89,8 +89,8 @@ void main() {
       final state = container.read(vocabPracticeProvider(VocabPool.transport));
 
       expect(state.options.length, 4);
-      // jp 可能同時出現在選項（漢字=中文同字），至少卡片上有一個
-      expect(find.text(state.current.jp), findsWidgets);
+      // 日→中答題前題目卡顯示假名（漢字會洩題）
+      expect(find.text(state.current.reading), findsWidgets);
 
       await tapOption(tester, state.options[state.correctIndex]);
 
@@ -98,6 +98,26 @@ void main() {
       final after =
           container.read(vocabPracticeProvider(VocabPool.transport));
       expect(after.streak, 1);
+      await tester.pump(const Duration(seconds: 1)); // flush autoNext
+    });
+
+    testWidgets('日→中：答題前藏漢字（選項外找不到 jp）、作答後揭曉', (tester) async {
+      final container = await pump(tester, VocabPool.transport);
+      final state = container.read(vocabPracticeProvider(VocabPool.transport));
+      final word = state.current;
+
+      if (word.jp != word.reading) {
+        // 答題前：漢字不得出現在選項按鈕以外的地方（題目卡藏漢字）
+        final jpOutsideOptions = find.text(word.jp).evaluate().where(
+            (e) => e.findAncestorWidgetOfExactType<OptionButton>() == null);
+        expect(jpOutsideOptions, isEmpty);
+      }
+      expect(find.text(word.reading), findsWidgets);
+
+      await tapOption(tester, state.options[state.correctIndex]);
+
+      // 作答後：漢字揭曉
+      expect(find.text(word.jp), findsWidgets);
       await tester.pump(const Duration(seconds: 1)); // flush autoNext
     });
 

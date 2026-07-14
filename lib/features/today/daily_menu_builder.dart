@@ -69,8 +69,8 @@ class DailyMenuBuilder {
       return MenuQuestion(
         kind: 'vocab',
         sourceKey: w.key,
-        prompt: w.jp,
-        subtitle: w.reading == w.jp ? null : w.reading,
+        // 漢字洩題（漢字常＝中文答案）：出題用假名，note 作答後揭曉漢字
+        prompt: w.reading,
         options: options,
         correctIndex: correctIndex,
         note: '$noteTag：${w.jp}（${w.reading}）= ${w.zh}',

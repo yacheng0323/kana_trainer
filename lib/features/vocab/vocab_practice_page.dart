@@ -95,14 +95,24 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
             ? AppColors.green
             : AppColors.red;
 
-    // 題目卡主文字與提示
-    final prompt = mode == VocabMode.zhJp ? state.current.zh : state.current.jp;
+    // 題目卡主文字與提示。
+    // 日→中：漢字對中文使用者等於直接洩題（如「出口」），
+    // 答題前一律用假名出題，作答後（對錯都）才揭曉漢字。
+    final hideKanji = mode == VocabMode.jpZh &&
+        !answered &&
+        state.current.jp != state.current.reading;
+    final prompt = mode == VocabMode.zhJp
+        ? state.current.zh
+        : hideKanji
+            ? state.current.reading
+            : state.current.jp;
     final promptSize = prompt.length <= 3
         ? 64.0
         : prompt.length <= 5
             ? 48.0
             : 34.0;
     final showReading = mode == VocabMode.jpZh &&
+        !hideKanji &&
         state.current.reading != state.current.jp;
 
     return Scaffold(
