@@ -110,4 +110,39 @@ void main() {
       expect(QuizGenerator<Kana>(keyOf: (k) => k.kana).freshWeight, 6);
     });
   });
+
+  group('近期不重複窗口', () {
+    test('連抽 200 題：8 題窗口內零重複（大池）', () {
+      final pool = PracticeMode.hiragana.buildPool(allKana);
+      final gen = kanaGen(7);
+      final recent = RecentKeys();
+      Kana? prev;
+      final window = <String>[];
+      for (var i = 0; i < 200; i++) {
+        final k = gen.next(pool, {}, previous: prev, recentKeys: recent.keys);
+        expect(window.contains(k.kana), isFalse,
+            reason: '第 $i 題 ${k.kana} 在近 ${window.length} 題內重複');
+        recent.add(k.kana);
+        window.add(k.kana);
+        if (window.length > QuizGenerator.recentWindow) window.removeAt(0);
+        prev = k;
+      }
+    });
+
+    test('池子比窗口小 → 自動退讓，仍能出題且不連續重複', () {
+      final a = findKana('か')!, b = findKana('き')!, c = findKana('く')!;
+      final pool = [a, b, c];
+      final gen = kanaGen(11);
+      final recent = RecentKeys();
+      Kana? prev;
+      for (var i = 0; i < 50; i++) {
+        final k = gen.next(pool, {}, previous: prev, recentKeys: recent.keys);
+        if (prev != null) {
+          expect(k.kana, isNot(prev.kana), reason: '連續兩題相同');
+        }
+        recent.add(k.kana);
+        prev = k;
+      }
+    });
+  });
 }

@@ -17,6 +17,7 @@ class VocabViewModel
   // freshWeight 12：沒見過的新字出現機率加倍，詞彙量持續往前推
   final QuizGenerator<VocabWord> _generator =
       QuizGenerator(keyOf: (w) => w.key, freshWeight: 12);
+  final RecentKeys _recent = RecentKeys(); // 近期 8 題不重複
   late List<VocabWord> _all; // 靜態 + 動態合併池
   late List<VocabWord> _pool;
 
@@ -48,7 +49,9 @@ class VocabViewModel
       _pool,
       ref.read(masteryProvider),
       previous: prev?.current,
+      recentKeys: _recent.keys,
     );
+    _recent.add(word.key);
     List<String> options = const [];
     var correctIndex = 0;
     if (mode != VocabMode.reading) {

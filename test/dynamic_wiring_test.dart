@@ -73,6 +73,27 @@ void main() {
         isTrue);
   });
 
+  test('單字練習連抽 60 題：近 8 題內零重複（VM 層行為）', () {
+    final kv = InMemoryKeyValueStore();
+    final c = ProviderContainer(overrides: [
+      keyValueStoreProvider.overrideWithValue(kv),
+    ]);
+    addTearDown(c.dispose);
+    final sub = c.listen(vocabPracticeProvider(VocabPool.travel), (_, _) {});
+    addTearDown(sub.close);
+
+    final notifier = c.read(vocabPracticeProvider(VocabPool.travel).notifier);
+    final window = <String>[];
+    for (var i = 0; i < 60; i++) {
+      final key = c.read(vocabPracticeProvider(VocabPool.travel)).current.key;
+      expect(window.contains(key), isFalse,
+          reason: '第 $i 題 $key 在近 ${window.length} 題內重複');
+      window.add(key);
+      if (window.length > 8) window.removeAt(0);
+      notifier.nextQuestion();
+    }
+  });
+
   test('句子 refreshPool：擴充後併入新句、session 不重置', () async {
     final kv = InMemoryKeyValueStore();
     final store = DynamicContentStore(kv);

@@ -16,6 +16,7 @@ class SentenceViewModel
   // freshWeight 12：沒見過的新句優先出（同單字，v2.6.2 機制）
   final QuizGenerator<Sentence> _generator =
       QuizGenerator(keyOf: (s) => s.key, freshWeight: 12);
+  final RecentKeys _recent = RecentKeys(); // 近期 8 題不重複
   final Random _rng = Random();
   late List<Sentence> _all; // 靜態 + 動態合併池
   late List<Sentence> _pool;
@@ -45,7 +46,9 @@ class SentenceViewModel
       _pool,
       ref.read(masteryProvider),
       previous: prev?.current,
+      recentKeys: _recent.keys,
     );
+    _recent.add(sentence.key);
     // 語塊少於 3 的句子不適合重組，固定出克漏字
     final type = sentence.chunks.length >= 3 && _rng.nextBool()
         ? SentenceQuizType.reorder

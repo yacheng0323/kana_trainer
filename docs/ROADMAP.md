@@ -84,6 +84,11 @@
 > 池內總數/已學會/學習中/未見過大數字、30 天雙線成長曲線（池內 vs 已學會，
 > 自繪 CustomPaint 零依賴）、本週新學、7 主題進度條。資料源 =
 > `vocab_history` 每日快照（App 啟動＋開頁記錄、同日覆寫、進備份）。158 tests。
+> **v2.8.1（2026-07-15）＝ fix 出題重複感**（使用者實測：前後題重複、單字仍輪迴）：
+> ① `QuizGenerator` 近期 8 題不重複窗口（原本只排除上一題 → 小池高權重字
+> 隔題就回來）；② `ExpansionPolicy` 加 `poolSize < 30` 觸發 — 原條件
+> 「未見過 <10」在全新主題（15 字全未見過）永不成立，補貨從未啟動。
+> 新增分佈行為測試（連抽 200/60 題斷言窗口內零重複）。162 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。
