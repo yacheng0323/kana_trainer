@@ -13,20 +13,31 @@ export 'package:kana_trainer/domain/models/sentence_models.dart';
 
 class SentenceViewModel
     extends AutoDisposeFamilyNotifier<SentencePracticeState, ScenePool> {
-  final QuizGenerator<Sentence> _generator = QuizGenerator(keyOf: (s) => s.key);
+  // freshWeight 12：沒見過的新句優先出（同單字，v2.6.2 機制）
+  final QuizGenerator<Sentence> _generator =
+      QuizGenerator(keyOf: (s) => s.key, freshWeight: 12);
   final Random _rng = Random();
   late List<Sentence> _all; // 靜態 + 動態合併池
   late List<Sentence> _pool;
 
   @override
   SentencePracticeState build(ScenePool arg) {
+    _rebuildPool();
+    return _question(null);
+  }
+
+  void _rebuildPool() {
     _all = ref.read(contentRepositoryProvider).sentences();
     final wrongKeys = ref.read(sentenceWrongProvider).keys.toSet();
     _pool = arg.buildPool(_all, wrongKeys: wrongKeys);
     if (_pool.isEmpty) {
       _pool = List.of(_all);
     }
-    return _question(null);
+  }
+
+  /// 題庫擴充完成後呼叫：新題併入當前池，session 不重置。
+  void refreshPool() {
+    _rebuildPool();
   }
 
   SentencePracticeState _question(SentencePracticeState? prev) {

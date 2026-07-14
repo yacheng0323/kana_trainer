@@ -25,6 +25,7 @@ class BackupService {
     'dyn_vocab',
     'dyn_sentences',
     'dyn_grammar_quiz',
+    'dyn_blacklist', // 使用者刪題紀錄（整理成果，換機不該丟）
   ];
 
   static String export(SharedPreferences prefs) {
