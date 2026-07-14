@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kana_trainer/data/static/grammar_data.dart';
 import 'package:kana_trainer/data/storage/prefs_provider.dart';
+import 'package:kana_trainer/domain/entities/grammar.dart';
 import 'package:kana_trainer/features/grammar/grammar_lesson_page.dart';
 import 'package:kana_trainer/features/grammar/grammar_list_page.dart';
 import 'package:kana_trainer/features/grammar/grammar_progress_notifier.dart';
@@ -71,9 +72,13 @@ void main() {
       await tester.tap(find.text('開始練習（3 題）'));
       await tester.pump();
 
-      // 依序答對 3 題（選項已打亂，從資料找正解文字）
+      // 依序答對 3 題（題序與選項已打亂，從頁面實際題組找正解文字）
+      // ignore: avoid_dynamic_calls
+      final dynamic pageState =
+          tester.state<ConsumerState>(find.byType(GrammarLessonPage));
+      final quizzes = pageState.debugQuizzes as List<GrammarQuiz>;
       for (var i = 0; i < 3; i++) {
-        final q = point.quiz[i];
+        final q = quizzes[i];
         final correctText = q.options[q.correctIndex];
         final f = find.descendant(
           of: find.byType(OptionButton),
@@ -109,8 +114,12 @@ void main() {
       await tester.tap(find.text('開始練習（3 題）'));
       await tester.pump();
 
+      // ignore: avoid_dynamic_calls
+      final dynamic pageState =
+          tester.state<ConsumerState>(find.byType(GrammarLessonPage));
+      final quizzes = pageState.debugQuizzes as List<GrammarQuiz>;
       for (var i = 0; i < 3; i++) {
-        final q = point.quiz[i];
+        final q = quizzes[i];
         // 故意選錯（挑非正解選項）
         final wrongText =
             q.options[(q.correctIndex + 1) % q.options.length];

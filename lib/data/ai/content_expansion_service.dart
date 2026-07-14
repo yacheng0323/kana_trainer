@@ -5,7 +5,6 @@ import 'package:kana_trainer/domain/entities/grammar.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/domain/models/dynamic_content.dart';
-import 'package:kana_trainer/domain/repositories/ai_client.dart';
 
 /// AI 題庫擴充：一次生成一批，本地驗證（AI 回傳不可信）+ 去重後回傳。
 /// 整批全滅回空 list（呼叫端視為失敗批，仍計入每日批數避免壞回應重試迴圈）。

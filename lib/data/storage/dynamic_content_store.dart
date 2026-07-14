@@ -6,7 +6,6 @@ import 'package:kana_trainer/data/storage/prefs_store.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/domain/models/dynamic_content.dart';
-import 'package:kana_trainer/domain/repositories/key_value_store.dart';
 
 /// AI 生成內容的本地持久化池。建構時全量載入記憶體（量級：數百筆 JSON），
 /// add 時 dedup（against 既有池 + 呼叫端傳入的靜態 key）後 write-through。
