@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/library/library_page.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_list_page.dart';
@@ -80,6 +81,15 @@ class ProfileTab extends ConsumerWidget {
                     badge: wrongCount > 0 ? '$wrongCount' : null,
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const WrongListPage()),
+                    ),
+                  ),
+                  EntryCard(
+                    icon: Icons.library_books_outlined,
+                    iconBg: AppColors.green,
+                    iconColor: Colors.white,
+                    label: '我的題庫',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const LibraryPage()),
                     ),
                   ),
                   EntryCard(
