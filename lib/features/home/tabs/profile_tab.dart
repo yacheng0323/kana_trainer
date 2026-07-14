@@ -9,6 +9,7 @@ import 'package:kana_trainer/features/progress/wrong_list_page.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_page.dart';
+import 'package:kana_trainer/features/stats/vocab_stats_page.dart';
 import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
 /// Tab 4：我的 — 學習統計、每日目標、錯題本、設定。
@@ -84,6 +85,16 @@ class ProfileTab extends ConsumerWidget {
                     ),
                   ),
                   EntryCard(
+                    icon: Icons.trending_up,
+                    iconBg: AppColors.red,
+                    iconColor: Colors.white,
+                    label: '詞彙量',
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (_) => const VocabStatsPage()),
+                    ),
+                  ),
+                  EntryCard(
                     icon: Icons.library_books_outlined,
                     iconBg: AppColors.green,
                     iconColor: Colors.white,
@@ -106,7 +117,7 @@ class ProfileTab extends ConsumerWidget {
               const SizedBox(height: 30),
               const Center(
                 child: Text(
-                  'kana_trainer v2.7.0',
+                  'kana_trainer v2.8.0',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
