@@ -16,6 +16,7 @@ export 'package:kana_trainer/domain/models/practice_models.dart';
 class PracticeViewModel
     extends AutoDisposeFamilyNotifier<PracticeState, PracticeMode> {
   final QuizGenerator<Kana> _generator = QuizGenerator(keyOf: (k) => k.kana);
+  final RecentKeys _recent = RecentKeys(); // 近期 8 題不重複
   late List<Kana> _pool;
 
   @override
@@ -30,8 +31,13 @@ class PracticeViewModel
   }
 
   PracticeState _question(PracticeState? prev) {
-    final kana =
-        _generator.next(_pool, ref.read(masteryProvider), previous: prev?.current);
+    final kana = _generator.next(
+      _pool,
+      ref.read(masteryProvider),
+      previous: prev?.current,
+      recentKeys: _recent.keys,
+    );
+    _recent.add(kana.kana);
     final (options, correctIndex) = _generator.buildOptions(
       kana,
       _pool,

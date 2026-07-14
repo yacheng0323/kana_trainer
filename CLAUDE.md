@@ -38,6 +38,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.6.2 | 詞彙量成長加速：補貨門檻 5→10、每日上限 5→20 批、單字一批 15→20；`QuizGenerator.freshWeight`（單字未見過權重 12，新字優先出）；擴充完成即時併入當前練習池（`refreshPool`，session 不重置）。145 tests |
 | v2.7.0 | 我的題庫（`LibraryPage`，我的 tab 入口）：瀏覽全部單字/句子/文法題，AI 動態項可刪除＋黑名單（`dyn_blacklist`，進備份，擋 AI 重生成）；句子練習補齊 freshWeight 12 + refreshPool。152 tests |
 | v2.8.0 | 詞彙量成長儀表板（`VocabStatsPage`）：每日快照 `vocab_history`（App 啟動+開頁記錄，進備份）、30 天雙線成長曲線（自繪 `GrowthChart`）、本週新學、7 主題進度條。158 tests |
+| v2.8.1 | fix 出題重複感（使用者實測回饋）：①近期 8 題不重複窗口（`RecentKeys`，四練習 VM 全掛）；②補貨加「池 <30 就補」條件 — 修全新主題 15 字全未見過（≥門檻 10）永不觸發擴充的設計漏洞。162 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 

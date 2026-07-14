@@ -13,6 +13,7 @@ export 'package:kana_trainer/domain/models/listening_models.dart';
 class ListeningViewModel extends AutoDisposeNotifier<ListeningState> {
   final QuizGenerator<VocabWord> _generator =
       QuizGenerator(keyOf: (w) => w.key);
+  final RecentKeys _recent = RecentKeys(); // 近期 8 題不重複
 
   @override
   ListeningState build() => _question(null);
@@ -23,7 +24,9 @@ class ListeningViewModel extends AutoDisposeNotifier<ListeningState> {
       all,
       ref.read(masteryProvider),
       previous: prev?.current,
+      recentKeys: _recent.keys,
     );
+    _recent.add(word.key);
     // 干擾項同主題優先，聽感混淆度較高
     final samesTopic = all.where((w) => w.topic == word.topic).toList();
     final (options, correctIndex) = _generator.buildOptions(

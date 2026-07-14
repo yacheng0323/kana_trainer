@@ -10,10 +10,17 @@ class ExpansionPolicy {
   /// 20 批 ≈ 最多 $0.4/天（實際觸發遠低於此）。
   static const dailyLimit = 20;
 
+  /// 範圍池最低題量：低於此值就補（v2.8.1 修：全新主題 15 字全是未見過
+  /// → 舊條件永不觸發，使用者一直輪原始靜態題）。
+  static const minPoolSize = 30;
+
   static bool shouldExpand({
     required bool enabled,
     required int unseenCount,
     required int dailyCount,
+    int poolSize = minPoolSize,
   }) =>
-      enabled && unseenCount < unseenThreshold && dailyCount < dailyLimit;
+      enabled &&
+      dailyCount < dailyLimit &&
+      (unseenCount < unseenThreshold || poolSize < minPoolSize);
 }

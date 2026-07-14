@@ -1,5 +1,20 @@
 import 'dart:math';
 
+/// 滾動「近期出過」窗口（ViewModel 持有；換池、refreshPool 都不影響）。
+class RecentKeys {
+  final List<String> _keys = [];
+
+  Iterable<String> get keys => _keys;
+
+  void add(String key, {int window = QuizGenerator.recentWindow}) {
+    _keys.remove(key);
+    _keys.add(key);
+    while (_keys.length > window) {
+      _keys.removeAt(0);
+    }
+  }
+}
+
 /// 出題演算法（泛型：假名 Kana / 單字 VocabWord 共用）。
 ///
 /// [keyOf] 取熟練度 map 的 key；[valueOf]（buildOptions）取選項顯示文字。
@@ -18,19 +33,29 @@ class QuizGenerator<T> {
   QuizGenerator({required this.keyOf, this.freshWeight = 6, Random? rng})
       : _rng = rng ?? Random();
 
+  /// 近期不重複窗口：連續 [recentWindow] 題內不出同一題（池子小時自動退讓）。
+  static const recentWindow = 8;
+
   T next(
     List<T> pool,
     Map<String, int> mastery, {
     T? previous,
+    Iterable<String> recentKeys = const [],
     bool weighted = true,
   }) {
     if (pool.isEmpty) {
       throw StateError('題庫為空，無法出題');
     }
-    var candidates = pool;
-    if (previous != null && pool.length > 1) {
+    // 排除近期出過的題；全被排除時退回只排除上一題（保證有題可出）。
+    final excluded = recentKeys.toSet();
+    if (previous != null) excluded.add(keyOf(previous));
+    var candidates = pool.where((k) => !excluded.contains(keyOf(k))).toList();
+    if (candidates.isEmpty && previous != null && pool.length > 1) {
       final prevKey = keyOf(previous);
       candidates = pool.where((k) => keyOf(k) != prevKey).toList();
+    }
+    if (candidates.isEmpty) {
+      candidates = pool;
     }
     if (!weighted) {
       return candidates[_rng.nextInt(candidates.length)];

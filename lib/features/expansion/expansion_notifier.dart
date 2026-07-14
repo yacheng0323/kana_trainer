@@ -76,6 +76,7 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
   /// 共用補貨流程。先計數再生成：壞回應/失敗也算一批，防重試迴圈。
   Future<void> _maybeExpand({
     required int unseenCount,
+    required int poolSize,
     required Future<int> Function(String apiKey) generateAndStore,
   }) async {
     final apiKey = ref.read(apiKeyProvider);
@@ -84,6 +85,7 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
       enabled: enabled,
       unseenCount: unseenCount,
       dailyCount: _readDailyCount(),
+      poolSize: poolSize,
     )) {
       return;
     }
@@ -106,9 +108,10 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
   Future<void> maybeExpandVocab(VocabTopic topic,
       {@visibleForTesting int? unseenOverride}) async {
     final repo = ref.read(contentRepositoryProvider);
-    final pool = repo.vocab().where((w) => w.topic == topic);
+    final pool = repo.vocab().where((w) => w.topic == topic).toList();
     await _maybeExpand(
       unseenCount: unseenOverride ?? _unseen(pool.map((w) => w.key)),
+      poolSize: unseenOverride != null ? 999 : pool.length,
       generateAndStore: (apiKey) async {
         final batch =
             await ref.read(contentExpansionServiceProvider).generateVocab(
@@ -125,9 +128,10 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
   Future<void> maybeExpandSentences(Scene scene,
       {@visibleForTesting int? unseenOverride}) async {
     final repo = ref.read(contentRepositoryProvider);
-    final pool = repo.sentences().where((s) => s.scene == scene);
+    final pool = repo.sentences().where((s) => s.scene == scene).toList();
     await _maybeExpand(
       unseenCount: unseenOverride ?? _unseen(pool.map((s) => s.key)),
+      poolSize: unseenOverride != null ? 999 : pool.length,
       generateAndStore: (apiKey) async {
         final batch =
             await ref.read(contentExpansionServiceProvider).generateSentences(
@@ -149,6 +153,8 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
     final dynamicCount = existing.length - point.quiz.length;
     await _maybeExpand(
       unseenCount: unseenOverride ?? dynamicCount,
+      // 文法題量門檻走 unseen（每課動態題 <10 就補），不吃 minPoolSize
+      poolSize: 999,
       generateAndStore: (apiKey) async {
         final batch = await ref
             .read(contentExpansionServiceProvider)
