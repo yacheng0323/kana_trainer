@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
 import 'package:kana_trainer/data/ai/content_expansion_service.dart';
+import 'package:kana_trainer/data/storage/backup_service.dart';
 import 'package:kana_trainer/data/storage/dynamic_content_store.dart';
 import 'package:kana_trainer/data/storage/prefs_store.dart';
 import 'package:kana_trainer/data/storage/secure_store.dart';
@@ -124,6 +125,14 @@ void main() {
     await n.maybeExpandVocab(VocabTopic.travel, unseenOverride: 0);
     expect(fake.calls, 6);
     expect(c.read(expansionProvider).todayCount, 1);
+  });
+
+  test('動態池進備份、日計數不進', () {
+    expect(BackupService.backupKeys, contains('dyn_vocab'));
+    expect(BackupService.backupKeys, contains('dyn_sentences'));
+    expect(BackupService.backupKeys, contains('dyn_grammar_quiz'));
+    expect(
+        BackupService.backupKeys, isNot(contains(ExpansionNotifier.dailyKey)));
   });
 
   test('AI 失敗 → error 狀態、批數仍 +1（防重試迴圈）、不炸', () async {

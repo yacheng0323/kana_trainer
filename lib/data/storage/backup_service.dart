@@ -21,6 +21,10 @@ class BackupService {
     'exam_history',
     'daily_history',
     'menu_done',
+    // 動態題庫池（AI 生成內容，換機不該丟）
+    'dyn_vocab',
+    'dyn_sentences',
+    'dyn_grammar_quiz',
   ];
 
   static String export(SharedPreferences prefs) {
