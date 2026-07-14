@@ -37,6 +37,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.6.1 | 單字日→中出題防洩題：答題前題目卡顯示假名（漢字常＝中文答案），作答後才揭曉漢字；今日菜單單字題同步。讀音輸入/中→日模式不變。141 tests |
 | v2.6.2 | 詞彙量成長加速：補貨門檻 5→10、每日上限 5→20 批、單字一批 15→20；`QuizGenerator.freshWeight`（單字未見過權重 12，新字優先出）；擴充完成即時併入當前練習池（`refreshPool`，session 不重置）。145 tests |
 | v2.7.0 | 我的題庫（`LibraryPage`，我的 tab 入口）：瀏覽全部單字/句子/文法題，AI 動態項可刪除＋黑名單（`dyn_blacklist`，進備份，擋 AI 重生成）；句子練習補齊 freshWeight 12 + refreshPool。152 tests |
+| v2.8.0 | 詞彙量成長儀表板（`VocabStatsPage`）：每日快照 `vocab_history`（App 啟動+開頁記錄，進備份）、30 天雙線成長曲線（自繪 `GrowthChart`）、本週新學、7 主題進度條。158 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -68,7 +69,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 152 tests
+flutter test                 # 158 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
@@ -141,6 +142,7 @@ lib/
 | `ai_cache_<主題>` | AI 題組快取 | ❌ |
 | `dyn_vocab` / `dyn_sentences` / `dyn_grammar_quiz` | 動態題庫池（AI 生成，v2.6.0） | ✅ |
 | `dyn_blacklist` | 使用者刪題黑名單（擋 AI 重生成，v2.7.0） | ✅ |
+| `vocab_history` | 詞彙量每日快照 `{"日期":[learned,total]}`（v2.8.0） | ✅ |
 | `expansion_daily` | 每日生成批數 `{"date","count"}` | ❌（日計數無跨機意義） |
 
 ### AI 出題（`core/ai/ai_quiz_service.dart`)
