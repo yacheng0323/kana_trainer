@@ -55,6 +55,50 @@ void main() {
     expect(reloaded.vocab(), isEmpty);
   });
 
+  group('remove + 黑名單', () {
+    test('remove：移出池、加黑名單、reload 後仍生效', () async {
+      await store.addVocab([_w1, _w2], existingKeys: {});
+      await store.remove(_w1.key);
+      expect(store.vocab().map((w) => w.jp), ['窓口']);
+
+      final reloaded = DynamicContentStore(kv);
+      expect(reloaded.vocab().map((w) => w.jp), ['窓口']);
+      // 黑名單擋 re-add（AI 重生成同字）
+      final added = await reloaded.addVocab([_w1], existingKeys: {});
+      expect(added, 0);
+      expect(reloaded.vocab().length, 1);
+    });
+
+    test('remove 句子與文法題', () async {
+      const s = Sentence(
+          chunks: ['お水', 'を', 'ください'],
+          blankIndex: 0,
+          zh: '請給我水',
+          scene: Scene.restaurant);
+      const g = DynamicGrammarQuiz(
+          lessonId: 'g01',
+          quiz: GrammarQuiz(
+              question: 'q＿＿', options: ['a', 'b', 'c', 'd'], correctIndex: 1));
+      await store.addSentences([s], existingKeys: {});
+      await store.addGrammarQuiz([g], existingKeys: {});
+      await store.remove(s.key);
+      await store.remove(g.key);
+      expect(store.sentences(), isEmpty);
+      expect(store.grammarQuiz(), isEmpty);
+      expect(await store.addSentences([s], existingKeys: {}), 0);
+      expect(await store.addGrammarQuiz([g], existingKeys: {}), 0);
+    });
+
+    test('remove 不存在的 key 不炸、仍進黑名單', () async {
+      await store.remove('v_幽靈');
+      final added = await store.addVocab([
+        const VocabWord(
+            jp: '幽靈', reading: 'ゆうれい', zh: '幽靈', topic: VocabTopic.daily),
+      ], existingKeys: {});
+      expect(added, 0);
+    });
+  });
+
   test('儲存內容壞掉（手動塞爛 JSON）→ 靜默略過壞筆', () async {
     await kv.setString(DynamicContentStore.vocabKey,
         '[{"jp":"良","reading":"よい","zh":"好","topic":"daily"},{"jp":""}]');
