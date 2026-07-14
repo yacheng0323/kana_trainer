@@ -67,8 +67,12 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
       if (next.status == ExpansionStatus.done &&
           next.lastAdded > 0 &&
           prev?.status == ExpansionStatus.generating) {
+        // 新題立刻併入本輪練習池（不用退出重進、session 不重置）
+        ref
+            .read(vocabPracticeProvider(widget.pool).notifier)
+            .refreshPool();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('題庫 +${next.lastAdded} 題')),
+          SnackBar(content: Text('題庫 +${next.lastAdded} 題，馬上就會出現新單字')),
         );
       }
     });

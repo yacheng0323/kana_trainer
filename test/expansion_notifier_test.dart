@@ -7,6 +7,7 @@ import 'package:kana_trainer/data/storage/dynamic_content_store.dart';
 import 'package:kana_trainer/data/storage/prefs_store.dart';
 import 'package:kana_trainer/data/storage/secure_store.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/domain/logic/expansion_policy.dart';
 import 'package:kana_trainer/domain/repositories/ai_client.dart';
 import 'package:kana_trainer/features/expansion/expansion_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
@@ -113,17 +114,17 @@ void main() {
     expect(fake.calls, 0);
   });
 
-  test('每日 5 批封頂、跨日重置', () async {
+  test('每日批數封頂、跨日重置', () async {
     final fake = FakeAiClient(_payload);
     final c = makeContainer(fake);
     final n = c.read(expansionProvider.notifier);
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < ExpansionPolicy.dailyLimit + 2; i++) {
       await n.maybeExpandVocab(VocabTopic.travel, unseenOverride: 0);
     }
-    expect(fake.calls, 5);
+    expect(fake.calls, ExpansionPolicy.dailyLimit);
     StatsNotifier.today = () => '2026-07-15';
     await n.maybeExpandVocab(VocabTopic.travel, unseenOverride: 0);
-    expect(fake.calls, 6);
+    expect(fake.calls, ExpansionPolicy.dailyLimit + 1);
     expect(c.read(expansionProvider).todayCount, 1);
   });
 

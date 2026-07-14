@@ -3,14 +3,20 @@ import 'dart:math';
 /// 出題演算法（泛型：假名 Kana / 單字 VocabWord 共用）。
 ///
 /// [keyOf] 取熟練度 map 的 key；[valueOf]（buildOptions）取選項顯示文字。
-/// 加權隨機：weight = 6 - 熟練度（0..5），熟練度越低越常出現。
+/// 加權隨機：weight = 6 - 熟練度（0..5），熟練度越低越常出現；
+/// [freshWeight] 可另指定「完全沒見過（熟練度 0）」的權重
+/// （單字練習用 12：新字優先出，避免舊字輪迴）。
 /// weighted=false 時為純隨機（基本模式）。
 /// 連續兩題不出同一題（題庫多於一題時排除上一題）。
 class QuizGenerator<T> {
   final Random _rng;
   final String Function(T) keyOf;
 
-  QuizGenerator({required this.keyOf, Random? rng}) : _rng = rng ?? Random();
+  /// 熟練度 0（未見過）項目的權重。預設 6 = 原本行為。
+  final int freshWeight;
+
+  QuizGenerator({required this.keyOf, this.freshWeight = 6, Random? rng})
+      : _rng = rng ?? Random();
 
   T next(
     List<T> pool,
@@ -29,9 +35,10 @@ class QuizGenerator<T> {
     if (!weighted) {
       return candidates[_rng.nextInt(candidates.length)];
     }
-    final weights = candidates
-        .map((k) => 6 - (mastery[keyOf(k)] ?? 0).clamp(0, 5))
-        .toList();
+    final weights = candidates.map((k) {
+      final m = (mastery[keyOf(k)] ?? 0).clamp(0, 5);
+      return m == 0 ? freshWeight : 6 - m;
+    }).toList();
     final total = weights.fold<int>(0, (a, b) => a + b);
     var roll = _rng.nextInt(total);
     for (var i = 0; i < candidates.length; i++) {
