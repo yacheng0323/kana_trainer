@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/domain/entities/grammar.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/features/expansion/expansion_notifier.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'grammar_progress_notifier.dart';
@@ -20,26 +22,38 @@ class GrammarLessonPage extends ConsumerStatefulWidget {
 }
 
 class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
+  static const _quizCount = 3;
+
   bool _quizStarted = false;
   int _quizIndex = 0;
   int _correctCount = 0;
   int? _chosen; // 本題已選選項（顯示順序索引）
+  late List<GrammarQuiz> _quizzes; // 靜態 + 動態合併池打亂取 3
   late List<List<int>> _optionOrders; // 每題選項顯示順序（打亂）
 
   @override
   void initState() {
     super.initState();
     final rng = Random();
+    final merged =
+        ref.read(contentRepositoryProvider).grammarQuiz(widget.point.id);
+    _quizzes = (List.of(merged)..shuffle(rng)).take(_quizCount).toList();
     _optionOrders = [
-      for (final q in widget.point.quiz)
+      for (final q in _quizzes)
         List.generate(q.options.length, (i) => i)..shuffle(rng),
     ];
+    // 背景補貨（fire-and-forget）：本課動態題不足時生成
+    Future.microtask(() =>
+        ref.read(expansionProvider.notifier).maybeExpandGrammar(widget.point));
   }
 
-  GrammarQuiz get _quiz => widget.point.quiz[_quizIndex];
+  @visibleForTesting
+  List<GrammarQuiz> get debugQuizzes => _quizzes;
+
+  GrammarQuiz get _quiz => _quizzes[_quizIndex];
   List<int> get _order => _optionOrders[_quizIndex];
   bool get _answered => _chosen != null;
-  bool get _lastQuestion => _quizIndex == widget.point.quiz.length - 1;
+  bool get _lastQuestion => _quizIndex == _quizzes.length - 1;
 
   void _choose(int displayIndex) {
     if (_answered) return;
@@ -60,7 +74,7 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
       return;
     }
     // 結束：全對 → 完成
-    final allCorrect = _correctCount == widget.point.quiz.length;
+    final allCorrect = _correctCount == _quizzes.length;
     if (allCorrect) {
       ref.read(grammarProgressProvider.notifier).markDone(widget.point.id);
     }

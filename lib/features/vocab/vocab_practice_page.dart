@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/expansion/expansion_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'vocab_view_model.dart';
 
@@ -24,6 +25,17 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
   final _inputController = TextEditingController();
   final _focusNode = FocusNode();
   Timer? _autoNextTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // 背景補貨（fire-and-forget）：本輪照用現有池，下輪吃到新題
+    final topic = widget.pool.topic;
+    if (topic != null) {
+      Future.microtask(
+          () => ref.read(expansionProvider.notifier).maybeExpandVocab(topic));
+    }
+  }
 
   @override
   void dispose() {
@@ -50,6 +62,16 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
     final state = ref.watch(vocabPracticeProvider(widget.pool));
     final settings = ref.watch(settingsProvider);
     final mode = state.mode;
+
+    ref.listen(expansionProvider, (prev, next) {
+      if (next.status == ExpansionStatus.done &&
+          next.lastAdded > 0 &&
+          prev?.status == ExpansionStatus.generating) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('題庫 +${next.lastAdded} 題')),
+        );
+      }
+    });
 
     ref.listen(vocabPracticeProvider(widget.pool), (prev, next) {
       final fb = next.feedback;

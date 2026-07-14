@@ -40,9 +40,17 @@ class DailyMenuBuilder {
     required Map<String, int> kanaWrong,
     required Map<String, int> vocabWrong,
     required Map<String, int> sentenceWrong,
+    List<VocabWord>? vocabPool, // 不傳 = 靜態表（動態池由呼叫端經 repo 傳入）
+    List<Sentence>? sentencePool,
     Random? rng,
   }) {
     final random = rng ?? Random();
+    final vocabAll = vocabPool ?? allVocab;
+    final sentenceAll = sentencePool ?? allSentences;
+    VocabWord? vocabByKey(String key) =>
+        vocabAll.where((w) => w.key == key).firstOrNull;
+    Sentence? sentenceByKey(String key) =>
+        sentenceAll.where((s) => s.key == key).firstOrNull;
     final kanaGen = QuizGenerator<Kana>(keyOf: (k) => k.kana, rng: random);
     final vocabGen = QuizGenerator<VocabWord>(keyOf: (w) => w.key, rng: random);
     final sentenceGen =
@@ -54,9 +62,9 @@ class DailyMenuBuilder {
     MenuQuestion vocabQuestion(VocabWord w, String noteTag) {
       final (options, correctIndex) = vocabGen.buildOptions(
         w,
-        allVocab.where((x) => x.topic == w.topic).toList(),
+        vocabAll.where((x) => x.topic == w.topic).toList(),
         valueOf: (x) => x.zh,
-        fallback: allVocab,
+        fallback: vocabAll,
       );
       return MenuQuestion(
         kind: 'vocab',
@@ -88,9 +96,9 @@ class DailyMenuBuilder {
     MenuQuestion sentenceQuestion(Sentence s, String noteTag) {
       final (options, correctIndex) = sentenceGen.buildOptions(
         s,
-        allSentences.where((x) => x.scene == s.scene).toList(),
+        sentenceAll.where((x) => x.scene == s.scene).toList(),
         valueOf: (x) => x.blank,
-        fallback: allSentences,
+        fallback: sentenceAll,
       );
       return MenuQuestion(
         kind: 'sentence',
@@ -107,7 +115,7 @@ class DailyMenuBuilder {
     var dueTaken = 0;
     for (final key in dueVocabKeys.toList()..shuffle(random)) {
       if (dueTaken >= maxDue) break;
-      final w = findVocab(key);
+      final w = vocabByKey(key);
       if (w == null || !used.add(key)) continue;
       questions.add(vocabQuestion(w, '複習'));
       dueTaken++;
@@ -125,7 +133,7 @@ class DailyMenuBuilder {
     t = 0;
     for (final key in vocabWrong.keys.toList()..shuffle(random)) {
       if (t >= maxWrongVocab) break;
-      final w = findVocab(key);
+      final w = vocabByKey(key);
       if (w == null || !used.add(key)) continue;
       questions.add(vocabQuestion(w, '錯題'));
       t++;
@@ -133,7 +141,7 @@ class DailyMenuBuilder {
     t = 0;
     for (final key in sentenceWrong.keys.toList()..shuffle(random)) {
       if (t >= maxWrongSentence) break;
-      final s = findSentence(key);
+      final s = sentenceByKey(key);
       if (s == null || !used.add(key)) continue;
       questions.add(sentenceQuestion(s, '錯題'));
       t++;
@@ -143,7 +151,7 @@ class DailyMenuBuilder {
     final freshKana = allKana.where((k) => !used.contains(k.kana)).toList()
       ..shuffle(random)
       ..sort((a, b) => (mastery[a.kana] ?? 0).compareTo(mastery[b.kana] ?? 0));
-    final freshVocab = allVocab.where((w) => !used.contains(w.key)).toList()
+    final freshVocab = vocabAll.where((w) => !used.contains(w.key)).toList()
       ..shuffle(random)
       ..sort((a, b) => (mastery[a.key] ?? 0).compareTo(mastery[b.key] ?? 0));
     var ki = 0, vi = 0, turn = 0;

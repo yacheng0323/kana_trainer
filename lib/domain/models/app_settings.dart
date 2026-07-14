@@ -24,6 +24,7 @@ class Settings {
   final bool reminderEnabled; // 每日提醒
   final int reminderHour; // 提醒時間（24h）
   final int reminderMinute;
+  final bool autoExpand; // AI 自動擴充題庫
 
   const Settings({
     this.answerMode = AnswerMode.choice,
@@ -37,6 +38,7 @@ class Settings {
     this.reminderEnabled = false,
     this.reminderHour = 20,
     this.reminderMinute = 0,
+    this.autoExpand = true,
   });
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +53,7 @@ class Settings {
         'reminderEnabled': reminderEnabled,
         'reminderHour': reminderHour,
         'reminderMinute': reminderMinute,
+        'autoExpand': autoExpand,
       };
 
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
@@ -67,6 +70,7 @@ class Settings {
         reminderEnabled: json['reminderEnabled'] as bool? ?? false,
         reminderHour: json['reminderHour'] as int? ?? 20,
         reminderMinute: json['reminderMinute'] as int? ?? 0,
+        autoExpand: json['autoExpand'] as bool? ?? true,
       );
 
   Settings copyWith({
@@ -81,6 +85,7 @@ class Settings {
     bool? reminderEnabled,
     int? reminderHour,
     int? reminderMinute,
+    bool? autoExpand,
   }) =>
       Settings(
         answerMode: answerMode ?? this.answerMode,
@@ -94,5 +99,6 @@ class Settings {
         reminderEnabled: reminderEnabled ?? this.reminderEnabled,
         reminderHour: reminderHour ?? this.reminderHour,
         reminderMinute: reminderMinute ?? this.reminderMinute,
+        autoExpand: autoExpand ?? this.autoExpand,
       );
 }

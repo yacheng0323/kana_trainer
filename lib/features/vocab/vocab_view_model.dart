@@ -1,6 +1,6 @@
 ﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:kana_trainer/data/static/vocab_data.dart';
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/domain/logic/quiz_generator.dart';
 import 'package:kana_trainer/domain/logic/romaji_converter.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
@@ -16,17 +16,18 @@ class VocabViewModel
     extends AutoDisposeFamilyNotifier<VocabPracticeState, VocabPool> {
   final QuizGenerator<VocabWord> _generator =
       QuizGenerator(keyOf: (w) => w.key);
+  late List<VocabWord> _all; // 靜態 + 動態合併池
   late List<VocabWord> _pool;
 
   @override
   VocabPracticeState build(VocabPool arg) {
+    _all = ref.read(contentRepositoryProvider).vocab();
     final wrongKeys = ref.read(vocabWrongProvider).keys.toSet();
-    final dueKeys = ref
-        .read(srsProvider.notifier)
-        .dueKeys(allVocab.map((w) => w.key));
-    _pool = arg.buildPool(allVocab, wrongKeys: wrongKeys, dueKeys: dueKeys);
+    final dueKeys =
+        ref.read(srsProvider.notifier).dueKeys(_all.map((w) => w.key));
+    _pool = arg.buildPool(_all, wrongKeys: wrongKeys, dueKeys: dueKeys);
     if (_pool.isEmpty) {
-      _pool = List.of(allVocab); // 保險：空池由 UI 擋掉
+      _pool = List.of(_all); // 保險：空池由 UI 擋掉
     }
     return _question(null);
   }
@@ -45,7 +46,7 @@ class VocabViewModel
         word,
         _pool,
         valueOf: mode == VocabMode.jpZh ? (w) => w.zh : (w) => w.jp,
-        fallback: allVocab,
+        fallback: _all,
       );
     }
     return VocabPracticeState(

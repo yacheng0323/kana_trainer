@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/expansion/expansion_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'sentence_view_model.dart';
 
@@ -25,6 +26,17 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
   Timer? _autoNextTimer;
 
   @override
+  void initState() {
+    super.initState();
+    // 背景補貨（fire-and-forget）
+    final scene = widget.pool.scene;
+    if (scene != null) {
+      Future.microtask(() =>
+          ref.read(expansionProvider.notifier).maybeExpandSentences(scene));
+    }
+  }
+
+  @override
   void dispose() {
     _autoNextTimer?.cancel();
     super.dispose();
@@ -40,6 +52,16 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
     final state = ref.watch(sentencePracticeProvider(widget.pool));
     final settings = ref.watch(settingsProvider);
     final notifier = ref.read(sentencePracticeProvider(widget.pool).notifier);
+
+    ref.listen(expansionProvider, (prev, next) {
+      if (next.status == ExpansionStatus.done &&
+          next.lastAdded > 0 &&
+          prev?.status == ExpansionStatus.generating) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('題庫 +${next.lastAdded} 題')),
+        );
+      }
+    });
 
     ref.listen(sentencePracticeProvider(widget.pool), (prev, next) {
       final fb = next.feedback;

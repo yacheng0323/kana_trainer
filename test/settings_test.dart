@@ -82,4 +82,25 @@ void main() {
     await tester.pump();
     expect(container.read(settingsProvider).caseSensitive, isTrue);
   });
+
+  testWidgets('AI 自動擴充開關切換持久化', (tester) async {
+    tester.view.physicalSize = const Size(800, 2600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [prefsProvider.overrideWithValue(prefs)],
+        child: const MaterialApp(home: SettingsPage()),
+      ),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsPage)),
+    );
+    expect(container.read(settingsProvider).autoExpand, isTrue);
+    await tester.ensureVisible(find.text('AI 自動擴充題庫'));
+    await tester.tap(find.text('AI 自動擴充題庫'));
+    await tester.pump();
+    expect(container.read(settingsProvider).autoExpand, isFalse);
+  });
 }
