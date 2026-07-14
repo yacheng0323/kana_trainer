@@ -91,4 +91,23 @@ void main() {
       expect(options[correctIndex], 'ka');
     });
   });
+
+  group('freshWeight（新字優先）', () {
+    test('freshWeight 12：未見過項目明顯比熟練項目常出', () {
+      final rng = Random(42);
+      final gen = QuizGenerator<Kana>(
+          keyOf: (k) => k.kana, freshWeight: 12, rng: rng);
+      final a = findKana('か')!; // 熟練 5 → weight 1
+      final b = findKana('き')!; // 未見過 → weight 12
+      var bCount = 0;
+      for (var i = 0; i < 100; i++) {
+        if (gen.next([a, b], {'か': 5}).kana == 'き') bCount++;
+      }
+      expect(bCount, greaterThan(80)); // 期望值 ~92
+    });
+
+    test('預設 freshWeight 6 = 原行為（未見過 weight 6）', () {
+      expect(QuizGenerator<Kana>(keyOf: (k) => k.kana).freshWeight, 6);
+    });
+  });
 }
