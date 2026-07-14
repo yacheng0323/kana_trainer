@@ -5,7 +5,9 @@ import 'package:kana_trainer/data/static/vocab_data.dart';
 import 'package:kana_trainer/data/storage/dynamic_content_store.dart';
 import 'package:kana_trainer/data/storage/prefs_store.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
+import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/sentence/sentence_view_model.dart';
 import 'package:kana_trainer/features/vocab/vocab_view_model.dart';
 
 void main() {
@@ -68,6 +70,46 @@ void main() {
             .vocab()
             .where((x) => x.topic == VocabTopic.travel)
             .any((x) => x.jp == '免税店'),
+        isTrue);
+  });
+
+  test('句子 refreshPool：擴充後併入新句、session 不重置', () async {
+    final kv = InMemoryKeyValueStore();
+    final store = DynamicContentStore(kv);
+    final c = ProviderContainer(overrides: [
+      keyValueStoreProvider.overrideWithValue(kv),
+      dynamicContentStoreProvider.overrideWithValue(store),
+    ]);
+    addTearDown(c.dispose);
+    final sub =
+        c.listen(sentencePracticeProvider(ScenePool.restaurant), (_, _) {});
+    addTearDown(sub.close);
+
+    final notifier =
+        c.read(sentencePracticeProvider(ScenePool.restaurant).notifier);
+    var state = c.read(sentencePracticeProvider(ScenePool.restaurant));
+    // 克漏字題直接答對；重組題跳過作答（只驗 refreshPool 不重置）
+    var expectedStreak = 0;
+    if (state.type == SentenceQuizType.cloze) {
+      notifier.choose(state.correctIndex);
+      expectedStreak = 1;
+    }
+
+    const s = Sentence(
+        chunks: ['お会計', 'を', 'お願いします'],
+        blankIndex: 0,
+        zh: '請幫我結帳',
+        scene: Scene.restaurant);
+    await store.addSentences([s], existingKeys: {});
+    notifier.refreshPool();
+
+    state = c.read(sentencePracticeProvider(ScenePool.restaurant));
+    expect(state.streak, expectedStreak);
+    expect(
+        c
+            .read(contentRepositoryProvider)
+            .sentences()
+            .any((x) => x.jp == 'お会計をお願いします'),
         isTrue);
   });
 }

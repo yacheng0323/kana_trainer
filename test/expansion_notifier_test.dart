@@ -132,6 +132,7 @@ void main() {
     expect(BackupService.backupKeys, contains('dyn_vocab'));
     expect(BackupService.backupKeys, contains('dyn_sentences'));
     expect(BackupService.backupKeys, contains('dyn_grammar_quiz'));
+    expect(BackupService.backupKeys, contains('dyn_blacklist'));
     expect(
         BackupService.backupKeys, isNot(contains(ExpansionNotifier.dailyKey)));
   });
