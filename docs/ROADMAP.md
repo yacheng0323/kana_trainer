@@ -68,6 +68,9 @@
 > 背景生成（`ExpansionPolicy`，每日 5 批上限、設定頁可關）。50 音維持固定；
 > exam 模擬測驗維持靜態（檢定基準一致性）。無 Key/斷網 → 靜默用現有池。
 > 140 tests。spec/plan 見 docs/superpowers/。
+> **v2.6.1（2026-07-14）＝ 假名優先出題**（使用者回饋：漢字常＝中文答案，直接洩題）：
+> 單字日→中與今日菜單單字題，答題前顯示假名、作答後（對錯皆）揭曉漢字＋讀音；
+> 讀音輸入（考漢字念法）與中→日（題面中文）不受影響。141 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。
