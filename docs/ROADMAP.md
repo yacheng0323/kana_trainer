@@ -80,6 +80,10 @@
 > AI 動態項標記 badge、可刪除 → 移出池＋`dyn_blacklist` 黑名單（進備份），
 > AI 重生成同題會被擋（品質管理閉環）；② 句子練習補齊 v2.6.2 機制
 > （freshWeight 12 新句優先、擴充即時併入當前池）。152 tests。
+> **v2.8.0（2026-07-15）＝ 詞彙量成長儀表板**：`VocabStatsPage`（我的 tab）—
+> 池內總數/已學會/學習中/未見過大數字、30 天雙線成長曲線（池內 vs 已學會，
+> 自繪 CustomPaint 零依賴）、本週新學、7 主題進度條。資料源 =
+> `vocab_history` 每日快照（App 啟動＋開頁記錄、同日覆寫、進備份）。158 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

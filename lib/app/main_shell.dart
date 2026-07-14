@@ -7,6 +7,7 @@ import 'package:kana_trainer/features/home/tabs/kana_tab.dart';
 import 'package:kana_trainer/features/home/tabs/profile_tab.dart';
 import 'package:kana_trainer/features/home/tabs/today_tab.dart';
 import 'package:kana_trainer/features/home/tabs/topics_tab.dart';
+import 'package:kana_trainer/features/progress/vocab_history_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_notifier.dart';
 
 /// Bottom navigation 殼：今日 / 50音基礎 / 主題學習 / 檢定 / 我的。
@@ -32,6 +33,8 @@ class _MainShellState extends ConsumerState<MainShell> {
             .read(notificationServiceProvider)
             .scheduleDaily(hour: s.reminderHour, minute: s.reminderMinute);
       }
+      // 詞彙量每日快照（成長曲線資料點，同日覆寫）
+      ref.read(vocabHistoryProvider.notifier).snapshot();
     });
   }
 
