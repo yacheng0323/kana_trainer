@@ -61,6 +61,13 @@
 > Keystore 加密），啟動時自動搬移 prefs 舊明文並刪除，新增 SecureStore（實作
 > KeyValueStore，secureStoreProvider）；③ 備份匯入版本檢查（無 version 視為
 > v1、過新拒絕並提示更新 App）。109 tests。
+> **v2.6.0（2026-07-14）＝ 動態題庫池**（使用者要求：題目不要固定寫死）：
+> 單字/句子/文法測驗題由 Claude API 批次生成（單字 15/句 8/文法題 5 一批），
+> 本地驗證＋去重後存入 `DynamicContentStore`（prefs，進備份），練習出題走
+> `ContentRepository`（靜態種子＋動態池合併）。自動補貨：範圍內未見過 <5 題時
+> 背景生成（`ExpansionPolicy`，每日 5 批上限、設定頁可關）。50 音維持固定；
+> exam 模擬測驗維持靜態（檢定基準一致性）。無 Key/斷網 → 靜默用現有池。
+> 140 tests。spec/plan 見 docs/superpowers/。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

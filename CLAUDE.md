@@ -33,6 +33,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.4.0 | M9 學習深度：動詞變化訓練（41 個 N5 動詞四變化 drill）、AI 情境對話（5 情境角色扮演＋糾錯）、AI 弱點分析（錯題→建議，快取 `ai_analysis`）；抽共用 ClaudeClient |
 | v2.5.0 | MVVM 架構重構：domain/data/features 分層、model 類別全數移出 ViewModel/service、抽象介面 KeyValueStore + AiClient、controller 更名 ViewModel、全面 package imports。零行為變更，103 tests |
 | v2.5.1 | 防禦性強化：GitHub Actions CI（analyze+test）、API Key 移入 flutter_secure_storage（Keystore 加密，啟動時自動搬移舊明文並刪除）、備份匯入版本檢查（過新拒絕）。109 tests |
+| v2.6.0 | 動態題庫池：單字/句子/文法題 AI 批次生成擴充（`ContentRepository` 合併靜態+動態、`DynamicContentStore` 持久化、`ExpansionNotifier` 自動補貨、每日 5 批上限、動態池進備份）。50 音維持固定。140 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -64,7 +65,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 109 tests
+flutter test                 # 140 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
@@ -93,7 +94,10 @@ lib/
 │   ├── storage/                  # prefs_provider（SharedPreferences 單例）、
 │   │                             #   prefs_store（SharedPrefsStore 實作 + keyValueStoreProvider）、
 │   │                             #   secure_store（SecureStore 實作，API Key 走 Keystore 加密）、
+│   │                             #   dynamic_content_store（AI 生成內容持久化池，dedup）、
 │   │                             #   backup_service（⚠️ backupKeys 刻意不含 claude_api_key）
+│   ├── content/                  # MergedContentRepository（靜態種子+動態池合併，
+│   │                             #   contentRepositoryProvider — 練習取題唯一入口）
 │   ├── ai/                       # ClaudeClient（實作 AiClient）+ quiz/chat/analysis services
 │   └── services/                 # TtsService、NotificationService（平台服務，皆有抽象+fake）
 └── features/                     # ═ View + ViewModel ═
@@ -132,6 +136,8 @@ lib/
 | `settings` / `mastery` / `wrong` / `vocab_wrong` / `sentence_wrong` / `srs` / `stats` / `grammar_done` / `exam_history` / `daily_history` / `menu_done` | 學習資料（JSON） | ✅ `BackupService.backupKeys` |
 | `claude_api_key` | ~~Claude API Key~~ **v2.5.1 起移入 flutter_secure_storage（Keystore）**，不在 prefs；啟動時舊明文自動搬移＋刪除 | ❌ **刻意排除**（測試有斷言） |
 | `ai_cache_<主題>` | AI 題組快取 | ❌ |
+| `dyn_vocab` / `dyn_sentences` / `dyn_grammar_quiz` | 動態題庫池（AI 生成，v2.6.0） | ✅ |
+| `expansion_daily` | 每日生成批數 `{"date","count"}` | ❌（日計數無跨機意義） |
 
 ### AI 出題（`core/ai/ai_quiz_service.dart`)
 
