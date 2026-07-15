@@ -8,6 +8,7 @@ import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/domain/models/sentence_models.dart';
 export 'package:kana_trainer/domain/models/sentence_models.dart';
 
@@ -28,11 +29,17 @@ class SentenceViewModel
   }
 
   void _rebuildPool() {
-    _all = ref.read(contentRepositoryProvider).sentences();
+    final full = ref.read(contentRepositoryProvider).sentences();
+    final level = ref.read(settingsProvider).jlptLevel;
+    final levelAll = full.where((s) => s.jlpt == level).toList();
+    _all = full; // 干擾選項與最終 fallback 用全池
     final wrongKeys = ref.read(sentenceWrongProvider).keys.toSet();
-    _pool = arg.buildPool(_all, wrongKeys: wrongKeys);
+    _pool = arg.buildPool(levelAll, wrongKeys: wrongKeys);
+    if (_pool.length < 4) {
+      _pool = arg.buildPool(full, wrongKeys: wrongKeys);
+    }
     if (_pool.isEmpty) {
-      _pool = List.of(_all);
+      _pool = List.of(full);
     }
   }
 

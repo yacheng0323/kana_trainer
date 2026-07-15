@@ -8,6 +8,7 @@ import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/domain/entities/sentence.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
 import 'package:kana_trainer/features/sentence/sentence_view_model.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/vocab/vocab_view_model.dart';
 
 void main() {
@@ -92,6 +93,43 @@ void main() {
       if (window.length > 8) window.removeAt(0);
       notifier.nextQuestion();
     }
+  });
+
+  test('等級切換：N4 池夠大時只出 N4 字；等級池太小 fallback 全池墊檔', () async {
+    final kv = InMemoryKeyValueStore();
+    final store = DynamicContentStore(kv);
+    // jp 加序號保證不與靜態 105 詞撞名（撞名會被 repo 靜態優先過濾）
+    final n4words = [
+      for (var i = 1; i <= 5; i++)
+        VocabWord(
+            jp: '会議室$i',
+            reading: 'かいぎしつ$i',
+            zh: '會議室$i',
+            topic: VocabTopic.work,
+            jlpt: 4),
+    ];
+    await store.addVocab(n4words, existingKeys: {});
+
+    final c = ProviderContainer(overrides: [
+      keyValueStoreProvider.overrideWithValue(kv),
+      dynamicContentStoreProvider.overrideWithValue(store),
+    ]);
+    addTearDown(c.dispose);
+    c.read(settingsProvider.notifier).update((s) => s.copyWith(jlptLevel: 4));
+
+    // N4 work 池有 5 字（≥4）→ 純 N4 出題
+    final sub = c.listen(vocabPracticeProvider(VocabPool.work), (_, _) {});
+    addTearDown(sub.close);
+    final notifier = c.read(vocabPracticeProvider(VocabPool.work).notifier);
+    for (var i = 0; i < 10; i++) {
+      expect(c.read(vocabPracticeProvider(VocabPool.work)).current.jlpt, 4);
+      notifier.nextQuestion();
+    }
+
+    // N4 travel 主題零字 → fallback 全池墊檔，仍正常出 4 選項
+    final sub2 = c.listen(vocabPracticeProvider(VocabPool.travel), (_, _) {});
+    addTearDown(sub2.close);
+    expect(c.read(vocabPracticeProvider(VocabPool.travel)).options.length, 4);
   });
 
   test('句子 refreshPool：擴充後併入新句、session 不重置', () async {

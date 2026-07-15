@@ -133,8 +133,69 @@ void main() {
     expect(BackupService.backupKeys, contains('dyn_sentences'));
     expect(BackupService.backupKeys, contains('dyn_grammar_quiz'));
     expect(BackupService.backupKeys, contains('dyn_blacklist'));
+    expect(BackupService.backupKeys, contains('dyn_grammar_lessons'));
     expect(
         BackupService.backupKeys, isNot(contains(ExpansionNotifier.dailyKey)));
+  });
+
+  group('expandGrammarLesson（手動）', () {
+    final lessonPayload = {
+      'title': '受身形',
+      'explanation': '動詞被動態。',
+      'examples': [
+        {'jp': '先生に褒められました。', 'zh': '被老師稱讚了。'},
+        {'jp': '雨に降られました。', 'zh': '被雨淋了。'},
+      ],
+      'quiz': [
+        {
+          'question': '先生に＿＿ました。',
+          'options': ['褒められ', '褒め', '褒めて', '褒めよう'],
+          'correctIndex': 0
+        },
+        {
+          'question': '犬に＿＿ました。',
+          'options': ['噛まれ', '噛み', '噛んで', '噛もう'],
+          'correctIndex': 0
+        },
+        {
+          'question': '友達に＿＿ました。',
+          'options': ['笑われ', '笑い', '笑って', '笑おう'],
+          'correctIndex': 0
+        },
+      ],
+    };
+
+    test('成功 → 課入池、批數 +1、回傳 id', () async {
+      final fake = FakeAiClient(lessonPayload);
+      final c = makeContainer(fake);
+      final id =
+          await c.read(expansionProvider.notifier).expandGrammarLesson(4);
+      expect(id, 'gdyn_n4_受身形');
+      expect(c.read(expansionProvider).todayCount, 1);
+      expect(
+          c.read(dynamicContentStoreProvider).grammarLessons().single.level, 4);
+    });
+
+    test('無 API Key → null、不呼叫', () async {
+      final fake = FakeAiClient(lessonPayload);
+      final c = makeContainer(fake, apiKey: '');
+      final id =
+          await c.read(expansionProvider.notifier).expandGrammarLesson(4);
+      expect(id, isNull);
+      expect(fake.calls, 0);
+    });
+
+    test('達每日上限 → null、不呼叫', () async {
+      final fake = FakeAiClient(lessonPayload);
+      final c = makeContainer(fake);
+      final n = c.read(expansionProvider.notifier);
+      for (var i = 0; i < ExpansionPolicy.dailyLimit; i++) {
+        await n.expandGrammarLesson(4);
+      }
+      final callsAtCap = fake.calls;
+      expect(await n.expandGrammarLesson(4), isNull);
+      expect(fake.calls, callsAtCap);
+    });
   });
 
   test('AI 失敗 → error 狀態、批數仍 +1（防重試迴圈）、不炸', () async {

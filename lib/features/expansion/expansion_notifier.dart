@@ -108,7 +108,12 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
   Future<void> maybeExpandVocab(VocabTopic topic,
       {@visibleForTesting int? unseenOverride}) async {
     final repo = ref.read(contentRepositoryProvider);
-    final pool = repo.vocab().where((w) => w.topic == topic).toList();
+    final level = ref.read(settingsProvider).jlptLevel;
+    // unseen / 池量以「目前等級內」計，補的也是該等級
+    final pool = repo
+        .vocab()
+        .where((w) => w.topic == topic && w.jlpt == level)
+        .toList();
     await _maybeExpand(
       unseenCount: unseenOverride ?? _unseen(pool.map((w) => w.key)),
       poolSize: unseenOverride != null ? 999 : pool.length,
@@ -117,6 +122,7 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
             await ref.read(contentExpansionServiceProvider).generateVocab(
                   apiKey: apiKey,
                   topic: topic,
+                  level: level,
                   existingJp: repo.vocab().map((w) => w.jp).toSet(),
                 );
         return ref.read(dynamicContentStoreProvider).addVocab(batch,
@@ -128,7 +134,11 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
   Future<void> maybeExpandSentences(Scene scene,
       {@visibleForTesting int? unseenOverride}) async {
     final repo = ref.read(contentRepositoryProvider);
-    final pool = repo.sentences().where((s) => s.scene == scene).toList();
+    final level = ref.read(settingsProvider).jlptLevel;
+    final pool = repo
+        .sentences()
+        .where((s) => s.scene == scene && s.jlpt == level)
+        .toList();
     await _maybeExpand(
       unseenCount: unseenOverride ?? _unseen(pool.map((s) => s.key)),
       poolSize: unseenOverride != null ? 999 : pool.length,
@@ -137,12 +147,49 @@ class ExpansionNotifier extends Notifier<ExpansionState> {
             await ref.read(contentExpansionServiceProvider).generateSentences(
                   apiKey: apiKey,
                   scene: scene,
+                  level: level,
                   existingJp: repo.sentences().map((s) => s.jp).toSet(),
                 );
         return ref.read(dynamicContentStoreProvider).addSentences(batch,
             existingKeys: repo.sentences().map((s) => s.key).toSet());
       },
     );
+  }
+
+  /// 手動生成一課 N4~N1 文法（教學內容 → 使用者主動觸發，計每日批數）。
+  /// 回傳新課 id；null = 沒生成（關閉/無 Key/達上限/生成不合格）。
+  Future<String?> expandGrammarLesson(int level) async {
+    final apiKey = ref.read(apiKeyProvider);
+    final enabled = ref.read(settingsProvider).autoExpand && apiKey.isNotEmpty;
+    if (!enabled || _readDailyCount() >= ExpansionPolicy.dailyLimit) {
+      return null;
+    }
+    await _bumpDailyCount();
+    state = state.copyWith(status: ExpansionStatus.generating);
+    try {
+      final store = ref.read(dynamicContentStoreProvider);
+      final existingTitles = store
+          .grammarLessons()
+          .where((l) => l.level == level)
+          .map((l) => l.title)
+          .toSet();
+      final lesson = await ref
+          .read(contentExpansionServiceProvider)
+          .generateGrammarLesson(
+              apiKey: apiKey, level: level, existingTitles: existingTitles);
+      if (lesson == null) {
+        state = state.copyWith(
+            status: ExpansionStatus.error, error: 'AI 回傳不合格，請再試一次');
+        return null;
+      }
+      final added = await store.addGrammarLessons([lesson], existingKeys: {});
+      state = state.copyWith(
+          status: ExpansionStatus.done, lastAdded: added, error: null);
+      return added > 0 ? lesson.id : null;
+    } on AiException catch (e) {
+      state = state.copyWith(status: ExpansionStatus.error, error: e.message);
+      return null;
+    }
   }
 
   Future<void> maybeExpandGrammar(GrammarPoint point,

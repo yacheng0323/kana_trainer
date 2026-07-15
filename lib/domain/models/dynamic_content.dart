@@ -10,6 +10,7 @@ Map<String, dynamic> vocabWordToJson(VocabWord w) => {
       'reading': w.reading,
       'zh': w.zh,
       'topic': w.topic.name,
+      'jlpt': w.jlpt,
     };
 
 VocabWord? vocabWordFromJson(Map<String, dynamic> json) {
@@ -19,7 +20,9 @@ VocabWord? vocabWordFromJson(Map<String, dynamic> json) {
   if (reading is! String || reading.isEmpty) return null;
   if (zh is! String || zh.isEmpty) return null;
   if (topic == null) return null;
-  return VocabWord(jp: jp, reading: reading, zh: zh, topic: topic);
+  final jlpt = (json['jlpt'] as int? ?? 5).clamp(1, 5); // 舊資料缺 → N5
+  return VocabWord(
+      jp: jp, reading: reading, zh: zh, topic: topic, jlpt: jlpt);
 }
 
 Map<String, dynamic> sentenceToJson(Sentence s) => {
@@ -27,6 +30,7 @@ Map<String, dynamic> sentenceToJson(Sentence s) => {
       'blankIndex': s.blankIndex,
       'zh': s.zh,
       'scene': s.scene.name,
+      'jlpt': s.jlpt,
     };
 
 Sentence? sentenceFromJson(Map<String, dynamic> json) {
@@ -43,7 +47,9 @@ Sentence? sentenceFromJson(Map<String, dynamic> json) {
   }
   if (zh is! String || zh.isEmpty) return null;
   if (scene == null) return null;
-  return Sentence(chunks: chunks, blankIndex: blankIndex, zh: zh, scene: scene);
+  final jlpt = (json['jlpt'] as int? ?? 5).clamp(1, 5); // 舊資料缺 → N5
+  return Sentence(
+      chunks: chunks, blankIndex: blankIndex, zh: zh, scene: scene, jlpt: jlpt);
 }
 
 /// 動態文法測驗題：綁定既有文法課（lessonId = GrammarPoint.id）。
@@ -55,6 +61,88 @@ class DynamicGrammarQuiz {
 
   /// 去重 key：同課同題面視為重複。
   String get key => '$lessonId|${quiz.question}';
+}
+
+/// AI 生成的文法「課程」（N4~N1：教學卡+例句+3 題，未人審，可刪+黑名單）。
+class DynamicGrammarLesson {
+  final String id; // gdyn_n{level}_{title}，全域唯一（黑名單 key）
+  final int level; // 4..1
+  final String title;
+  final String explanation;
+  final List<GrammarExample> examples;
+  final List<GrammarQuiz> quiz; // 恰 3 題
+
+  const DynamicGrammarLesson({
+    required this.id,
+    required this.level,
+    required this.title,
+    required this.explanation,
+    required this.examples,
+    required this.quiz,
+  });
+
+  /// 直接餵既有 GrammarLessonPage（零 UI 重工）。
+  GrammarPoint toGrammarPoint() => GrammarPoint(
+        id: id,
+        title: title,
+        explanation: explanation,
+        examples: examples,
+        quiz: quiz,
+      );
+}
+
+Map<String, dynamic> dynamicGrammarLessonToJson(DynamicGrammarLesson l) => {
+      'id': l.id,
+      'level': l.level,
+      'title': l.title,
+      'explanation': l.explanation,
+      'examples': [
+        for (final e in l.examples) {'jp': e.jp, 'zh': e.zh},
+      ],
+      'quiz': [
+        for (final q in l.quiz)
+          {
+            'question': q.question,
+            'options': q.options,
+            'correctIndex': q.correctIndex,
+          },
+      ],
+    };
+
+DynamicGrammarLesson? dynamicGrammarLessonFromJson(Map<String, dynamic> json) {
+  final id = json['id'], level = json['level'];
+  final title = json['title'], explanation = json['explanation'];
+  final rawExamples = json['examples'], rawQuiz = json['quiz'];
+  if (id is! String || id.isEmpty) return null;
+  if (level is! int || level < 1 || level > 4) return null;
+  if (title is! String || title.isEmpty) return null;
+  if (explanation is! String || explanation.isEmpty) return null;
+  if (rawExamples is! List || rawQuiz is! List) return null;
+
+  final examples = <GrammarExample>[];
+  for (final raw in rawExamples.whereType<Map<String, dynamic>>()) {
+    final jp = raw['jp'], zh = raw['zh'];
+    if (jp is! String || jp.isEmpty || zh is! String || zh.isEmpty) continue;
+    examples.add(GrammarExample(jp, zh));
+  }
+  if (examples.length < 2) return null;
+
+  final quiz = <GrammarQuiz>[];
+  for (final raw in rawQuiz.whereType<Map<String, dynamic>>()) {
+    final q = dynamicGrammarQuizFromJson({...raw, 'lessonId': id});
+    if (q == null || !q.quiz.question.contains('＿＿')) continue;
+    quiz.add(q.quiz);
+  }
+  if (quiz.length != 3) return null;
+
+  return DynamicGrammarLesson(
+    id: id,
+    level: level,
+    title: title,
+    explanation: explanation,
+    examples: examples,
+    quiz: quiz,
+  );
 }
 
 Map<String, dynamic> dynamicGrammarQuizToJson(DynamicGrammarQuiz q) => {

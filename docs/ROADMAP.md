@@ -89,6 +89,13 @@
 > 隔題就回來）；② `ExpansionPolicy` 加 `poolSize < 30` 觸發 — 原條件
 > 「未見過 <10」在全新主題（15 字全未見過）永不成立，補貨從未啟動。
 > 新增分佈行為測試（連抽 200/60 題斷言窗口內零重複）。162 tests。
+> **v2.9.0（2026-07-16）＝ N1~N5 全等級**（使用者要求：不等 N5 刷完，自由選等級）：
+> ① `Settings.jlptLevel` + 主題學習 tab 等級選擇器（N5~N1）；② 單字/句子按
+> 等級獨立池，N4~N1 從零由 AI 生成（prompt 鎖 JLPT 等級、等級池 <4 時全池墊檔）；
+> ③ 文法：N5 人審 12 課線性解鎖不變，N4~N1 = `DynamicGrammarLesson`（AI 生成
+> 教學卡+例句+3 題，badge 標未人審、可刪+黑名單、手動「生成下一課」按鈕計每日
+> 批數）；④ 儀表板按目前等級統計（曲線維持全等級）。mastery/SRS/錯題 key 全域
+> 唯一跨等級共用；exam 維持 N5（檢定基準）。178 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

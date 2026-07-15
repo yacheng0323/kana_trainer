@@ -38,10 +38,11 @@ void main() {
     // Tab 2：主題學習
     await tester.tap(find.text('主題學習'));
     await tester.pumpAndSettle();
-    expect(find.text('單字（N5・105 詞）'), findsOneWidget);
+    expect(find.text('練習等級'), findsOneWidget); // 等級選擇器（v2.9.0）
+    expect(find.text('單字（N5）'), findsOneWidget);
     expect(find.text('聽力測驗'), findsOneWidget);
     expect(find.text('情境句子（40 句）'), findsOneWidget);
-    expect(find.text('N5 文法課程'), findsOneWidget);
+    expect(find.text('文法課程'), findsOneWidget);
 
     // Tab 3：檢定
     await tester.tap(find.text('檢定'));

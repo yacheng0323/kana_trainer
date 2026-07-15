@@ -94,12 +94,14 @@ class ContentExpansionService {
     required String apiKey,
     required VocabTopic topic,
     required Set<String> existingJp,
+    int level = 5,
   }) async {
     final payload = await _client.completeJson(
       apiKey: apiKey,
-      system: '你是專業日語教師，為繁體中文使用者挑選 JLPT N5 程度的日語單字。'
+      system: '你是專業日語教師，為繁體中文使用者挑選 JLPT N$level 程度的日語單字。'
           '規則：jp 為顯示字（常用漢字或假名）、reading 為假名讀音、'
-          'zh 為繁體中文意思（簡短）；全部必須是 N5 常用詞，不出偏僻詞。',
+          'zh 為繁體中文意思（簡短）；難度必須精準落在 N$level'
+          '（不出更簡單或更難等級的詞）。',
       messages: [
         {
           'role': 'user',
@@ -112,7 +114,8 @@ class ContentExpansionService {
     final seen = {...existingJp};
     final out = <VocabWord>[];
     for (final raw in _items(payload)) {
-      final w = vocabWordFromJson({...raw, 'topic': topic.name});
+      final w =
+          vocabWordFromJson({...raw, 'topic': topic.name, 'jlpt': level});
       if (w == null || seen.contains(w.jp)) continue;
       seen.add(w.jp);
       out.add(w);
@@ -124,13 +127,15 @@ class ContentExpansionService {
     required String apiKey,
     required Scene scene,
     required Set<String> existingJp,
+    int level = 5,
   }) async {
     final payload = await _client.completeJson(
       apiKey: apiKey,
-      system: '你是專業日語教師，為繁體中文使用者編寫 JLPT N5 程度的日語情境句。'
+      system: '你是專業日語教師，為繁體中文使用者編寫 JLPT N$level 程度的日語情境句。'
           '規則：chunks 為正確語序的語塊（3~6 塊，供重組題用），'
           'blankIndex 為克漏字挖空的語塊索引（挑助詞或關鍵詞），'
-          'zh 為繁體中文翻譯。句子必須自然、實用、N5 程度。',
+          'zh 為繁體中文翻譯。句子必須自然、實用、難度精準落在 N$level'
+          '（高等級可用敬語、複合句型）。',
       messages: [
         {
           'role': 'user',
@@ -143,7 +148,7 @@ class ContentExpansionService {
     final seen = {...existingJp};
     final out = <Sentence>[];
     for (final raw in _items(payload)) {
-      final s = sentenceFromJson({...raw, 'scene': scene.name});
+      final s = sentenceFromJson({...raw, 'scene': scene.name, 'jlpt': level});
       if (s == null || seen.contains(s.jp)) continue;
       seen.add(s.jp);
       out.add(s);
@@ -180,6 +185,81 @@ class ContentExpansionService {
       out.add(q);
     }
     return out;
+  }
+
+  static const _grammarLessonSchema = {
+    'type': 'object',
+    'properties': {
+      'title': {'type': 'string'},
+      'explanation': {'type': 'string'},
+      'examples': {
+        'type': 'array',
+        'items': {
+          'type': 'object',
+          'properties': {
+            'jp': {'type': 'string'},
+            'zh': {'type': 'string'},
+          },
+          'required': ['jp', 'zh'],
+          'additionalProperties': false,
+        },
+      },
+      'quiz': {
+        'type': 'array',
+        'items': {
+          'type': 'object',
+          'properties': {
+            'question': {'type': 'string'},
+            'options': {
+              'type': 'array',
+              'items': {'type': 'string'},
+            },
+            'correctIndex': {
+              'type': 'integer',
+              'enum': [0, 1, 2, 3]
+            },
+          },
+          'required': ['question', 'options', 'correctIndex'],
+          'additionalProperties': false,
+        },
+      },
+    },
+    'required': ['title', 'explanation', 'examples', 'quiz'],
+    'additionalProperties': false,
+  };
+
+  /// 生成一課 N4~N1 文法（教學卡+例句+3 題）。未人審 — UI 標示 AI badge，
+  /// 教錯可刪（黑名單）。回 null = 該次生成不合格（title 重複或驗證不過）。
+  Future<DynamicGrammarLesson?> generateGrammarLesson({
+    required String apiKey,
+    required int level,
+    required Set<String> existingTitles,
+  }) async {
+    final payload = await _client.completeJson(
+      apiKey: apiKey,
+      system: '你是專業日語教師，為繁體中文使用者編寫 JLPT N$level 文法課。'
+          '規則：title 為文法點名稱（如「〜られる（受身形）」）；'
+          'explanation 用繁體中文 2-4 行說明接續與用法；'
+          'examples 恰 3 個例句（jp 日文、zh 繁中翻譯）；'
+          'quiz 恰 3 題，question 為含「＿＿」挖空的日文句、'
+          'options 恰 4 個不重複、干擾項合理但明確錯誤。'
+          '難度精準落在 N$level。',
+      messages: [
+        {
+          'role': 'user',
+          'content': '出一課新的 N$level 文法。'
+              '絕對不要出這些已有的文法點：${existingTitles.join('、')}',
+        },
+      ],
+      schema: _grammarLessonSchema,
+    );
+    final title = payload['title'];
+    if (title is! String || existingTitles.contains(title)) return null;
+    return dynamicGrammarLessonFromJson({
+      ...payload,
+      'id': 'gdyn_n${level}_$title',
+      'level': level,
+    });
   }
 
   List<Map<String, dynamic>> _items(Map<String, dynamic> payload) {
