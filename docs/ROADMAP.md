@@ -96,6 +96,14 @@
 > 教學卡+例句+3 題，badge 標未人審、可刪+黑名單、手動「生成下一課」按鈕計每日
 > 批數）；④ 儀表板按目前等級統計（曲線維持全等級）。mastery/SRS/錯題 key 全域
 > 唯一跨等級共用；exam 維持 N5（檢定基準）。178 tests。
+> **v2.10.0（2026-07-16）＝ 全等級一致性收尾**：① 各等級模擬測驗 — N4~N1 由
+> 等級池組卷（單字 10 從等級單字池、文法 5 從動態課 quiz 池、假名 5 照舊），
+> `ExamReadiness`（單字 ≥20、文法題 ≥5）不足時開始鈕停用＋缺口提示，
+> `ExamRecord.level`（舊紀錄視為 N5）、歷史/最近三次顯示等級；② AI 出題
+> prompt 等級化＋快取 key 按等級分（`ai_cache_n<level>_<主題>`，N5 舊快取
+> 不遷移重生即可）；③ AI 情境對話難度跟等級（N2/N1 敬語＋進階句型）；
+> ④ 今日菜單新內容按目前等級抽（等級池 <15 退全池），`lookupPool` 保
+> 跨等級 SRS/錯題複習。187 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

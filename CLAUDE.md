@@ -40,6 +40,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.8.0 | 詞彙量成長儀表板（`VocabStatsPage`）：每日快照 `vocab_history`（App 啟動+開頁記錄，進備份）、30 天雙線成長曲線（自繪 `GrowthChart`）、本週新學、7 主題進度條。158 tests |
 | v2.8.1 | fix 出題重複感（使用者實測回饋）：①近期 8 題不重複窗口（`RecentKeys`，四練習 VM 全掛）；②補貨加「池 <30 就補」條件 — 修全新主題 15 字全未見過（≥門檻 10）永不觸發擴充的設計漏洞。162 tests |
 | v2.9.0 | **N1~N5 全等級**：`Settings.jlptLevel` + 主題學習 tab 等級選擇器；單字/句子各等級獨立池（N4~N1 從零 AI 生成，prompt 鎖等級）；文法 N5 維持人審線性課、N4~N1 = AI 生成課（`DynamicGrammarLesson`，badge+可刪黑名單+手動「生成下一課」）；儀表板按等級。exam 維持 N5。178 tests |
+| v2.10.0 | 全等級一致性收尾：各等級模擬測驗（等級池組卷 + `ExamReadiness` 可考性 gate + `ExamRecord.level`）、AI 出題/對話等級化（prompt N$level、快取 key `ai_cache_n<level>_<主題>`、N2/N1 對話敬語）、今日菜單新內容按等級（`lookupPool` 保跨等級複習）。187 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -71,7 +72,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 178 tests
+flutter test                 # 187 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
