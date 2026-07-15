@@ -16,6 +16,7 @@ import 'package:kana_trainer/features/listening/listening_page.dart';
 import 'package:kana_trainer/features/progress/srs_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
 import 'package:kana_trainer/features/sentence/sentence_practice_page.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/vocab/vocab_practice_page.dart';
 import 'package:kana_trainer/features/home/widgets/home_cards.dart';
 
@@ -69,7 +70,26 @@ class TopicsTab extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionTitle('單字（N5・105 詞）'),
+              const SectionTitle('練習等級'),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment(value: 5, label: Text('N5')),
+                    ButtonSegment(value: 4, label: Text('N4')),
+                    ButtonSegment(value: 3, label: Text('N3')),
+                    ButtonSegment(value: 2, label: Text('N2')),
+                    ButtonSegment(value: 1, label: Text('N1')),
+                  ],
+                  selected: {ref.watch(settingsProvider).jlptLevel},
+                  onSelectionChanged: (sel) => ref
+                      .read(settingsProvider.notifier)
+                      .update((s) => s.copyWith(jlptLevel: sel.first)),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SectionTitle('單字（N${ref.watch(settingsProvider).jlptLevel}）'),
               const SizedBox(height: 10),
               EntryGrid(
                 children: [
@@ -230,7 +250,7 @@ class _GrammarEntryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'N5 文法課程',
+                      '文法課程',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
