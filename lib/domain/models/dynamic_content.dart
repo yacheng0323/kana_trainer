@@ -10,6 +10,7 @@ Map<String, dynamic> vocabWordToJson(VocabWord w) => {
       'reading': w.reading,
       'zh': w.zh,
       'topic': w.topic.name,
+      'jlpt': w.jlpt,
     };
 
 VocabWord? vocabWordFromJson(Map<String, dynamic> json) {
@@ -19,7 +20,9 @@ VocabWord? vocabWordFromJson(Map<String, dynamic> json) {
   if (reading is! String || reading.isEmpty) return null;
   if (zh is! String || zh.isEmpty) return null;
   if (topic == null) return null;
-  return VocabWord(jp: jp, reading: reading, zh: zh, topic: topic);
+  final jlpt = (json['jlpt'] as int? ?? 5).clamp(1, 5); // 舊資料缺 → N5
+  return VocabWord(
+      jp: jp, reading: reading, zh: zh, topic: topic, jlpt: jlpt);
 }
 
 Map<String, dynamic> sentenceToJson(Sentence s) => {
@@ -27,6 +30,7 @@ Map<String, dynamic> sentenceToJson(Sentence s) => {
       'blankIndex': s.blankIndex,
       'zh': s.zh,
       'scene': s.scene.name,
+      'jlpt': s.jlpt,
     };
 
 Sentence? sentenceFromJson(Map<String, dynamic> json) {
@@ -43,7 +47,9 @@ Sentence? sentenceFromJson(Map<String, dynamic> json) {
   }
   if (zh is! String || zh.isEmpty) return null;
   if (scene == null) return null;
-  return Sentence(chunks: chunks, blankIndex: blankIndex, zh: zh, scene: scene);
+  final jlpt = (json['jlpt'] as int? ?? 5).clamp(1, 5); // 舊資料缺 → N5
+  return Sentence(
+      chunks: chunks, blankIndex: blankIndex, zh: zh, scene: scene, jlpt: jlpt);
 }
 
 /// 動態文法測驗題：綁定既有文法課（lessonId = GrammarPoint.id）。

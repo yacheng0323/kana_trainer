@@ -17,6 +17,17 @@ void main() {
       expect(restored.key, 'v_切符');
     });
 
+    test('jlpt round-trip、舊資料缺 jlpt → 5', () {
+      const w = VocabWord(
+          jp: '敬語', reading: 'けいご', zh: '敬語', topic: VocabTopic.work, jlpt: 3);
+      expect(vocabWordFromJson(vocabWordToJson(w))!.jlpt, 3);
+      // 舊格式（無 jlpt）
+      expect(
+          vocabWordFromJson(
+              {'jp': 'x', 'reading': 'x', 'zh': 'x', 'topic': 'travel'})!.jlpt,
+          5);
+    });
+
     test('壞資料回 null（未知 topic、缺欄位、空字串）', () {
       expect(
           vocabWordFromJson(
@@ -42,6 +53,25 @@ void main() {
       expect(restored.blankIndex, 1);
       expect(restored.scene, Scene.train);
       expect(restored.key, 's_駅はどこですか');
+    });
+
+    test('句子 jlpt round-trip、舊資料缺 → 5', () {
+      const s = Sentence(
+          chunks: ['會議', 'に', '出ます'],
+          blankIndex: 1,
+          zh: '參加會議',
+          scene: Scene.hotel,
+          jlpt: 4);
+      expect(sentenceFromJson(sentenceToJson(s))!.jlpt, 4);
+      expect(
+          sentenceFromJson({
+            'chunks': ['a', 'b'],
+            'blankIndex': 0,
+            'zh': 'x',
+            'scene': 'train'
+          })!
+              .jlpt,
+          5);
     });
 
     test('壞資料回 null（blankIndex 超界、chunks 空）', () {
