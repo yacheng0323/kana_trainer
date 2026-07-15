@@ -18,12 +18,14 @@ class Sentence {
   final int blankIndex; // 克漏字挖空位置
   final String zh; // 中文意思
   final Scene scene;
+  final int jlpt; // JLPT 等級（5..1，靜態種子全 5）
 
   const Sentence({
     required this.chunks,
     required this.blankIndex,
     required this.zh,
     required this.scene,
+    this.jlpt = 5,
   });
 
   String get jp => chunks.join();

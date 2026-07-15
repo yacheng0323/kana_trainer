@@ -7,6 +7,7 @@ import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/srs_notifier.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
 import 'package:kana_trainer/features/progress/wrong_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/domain/models/listening_models.dart';
 export 'package:kana_trainer/domain/models/listening_models.dart';
 
@@ -19,7 +20,15 @@ class ListeningViewModel extends AutoDisposeNotifier<ListeningState> {
   ListeningState build() => _question(null);
 
   ListeningState _question(ListeningState? prev) {
-    final all = ref.read(contentRepositoryProvider).vocab();
+    final level = ref.read(settingsProvider).jlptLevel;
+    var all = ref
+        .read(contentRepositoryProvider)
+        .vocab()
+        .where((w) => w.jlpt == level)
+        .toList();
+    if (all.length < 4) {
+      all = ref.read(contentRepositoryProvider).vocab(); // 等級池不足 → 全池
+    }
     final word = _generator.next(
       all,
       ref.read(masteryProvider),

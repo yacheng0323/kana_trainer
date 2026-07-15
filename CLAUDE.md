@@ -39,6 +39,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.7.0 | 我的題庫（`LibraryPage`，我的 tab 入口）：瀏覽全部單字/句子/文法題，AI 動態項可刪除＋黑名單（`dyn_blacklist`，進備份，擋 AI 重生成）；句子練習補齊 freshWeight 12 + refreshPool。152 tests |
 | v2.8.0 | 詞彙量成長儀表板（`VocabStatsPage`）：每日快照 `vocab_history`（App 啟動+開頁記錄，進備份）、30 天雙線成長曲線（自繪 `GrowthChart`）、本週新學、7 主題進度條。158 tests |
 | v2.8.1 | fix 出題重複感（使用者實測回饋）：①近期 8 題不重複窗口（`RecentKeys`，四練習 VM 全掛）；②補貨加「池 <30 就補」條件 — 修全新主題 15 字全未見過（≥門檻 10）永不觸發擴充的設計漏洞。162 tests |
+| v2.9.0 | **N1~N5 全等級**：`Settings.jlptLevel` + 主題學習 tab 等級選擇器；單字/句子各等級獨立池（N4~N1 從零 AI 生成，prompt 鎖等級）；文法 N5 維持人審線性課、N4~N1 = AI 生成課（`DynamicGrammarLesson`，badge+可刪黑名單+手動「生成下一課」）；儀表板按等級。exam 維持 N5。178 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -70,7 +71,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 158 tests
+flutter test                 # 178 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
@@ -143,6 +144,7 @@ lib/
 | `ai_cache_<主題>` | AI 題組快取 | ❌ |
 | `dyn_vocab` / `dyn_sentences` / `dyn_grammar_quiz` | 動態題庫池（AI 生成，v2.6.0） | ✅ |
 | `dyn_blacklist` | 使用者刪題黑名單（擋 AI 重生成，v2.7.0） | ✅ |
+| `dyn_grammar_lessons` | AI 生成 N4~N1 文法課（v2.9.0） | ✅ |
 | `vocab_history` | 詞彙量每日快照 `{"日期":[learned,total]}`（v2.8.0） | ✅ |
 | `expansion_daily` | 每日生成批數 `{"date","count"}` | ❌（日計數無跨機意義） |
 

@@ -6,6 +6,7 @@ import 'package:kana_trainer/data/content/merged_content_repository.dart';
 import 'package:kana_trainer/domain/entities/vocab.dart';
 import 'package:kana_trainer/features/progress/mastery_notifier.dart';
 import 'package:kana_trainer/features/progress/vocab_history_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/stats/widgets/growth_chart.dart';
 
 /// 詞彙量成長儀表板：大數字、30 天成長曲線、本週新學、主題進度。
@@ -26,7 +27,12 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final vocab = ref.watch(contentRepositoryProvider).vocab();
+    final level = ref.watch(settingsProvider).jlptLevel;
+    final vocab = ref
+        .watch(contentRepositoryProvider)
+        .vocab()
+        .where((w) => w.jlpt == level)
+        .toList();
     final mastery = ref.watch(masteryProvider);
     final history = ref.watch(vocabHistoryProvider);
 
@@ -40,7 +46,7 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('詞彙量')),
+      appBar: AppBar(title: Text('詞彙量（N$level）')),
       body: ListView(
         padding: const EdgeInsets.all(18),
         children: [
@@ -57,7 +63,7 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
           ),
           const SizedBox(height: 14),
           _Card(
-            title: '成長曲線（30 天）',
+            title: '成長曲線（30 天・全等級）',
             trailing: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [

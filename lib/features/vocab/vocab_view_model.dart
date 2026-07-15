@@ -28,13 +28,20 @@ class VocabViewModel
   }
 
   void _rebuildPool() {
-    _all = ref.read(contentRepositoryProvider).vocab();
+    final full = ref.read(contentRepositoryProvider).vocab();
+    final level = ref.read(settingsProvider).jlptLevel;
+    final levelAll = full.where((w) => w.jlpt == level).toList();
+    _all = full; // 選項干擾與最終 fallback 用全池（保證湊得滿 4 選項）
     final wrongKeys = ref.read(vocabWrongProvider).keys.toSet();
     final dueKeys =
-        ref.read(srsProvider.notifier).dueKeys(_all.map((w) => w.key));
-    _pool = arg.buildPool(_all, wrongKeys: wrongKeys, dueKeys: dueKeys);
+        ref.read(srsProvider.notifier).dueKeys(full.map((w) => w.key));
+    // 等級內範圍 → 空則全等級同範圍尚未生成 → 退全池同範圍 → 再退全池
+    _pool = arg.buildPool(levelAll, wrongKeys: wrongKeys, dueKeys: dueKeys);
+    if (_pool.length < 4) {
+      _pool = arg.buildPool(full, wrongKeys: wrongKeys, dueKeys: dueKeys);
+    }
     if (_pool.isEmpty) {
-      _pool = List.of(_all); // 保險：空池由 UI 擋掉
+      _pool = List.of(full); // 保險：空池由 UI 擋掉
     }
   }
 

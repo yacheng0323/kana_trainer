@@ -25,6 +25,7 @@ class Settings {
   final int reminderHour; // 提醒時間（24h）
   final int reminderMinute;
   final bool autoExpand; // AI 自動擴充題庫
+  final int jlptLevel; // 目前練習等級（5..1，預設 N5）
 
   const Settings({
     this.answerMode = AnswerMode.choice,
@@ -39,6 +40,7 @@ class Settings {
     this.reminderHour = 20,
     this.reminderMinute = 0,
     this.autoExpand = true,
+    this.jlptLevel = 5,
   });
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +56,7 @@ class Settings {
         'reminderHour': reminderHour,
         'reminderMinute': reminderMinute,
         'autoExpand': autoExpand,
+        'jlptLevel': jlptLevel,
       };
 
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
@@ -71,6 +74,7 @@ class Settings {
         reminderHour: json['reminderHour'] as int? ?? 20,
         reminderMinute: json['reminderMinute'] as int? ?? 0,
         autoExpand: json['autoExpand'] as bool? ?? true,
+        jlptLevel: (json['jlptLevel'] as int? ?? 5).clamp(1, 5),
       );
 
   Settings copyWith({
@@ -86,6 +90,7 @@ class Settings {
     int? reminderHour,
     int? reminderMinute,
     bool? autoExpand,
+    int? jlptLevel,
   }) =>
       Settings(
         answerMode: answerMode ?? this.answerMode,
@@ -100,5 +105,6 @@ class Settings {
         reminderHour: reminderHour ?? this.reminderHour,
         reminderMinute: reminderMinute ?? this.reminderMinute,
         autoExpand: autoExpand ?? this.autoExpand,
+        jlptLevel: jlptLevel ?? this.jlptLevel,
       );
 }
