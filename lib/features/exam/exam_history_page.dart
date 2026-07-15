@@ -144,7 +144,7 @@ class _RecordTile extends StatelessWidget {
           ),
         ),
         title: Text(
-          '${record.score}/${record.total} 分',
+          'N${record.level}・${record.score}/${record.total} 分',
           style: const TextStyle(
             fontWeight: FontWeight.w800,
             color: AppColors.indigo,

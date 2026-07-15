@@ -6,6 +6,7 @@ import 'package:kana_trainer/features/exam/exam_history_notifier.dart';
 import 'package:kana_trainer/features/exam/exam_history_page.dart';
 import 'package:kana_trainer/features/exam/exam_page.dart';
 import 'package:kana_trainer/features/home/widgets/home_cards.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 
 /// Tab 3：檢定 — 模擬測驗入口 + 最佳/最近成績摘要 + 歷史。
 class ExamTab extends ConsumerWidget {
@@ -13,6 +14,7 @@ class ExamTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final level = ref.watch(settingsProvider).jlptLevel;
     final records = ref.watch(examHistoryProvider);
     final best = records.isEmpty
         ? null
@@ -24,7 +26,7 @@ class ExamTab extends ConsumerWidget {
         TabHeader(
           title: '檢定',
           subtitle: best == null
-              ? 'N5 模擬測驗・20 題 10 分鐘'
+              ? 'N$level 模擬測驗・20 題 10 分鐘'
               : '最佳成績 ${(best.percent * 100).round()}%・共 ${records.length} 次',
         ),
         Padding(
@@ -47,24 +49,24 @@ class ExamTab extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(AppTheme.radius),
                       boxShadow: AppShadows.hard,
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Text('📝', style: TextStyle(fontSize: 36)),
-                        SizedBox(width: 14),
+                        const Text('📝', style: TextStyle(fontSize: 36)),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'N5 模擬測驗',
-                                style: TextStyle(
+                                'N$level 模擬測驗',
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 2),
-                              Text(
+                              const SizedBox(height: 2),
+                              const Text(
                                 '單字 10＋假名 5＋文法 5・限時 10 分鐘',
                                 style: TextStyle(
                                   fontSize: 12,
@@ -75,7 +77,7 @@ class ExamTab extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        Icon(Icons.play_circle_fill,
+                        const Icon(Icons.play_circle_fill,
                             color: AppColors.gold, size: 36),
                       ],
                     ),
@@ -128,7 +130,7 @@ class ExamTab extends ConsumerWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            '${r.score}/${r.total} 分・${_dateText(r.dateIso)}',
+                            'N${r.level}・${r.score}/${r.total} 分・${_dateText(r.dateIso)}',
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,

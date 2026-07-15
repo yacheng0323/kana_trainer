@@ -23,11 +23,19 @@ class AiChatService {
     'additionalProperties': false,
   };
 
+  /// 各等級的回覆難度指示。
+  static String levelStyle(int level) => switch (level) {
+        5 || 4 => '全用 N$level 詞彙與文法的簡短句（1-2 句）',
+        3 => '一般日常口語，N3 程度句型（1-2 句）',
+        _ => '自然流暢的日語，可用敬語與 N$level 進階句型（1-3 句）',
+      };
+
   /// [history]：交錯的 user/assistant 純文字（assistant 為上輪 reply 日文）。
   Future<ChatReply> send({
     required String apiKey,
     required String scenario,
     required List<({bool isUser, String text})> history,
+    int level = 5,
   }) async {
     final messages = [
       for (final turn in history)
@@ -40,8 +48,8 @@ class AiChatService {
     final payload = await _client.completeJson(
       apiKey: apiKey,
       system: '你是日語會話練習夥伴，情境：$scenario。'
-          '你扮演該情境的服務人員，使用者是顧客/旅客（日語初學者 N5）。'
-          '規則：reply 用簡短自然的 N5 日語（1-2 句，全用 N5 詞彙與文法，漢字可用）；'
+          '你扮演該情境的服務人員，使用者是顧客/旅客（JLPT N$level 學習者）。'
+          '規則：reply 用${levelStyle(level)}（漢字可用）；'
           'translation 是 reply 的繁體中文翻譯；'
           'correction 檢查使用者上一句日語——有錯就用繁中溫和說明正確說法，'
           '沒問題或使用者用中文則給空字串。對話持續進行，適時推進情境。',

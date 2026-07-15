@@ -207,7 +207,7 @@ void main() {
 
       // 快取已寫入
       final prefs = container.read(prefsProvider);
-      expect(prefs.getString('ai_cache_旅遊'), isNotNull);
+      expect(prefs.getString('ai_cache_n5_旅遊'), isNotNull); // 快取按等級分 key
     });
 
     testWidgets('API 失敗 → 顯示錯誤並回主題選擇', (tester) async {
