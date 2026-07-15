@@ -47,15 +47,16 @@ class AiQuizService {
     required String apiKey,
     required String topic,
     int count = 10,
+    int level = 5,
   }) async {
     final Map<String, dynamic> payload;
     try {
       payload = await _client.completeJson(
         apiKey: apiKey,
-        system: '你是專業日語教師，為繁體中文使用者出 JLPT N5 程度的日語測驗題。'
+        system: '你是專業日語教師，為繁體中文使用者出 JLPT N$level 程度的日語測驗題。'
             '題型混合：單字意思（日→中）、克漏字（句中以＿＿挖空選詞）、假名讀音。'
             '規則：每題恰好 4 個不重複選項；干擾項要合理但明確錯誤；'
-            'note 用繁體中文簡短說明正解（含讀音）；難度維持 N5，不出偏僻詞。',
+            'note 用繁體中文簡短說明正解（含讀音）；難度精準落在 N$level。',
         messages: [
           {
             'role': 'user',

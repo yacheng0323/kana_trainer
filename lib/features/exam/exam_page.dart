@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
+import 'package:kana_trainer/data/content/merged_content_repository.dart';
+import 'package:kana_trainer/data/storage/dynamic_content_store.dart';
+import 'package:kana_trainer/domain/logic/exam_readiness.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'exam_view_model.dart';
 
 /// N5 模擬測驗頁：20 題 / 10 分鐘 / 交卷評分 + 錯題檢討。
@@ -56,9 +60,25 @@ class _ExamPageState extends ConsumerState<ExamPage> {
   }
 
   Widget _buildIntro() {
+    final level = ref.watch(settingsProvider).jlptLevel;
+    final vocabCount = ref
+        .read(contentRepositoryProvider)
+        .vocab()
+        .where((w) => w.jlpt == level)
+        .length;
+    final grammarCount = [
+      for (final l in ref
+          .read(dynamicContentStoreProvider)
+          .grammarLessons()
+          .where((l) => l.level == level))
+        ...l.quiz,
+    ].length;
+    final readiness = ExamReadiness.check(
+        level: level, vocabCount: vocabCount, grammarCount: grammarCount);
+
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('N5 模擬測驗')),
+      appBar: AppBar(title: Text('N$level 模擬測驗')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -100,9 +120,33 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                   ],
                 ),
               ),
+              if (!readiness.ready) ...[
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(AppTheme.radius),
+                    border: Border.all(color: AppColors.red, width: 2),
+                  ),
+                  child: Text(
+                    'N$level 題庫還不夠出卷：'
+                    '${readiness.vocabGap > 0 ? '單字還差 ${readiness.vocabGap} 個' : ''}'
+                    '${readiness.vocabGap > 0 && readiness.grammarGap > 0 ? '、' : ''}'
+                    '${readiness.grammarGap > 0 ? '文法題還差 ${readiness.grammarGap} 題' : ''}'
+                    '。\n先到主題學習練單字、文法頁生成課程來累積。',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.6,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.red,
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: _start,
+                onPressed: readiness.ready ? _start : null,
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
                   child: Text('開始測驗', style: TextStyle(fontSize: 17)),

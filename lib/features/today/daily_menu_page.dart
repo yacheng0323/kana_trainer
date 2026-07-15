@@ -38,7 +38,15 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
       kanaWrong: ref.read(wrongProvider),
       vocabWrong: ref.read(vocabWrongProvider),
       sentenceWrong: ref.read(sentenceWrongProvider),
-      vocabPool: ref.read(contentRepositoryProvider).vocab(),
+      // 新內容按目前等級抽；等級池不足 15 時退全池（菜單永遠補得滿）。
+      // lookupPool 用全池：SRS 到期/錯題是跨等級的，字面查找不能斷。
+      vocabPool: () {
+        final full = ref.read(contentRepositoryProvider).vocab();
+        final level = ref.read(settingsProvider).jlptLevel;
+        final levelPool = full.where((w) => w.jlpt == level).toList();
+        return levelPool.length >= 15 ? levelPool : full;
+      }(),
+      lookupPool: ref.read(contentRepositoryProvider).vocab(),
       sentencePool: ref.read(contentRepositoryProvider).sentences(),
     );
   }

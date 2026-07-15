@@ -9,6 +9,7 @@ import 'package:kana_trainer/data/storage/prefs_store.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_page.dart';
 
 const aiQuizTopics = ['旅遊', '交通', '餐飲', '購物', '時間', '日常', '職場', '綜合'];
@@ -34,7 +35,9 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
   String? _error;
   bool _fromCache = false;
 
-  String get _cacheKey => 'ai_cache_$_topic';
+  // 快取按等級分開（v2.10.0）；N5 舊 key（ai_cache_<主題>）不遷移，重生即可
+  String get _cacheKey =>
+      'ai_cache_n${ref.read(settingsProvider).jlptLevel}_$_topic';
 
   Future<void> _generate({bool forceRefresh = false}) async {
     setState(() {
@@ -64,6 +67,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
       final questions = await ref.read(aiQuizServiceProvider).generate(
             apiKey: ref.read(apiKeyProvider),
             topic: _topic,
+            level: ref.read(settingsProvider).jlptLevel,
           );
       await prefs.setString(
         _cacheKey,
