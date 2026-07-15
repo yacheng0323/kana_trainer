@@ -25,6 +25,7 @@ class BackupService {
     'dyn_vocab',
     'dyn_sentences',
     'dyn_grammar_quiz',
+    'dyn_grammar_lessons',
     'dyn_blacklist', // 使用者刪題紀錄（整理成果，換機不該丟）
     'vocab_history', // 詞彙量每日快照（成長曲線）
   ];

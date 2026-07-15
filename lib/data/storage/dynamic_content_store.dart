@@ -13,6 +13,7 @@ class DynamicContentStore {
   static const vocabKey = 'dyn_vocab';
   static const sentencesKey = 'dyn_sentences';
   static const grammarQuizKey = 'dyn_grammar_quiz';
+  static const grammarLessonsKey = 'dyn_grammar_lessons';
 
   /// 使用者刪除過的 key：永不再入池（擋 AI 重生成同題）。
   static const blacklistKey = 'dyn_blacklist';
@@ -21,12 +22,14 @@ class DynamicContentStore {
   late final List<VocabWord> _vocab;
   late final List<Sentence> _sentences;
   late final List<DynamicGrammarQuiz> _grammar;
+  late final List<DynamicGrammarLesson> _grammarLessons;
   late final Set<String> _blacklist;
 
   DynamicContentStore(this._kv) {
     _vocab = _load(vocabKey, vocabWordFromJson);
     _sentences = _load(sentencesKey, sentenceFromJson);
     _grammar = _load(grammarQuizKey, dynamicGrammarQuizFromJson);
+    _grammarLessons = _load(grammarLessonsKey, dynamicGrammarLessonFromJson);
     _blacklist = _loadBlacklist();
   }
 
@@ -57,6 +60,8 @@ class DynamicContentStore {
   List<VocabWord> vocab() => List.unmodifiable(_vocab);
   List<Sentence> sentences() => List.unmodifiable(_sentences);
   List<DynamicGrammarQuiz> grammarQuiz() => List.unmodifiable(_grammar);
+  List<DynamicGrammarLesson> grammarLessons() =>
+      List.unmodifiable(_grammarLessons);
 
   Future<int> addVocab(List<VocabWord> items,
       {required Set<String> existingKeys}) {
@@ -74,6 +79,12 @@ class DynamicContentStore {
       {required Set<String> existingKeys}) {
     return _add(items, _grammar, (q) => q.key, existingKeys, grammarQuizKey,
         dynamicGrammarQuizToJson);
+  }
+
+  Future<int> addGrammarLessons(List<DynamicGrammarLesson> items,
+      {required Set<String> existingKeys}) {
+    return _add(items, _grammarLessons, (l) => l.id, existingKeys,
+        grammarLessonsKey, dynamicGrammarLessonToJson);
   }
 
   Future<int> _add<T>(
@@ -113,6 +124,10 @@ class DynamicContentStore {
       _grammar.removeWhere((q) => q.key == key);
       await _kv.setString(grammarQuizKey,
           jsonEncode(_grammar.map(dynamicGrammarQuizToJson).toList()));
+    } else if (_grammarLessons.any((l) => l.id == key)) {
+      _grammarLessons.removeWhere((l) => l.id == key);
+      await _kv.setString(grammarLessonsKey,
+          jsonEncode(_grammarLessons.map(dynamicGrammarLessonToJson).toList()));
     }
     _blacklist.add(key);
     await _kv.setString(blacklistKey, jsonEncode(_blacklist.toList()));

@@ -99,6 +99,78 @@ void main() {
     });
   });
 
+  group('DynamicGrammarLesson', () {
+    const lesson = DynamicGrammarLesson(
+      id: 'gdyn_n4_受身形',
+      level: 4,
+      title: '受身形',
+      explanation: '動詞被動態，表示被～。',
+      examples: [
+        GrammarExample('先生に褒められました。', '被老師稱讚了。'),
+        GrammarExample('雨に降られました。', '被雨淋了。'),
+      ],
+      quiz: [
+        GrammarQuiz(
+            question: '先生に＿＿ました。',
+            options: ['褒められ', '褒め', '褒めて', '褒めよう'],
+            correctIndex: 0),
+        GrammarQuiz(
+            question: '犬に＿＿ました。',
+            options: ['噛まれ', '噛み', '噛んで', '噛もう'],
+            correctIndex: 0),
+        GrammarQuiz(
+            question: '友達に＿＿ました。',
+            options: ['笑われ', '笑い', '笑って', '笑おう'],
+            correctIndex: 0),
+      ],
+    );
+
+    test('codec round-trip + toGrammarPoint', () {
+      final restored =
+          dynamicGrammarLessonFromJson(dynamicGrammarLessonToJson(lesson));
+      expect(restored!.id, lesson.id);
+      expect(restored.level, 4);
+      expect(restored.examples.length, 2);
+      expect(restored.quiz.length, 3);
+      final point = restored.toGrammarPoint();
+      expect(point.id, lesson.id);
+      expect(point.quiz.length, 3);
+    });
+
+    test('壞課回 null（quiz≠3、examples<2、題面無挖空）', () {
+      final base = dynamicGrammarLessonToJson(lesson);
+      expect(
+          dynamicGrammarLessonFromJson(
+              {...base, 'quiz': (base['quiz'] as List).sublist(0, 2)}),
+          isNull);
+      expect(
+          dynamicGrammarLessonFromJson({
+            ...base,
+            'examples': [
+              {'jp': 'x', 'zh': 'y'}
+            ]
+          }),
+          isNull);
+      final noBlank = dynamicGrammarLessonToJson(lesson);
+      (noBlank['quiz'] as List)[0] = {
+        'question': '沒有挖空的題面',
+        'options': ['a', 'b', 'c', 'd'],
+        'correctIndex': 0,
+      };
+      expect(dynamicGrammarLessonFromJson(noBlank), isNull);
+    });
+
+    test('store 持久化 + remove 進黑名單擋 re-add', () async {
+      await store.addGrammarLessons([lesson], existingKeys: {});
+      final reloaded = DynamicContentStore(kv);
+      expect(reloaded.grammarLessons().single.title, '受身形');
+
+      await reloaded.remove(lesson.id);
+      expect(reloaded.grammarLessons(), isEmpty);
+      expect(await reloaded.addGrammarLessons([lesson], existingKeys: {}), 0);
+    });
+  });
+
   test('儲存內容壞掉（手動塞爛 JSON）→ 靜默略過壞筆', () async {
     await kv.setString(DynamicContentStore.vocabKey,
         '[{"jp":"良","reading":"よい","zh":"好","topic":"daily"},{"jp":""}]');
