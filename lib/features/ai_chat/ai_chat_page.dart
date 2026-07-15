@@ -6,6 +6,7 @@ import 'package:kana_trainer/data/ai/ai_quiz_service.dart';
 import 'package:kana_trainer/data/ai/claude_client.dart';
 import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'package:kana_trainer/features/practice/widgets/quiz_widgets.dart';
+import 'package:kana_trainer/features/settings/settings_notifier.dart';
 import 'package:kana_trainer/features/settings/settings_page.dart';
 
 const chatScenarios = [
@@ -64,6 +65,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
       final reply = await ref.read(aiChatServiceProvider).send(
             apiKey: ref.read(apiKeyProvider),
             scenario: _scenario!,
+            level: ref.read(settingsProvider).jlptLevel,
             history: [
               for (final m in _messages.takeLast(_maxTurns))
                 (isUser: m.isUser, text: m.text),

@@ -21,12 +21,14 @@ class ExamRecord {
   final int score;
   final int total;
   final int durationSec;
+  final int level; // JLPT 等級（舊紀錄缺 → 5）
 
   const ExamRecord({
     required this.dateIso,
     required this.score,
     required this.total,
     required this.durationSec,
+    this.level = 5,
   });
 
   double get percent => total == 0 ? 0 : score / total;
@@ -36,6 +38,7 @@ class ExamRecord {
         'score': score,
         'total': total,
         'durationSec': durationSec,
+        'level': level,
       };
 
   factory ExamRecord.fromJson(Map<String, dynamic> json) => ExamRecord(
@@ -43,6 +46,7 @@ class ExamRecord {
         score: json['score'] as int? ?? 0,
         total: json['total'] as int? ?? 0,
         durationSec: json['durationSec'] as int? ?? 0,
+        level: (json['level'] as int? ?? 5).clamp(1, 5),
       );
 }
 

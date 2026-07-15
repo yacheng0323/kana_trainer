@@ -42,13 +42,15 @@ class DailyMenuBuilder {
     required Map<String, int> sentenceWrong,
     List<VocabWord>? vocabPool, // 不傳 = 靜態表（動態池由呼叫端經 repo 傳入）
     List<Sentence>? sentencePool,
+    List<VocabWord>? lookupPool, // due/wrong 查字面用（跨等級複習，預設 = vocabPool）
     Random? rng,
   }) {
     final random = rng ?? Random();
     final vocabAll = vocabPool ?? allVocab;
     final sentenceAll = sentencePool ?? allSentences;
+    final vocabLookup = lookupPool ?? vocabAll;
     VocabWord? vocabByKey(String key) =>
-        vocabAll.where((w) => w.key == key).firstOrNull;
+        vocabLookup.where((w) => w.key == key).firstOrNull;
     Sentence? sentenceByKey(String key) =>
         sentenceAll.where((s) => s.key == key).firstOrNull;
     final kanaGen = QuizGenerator<Kana>(keyOf: (k) => k.kana, rng: random);
