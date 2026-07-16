@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
 import 'package:kana_trainer/features/progress/stats_notifier.dart';
@@ -16,9 +16,9 @@ class GoalCard extends StatelessWidget {
         goal == 0 ? 1.0 : (stats.todayTotal / goal).clamp(0.0, 1.0);
     final done = stats.todayTotal >= goal;
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(
           color: done ? AppColors.green : AppColors.indigo,
@@ -27,8 +27,8 @@ class GoalCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(done ? '🎉' : '🎯', style: const TextStyle(fontSize: 22)),
-          const SizedBox(width: 10),
+          Text(done ? '🎉' : '🎯', style: TextStyle(fontSize: 22)),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,13 +43,13 @@ class GoalCard extends StatelessWidget {
                     color: done ? AppColors.green : AppColors.indigo,
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(3),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: const Color(0x1422254A),
+                    backgroundColor: Color(0x1422254A),
                     color: done ? AppColors.green : AppColors.gold,
                   ),
                 ),
@@ -78,11 +78,11 @@ class TabHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.indigo,
+      decoration: BoxDecoration(
+        color: AppColors.indigoSurface,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      padding: const EdgeInsets.fromLTRB(20, 0, 8, 20),
+      padding: EdgeInsets.fromLTRB(20, 0, 8, 20),
       child: SafeArea(
         bottom: false,
         child: Row(
@@ -92,20 +92,20 @@ class TabHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.gold,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -133,7 +133,7 @@ class SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w900,
         color: AppColors.indigo,
@@ -168,13 +168,13 @@ class EntryCard extends StatelessWidget {
     return Opacity(
       opacity: enabled ? 1 : 0.4,
       child: Material(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         child: InkWell(
           onTap: enabled ? onTap : null,
           borderRadius: BorderRadius.circular(AppTheme.radius),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppTheme.radius),
               border: Border.all(color: AppColors.indigo, width: 2),
@@ -191,11 +191,11 @@ class EntryCard extends StatelessWidget {
                   ),
                   child: Icon(icon, color: iconColor, size: 16),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: AppColors.indigo,
@@ -228,7 +228,7 @@ class EntryGrid extends StatelessWidget {
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
       childAspectRatio: 1.9,

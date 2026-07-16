@@ -23,15 +23,15 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('刪除「$label」？'),
-        content: const Text('會從題庫移除並加入黑名單，AI 不會再生成同一題。'),
+        content: Text('會從題庫移除並加入黑名單，AI 不會再生成同一題。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('刪除'),
+            child: Text('刪除'),
           ),
         ],
       ),
@@ -66,12 +66,12 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       child: Scaffold(
         backgroundColor: AppColors.cream,
         appBar: AppBar(
-          title: const Text('我的題庫'),
+          title: Text('我的題庫'),
           bottom: TabBar(
             indicatorColor: AppColors.gold,
             labelColor: AppColors.gold,
             unselectedLabelColor: Colors.white70,
-            labelStyle: const TextStyle(
+            labelStyle: TextStyle(
               fontFamily: AppTheme.fontFamily,
               fontWeight: FontWeight.w800,
             ),
@@ -87,9 +87,9 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
                   child: TextField(
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: '搜尋單字／讀音／中文',
                       prefixIcon: Icon(Icons.search),
                       isDense: true,
@@ -155,14 +155,14 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
     required VoidCallback onDelete,
   }) {
     return ListTile(
-      tileColor: Colors.white,
+      tileColor: AppColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radius),
-        side: const BorderSide(color: AppColors.indigo, width: 2),
+        side: BorderSide(color: AppColors.indigo, width: 2),
       ),
       leading: Text(
         leading,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w900,
           color: AppColors.indigo,
@@ -170,7 +170,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w800,
           color: AppColors.indigo,
         ),
@@ -182,23 +182,23 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
               children: [
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.gold,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'AI',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.indigo,
+                      color: AppColors.indigoSurface,
                     ),
                   ),
                 ),
                 IconButton(
                   tooltip: '刪除此題（加黑名單）',
-                  icon: const Icon(Icons.delete_outline, color: AppColors.red),
+                  icon: Icon(Icons.delete_outline, color: AppColors.red),
                   onPressed: onDelete,
                 ),
               ],
@@ -217,12 +217,12 @@ class _ItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (itemCount == 0) {
-      return const Center(child: Text('沒有符合的內容'));
+      return Center(child: Text('沒有符合的內容'));
     }
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       itemCount: itemCount,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => SizedBox(height: 8),
       itemBuilder: (_, i) => builder(i),
     );
   }

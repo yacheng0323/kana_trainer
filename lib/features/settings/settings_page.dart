@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,12 +28,57 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('設定')),
+      appBar: AppBar(title: Text('設定')),
       body: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 8),
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Text(
+              '外觀',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.indigo.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(
+                    value: 'system',
+                    label: Text('跟隨系統'),
+                    icon: Icon(Icons.brightness_auto)),
+                ButtonSegment(
+                    value: 'light',
+                    label: Text('亮色'),
+                    icon: Icon(Icons.light_mode)),
+                ButtonSegment(
+                    value: 'dark',
+                    label: Text('深色'),
+                    icon: Icon(Icons.dark_mode)),
+              ],
+              selected: {settings.themeMode},
+              onSelectionChanged: (sel) =>
+                  notifier.update((s) => s.copyWith(themeMode: sel.first)),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
+            child: Text(
+              '切換主題後畫面會回到首頁',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppColors.indigoFaded,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Text(
               '作答方式',
               style: TextStyle(
@@ -44,9 +89,9 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<AnswerMode>(
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: AnswerMode.choice,
                   label: Text('4 選 1'),
@@ -63,9 +108,9 @@ class SettingsPage extends ConsumerWidget {
                   notifier.update((s) => s.copyWith(answerMode: sel.first)),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Text(
               '單字題型',
               style: TextStyle(
@@ -76,7 +121,7 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: SegmentedButton<VocabMode>(
               segments: [
                 for (final m in VocabMode.values)
@@ -87,22 +132,22 @@ class SettingsPage extends ConsumerWidget {
                   notifier.update((s) => s.copyWith(vocabMode: sel.first)),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           ListTile(
-            title: const Text('每日目標題數'),
+            title: Text('每日目標題數'),
             subtitle: Text('目前：${settings.dailyGoal} 題／天'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
+                  icon: Icon(Icons.remove_circle_outline),
                   onPressed: settings.dailyGoal > 10
                       ? () => notifier.update(
                           (s) => s.copyWith(dailyGoal: s.dailyGoal - 10))
                       : null,
                 ),
                 IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
+                  icon: Icon(Icons.add_circle_outline),
                   onPressed: settings.dailyGoal < 200
                       ? () => notifier.update(
                           (s) => s.copyWith(dailyGoal: s.dailyGoal + 10))
@@ -111,20 +156,20 @@ class SettingsPage extends ConsumerWidget {
               ],
             ),
           ),
-          const Divider(),
+          Divider(),
           SwitchListTile(
-            title: const Text('答對自動下一題'),
-            subtitle: const Text('答對後 0.9 秒自動出下一題'),
+            title: Text('答對自動下一題'),
+            subtitle: Text('答對後 0.9 秒自動出下一題'),
             value: settings.autoNext,
             onChanged: (v) => notifier.update((s) => s.copyWith(autoNext: v)),
           ),
           SwitchListTile(
-            title: const Text('音效與震動'),
+            title: Text('音效與震動'),
             value: settings.sound,
             onChanged: (v) => notifier.update((s) => s.copyWith(sound: v)),
           ),
           SwitchListTile(
-            title: const Text('每日提醒'),
+            title: Text('每日提醒'),
             subtitle: Text(
               settings.reminderEnabled
                   ? '每天 ${settings.reminderHour.toString().padLeft(2, '0')}:'
@@ -136,12 +181,12 @@ class SettingsPage extends ConsumerWidget {
           ),
           if (settings.reminderEnabled)
             ListTile(
-              leading: const Icon(Icons.schedule, color: AppColors.indigo),
-              title: const Text('提醒時間'),
+              leading: Icon(Icons.schedule, color: AppColors.indigo),
+              title: Text('提醒時間'),
               trailing: Text(
                 '${settings.reminderHour.toString().padLeft(2, '0')}:'
                 '${settings.reminderMinute.toString().padLeft(2, '0')}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                   color: AppColors.indigo,
@@ -149,9 +194,9 @@ class SettingsPage extends ConsumerWidget {
               ),
               onTap: () => _pickReminderTime(context, ref),
             ),
-          const Divider(),
+          Divider(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: Text(
               '以下僅鍵盤輸入模式適用',
               style: TextStyle(
@@ -162,33 +207,33 @@ class SettingsPage extends ConsumerWidget {
             ),
           ),
           SwitchListTile(
-            title: const Text('區分大小寫'),
-            subtitle: const Text('關閉時 Ka / KA / ka 都算正確（預設）'),
+            title: Text('區分大小寫'),
+            subtitle: Text('關閉時 Ka / KA / ka 都算正確（預設）'),
             value: settings.caseSensitive,
             onChanged: isInput
                 ? (v) => notifier.update((s) => s.copyWith(caseSensitive: v))
                 : null,
           ),
           SwitchListTile(
-            title: const Text('顯示提示按鈕'),
-            subtitle: const Text('練習時可點燈泡看第一個字母'),
+            title: Text('顯示提示按鈕'),
+            subtitle: Text('練習時可點燈泡看第一個字母'),
             value: settings.showHint,
             onChanged: isInput
                 ? (v) => notifier.update((s) => s.copyWith(showHint: v))
                 : null,
           ),
           SwitchListTile(
-            title: const Text('羅馬拼音提示'),
-            subtitle: const Text('題目下方直接顯示答案（初學模式）'),
+            title: Text('羅馬拼音提示'),
+            subtitle: Text('題目下方直接顯示答案（初學模式）'),
             value: settings.romajiHint,
             onChanged: isInput
                 ? (v) => notifier.update((s) => s.copyWith(romajiHint: v))
                 : null,
           ),
-          const Divider(),
+          Divider(),
           ListTile(
-            leading: const Icon(Icons.key, color: AppColors.indigo),
-            title: const Text('Claude API Key（AI 出題用）'),
+            leading: Icon(Icons.key, color: AppColors.indigo),
+            title: Text('Claude API Key（AI 出題用）'),
             subtitle: Text(
               ref.watch(apiKeyProvider).isEmpty
                   ? '未設定 — AI 出題功能需要'
@@ -197,7 +242,7 @@ class SettingsPage extends ConsumerWidget {
             onTap: () => _showApiKeyDialog(context, ref),
           ),
           SwitchListTile(
-            title: const Text('AI 自動擴充題庫'),
+            title: Text('AI 自動擴充題庫'),
             subtitle: Text(
               '單字/句子/文法題快輪完時自動生成新題'
               '（今日已生成 ${ref.watch(expansionProvider).todayCount}/'
@@ -207,25 +252,25 @@ class SettingsPage extends ConsumerWidget {
             onChanged: (v) =>
                 notifier.update((s) => s.copyWith(autoExpand: v)),
           ),
-          const Divider(),
+          Divider(),
           ListTile(
-            leading: const Icon(Icons.upload, color: AppColors.indigo),
-            title: const Text('匯出學習資料'),
-            subtitle: const Text('複製備份 JSON 到剪貼簿'),
+            leading: Icon(Icons.upload, color: AppColors.indigo),
+            title: Text('匯出學習資料'),
+            subtitle: Text('複製備份 JSON 到剪貼簿'),
             onTap: () async {
               final json = BackupService.export(ref.read(prefsProvider));
               await Clipboard.setData(ClipboardData(text: json));
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('已複製到剪貼簿，貼到記事本保存即可')),
+                  SnackBar(content: Text('已複製到剪貼簿，貼到記事本保存即可')),
                 );
               }
             },
           ),
           ListTile(
-            leading: const Icon(Icons.download, color: AppColors.indigo),
-            title: const Text('匯入學習資料'),
-            subtitle: const Text('貼上先前匯出的備份 JSON（覆蓋現有進度）'),
+            leading: Icon(Icons.download, color: AppColors.indigo),
+            title: Text('匯入學習資料'),
+            subtitle: Text('貼上先前匯出的備份 JSON（覆蓋現有進度）'),
             onTap: () => _showImportDialog(context, ref),
           ),
         ],
@@ -249,7 +294,7 @@ class SettingsPage extends ConsumerWidget {
     if (!granted) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('未取得通知權限，請到系統設定開啟')),
+          SnackBar(content: Text('未取得通知權限，請到系統設定開啟')),
         );
       }
       return;
@@ -283,21 +328,21 @@ class SettingsPage extends ConsumerWidget {
     final key = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Claude API Key'),
+        title: Text('Claude API Key'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '到 platform.claude.com 建立 API Key 後貼上。\n'
               '僅儲存在本機，清空後儲存即可移除。',
               style: TextStyle(fontSize: 12),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             TextField(
               controller: controller,
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'sk-ant-…',
                 border: OutlineInputBorder(),
               ),
@@ -307,11 +352,11 @@ class SettingsPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
-            child: const Text('儲存'),
+            child: Text('儲存'),
           ),
         ],
       ),
@@ -330,11 +375,11 @@ class SettingsPage extends ConsumerWidget {
     final json = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('匯入學習資料'),
+        title: Text('匯入學習資料'),
         content: TextField(
           controller: controller,
           maxLines: 6,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: '貼上備份 JSON…',
             border: OutlineInputBorder(),
           ),
@@ -342,11 +387,11 @@ class SettingsPage extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('取消'),
+            child: Text('取消'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text),
-            child: const Text('匯入'),
+            child: Text('匯入'),
           ),
         ],
       ),

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/data/content/merged_content_repository.dart';
@@ -28,12 +28,12 @@ class WrongListPage extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: AppColors.cream,
         appBar: AppBar(
-          title: const Text('錯題本'),
+          title: Text('錯題本'),
           bottom: TabBar(
             indicatorColor: AppColors.gold,
             labelColor: AppColors.gold,
             unselectedLabelColor: Colors.white70,
-            labelStyle: const TextStyle(
+            labelStyle: TextStyle(
               fontFamily: AppTheme.fontFamily,
               fontWeight: FontWeight.w800,
             ),
@@ -60,7 +60,7 @@ class WrongListPage extends ConsumerWidget {
               onRetrain: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) =>
-                      const PracticePage(mode: PracticeMode.wrongReview),
+                      PracticePage(mode: PracticeMode.wrongReview),
                 ),
               ),
             ),
@@ -76,7 +76,7 @@ class WrongListPage extends ConsumerWidget {
               onRetrain: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) =>
-                      const VocabPracticePage(pool: VocabPool.wrongReview),
+                      VocabPracticePage(pool: VocabPool.wrongReview),
                 ),
               ),
             ),
@@ -89,7 +89,7 @@ class WrongListPage extends ConsumerWidget {
               onRetrain: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) =>
-                      const SentencePracticePage(pool: ScenePool.wrongReview),
+                      SentencePracticePage(pool: ScenePool.wrongReview),
                 ),
               ),
             ),
@@ -125,23 +125,23 @@ class _WrongList extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: entries.isEmpty
-          ? const Center(child: Text('目前沒有錯題，太棒了！'))
+          ? Center(child: Text('目前沒有錯題，太棒了！'))
           : ListView.separated(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               itemCount: sorted.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => SizedBox(height: 10),
               itemBuilder: (context, i) {
                 final entry = sorted[i];
                 final subtitle = subtitleOf(entry.key);
                 return ListTile(
-                  tileColor: Colors.white,
+                  tileColor: AppColors.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
-                    side: const BorderSide(color: AppColors.indigo, width: 2),
+                    side: BorderSide(color: AppColors.indigo, width: 2),
                   ),
                   leading: Text(
                     leadingOf(entry.key),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: AppColors.indigo,
@@ -149,7 +149,7 @@ class _WrongList extends ConsumerWidget {
                   ),
                   title: Text(
                     titleOf(entry.key),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       color: AppColors.indigo,
                     ),
@@ -159,7 +159,7 @@ class _WrongList extends ConsumerWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.gold,
@@ -167,16 +167,16 @@ class _WrongList extends ConsumerWidget {
                         ),
                         child: Text(
                           '錯 ${entry.value} 次',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.indigo,
+                            color: AppColors.indigoSurface,
                           ),
                         ),
                       ),
                       IconButton(
                         tooltip: '移除此錯題',
-                        icon: const Icon(Icons.close),
+                        icon: Icon(Icons.close),
                         onPressed: () =>
                             ref.read(provider.notifier).remove(entry.key),
                       ),
@@ -198,21 +198,21 @@ class _WrongList extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
                   ),
-                  child: const Icon(Icons.delete_outline),
+                  child: Icon(Icons.delete_outline),
                   onPressed: () async {
                     final ok = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('清除所有錯題？'),
-                        content: const Text('此動作無法復原。'),
+                        title: Text('清除所有錯題？'),
+                        content: Text('此動作無法復原。'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('取消'),
+                            child: Text('取消'),
                           ),
                           FilledButton(
                             onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('清除'),
+                            child: Text('清除'),
                           ),
                         ],
                       ),
@@ -220,7 +220,7 @@ class _WrongList extends ConsumerWidget {
                     if (ok == true) ref.read(provider.notifier).clear();
                   },
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 FloatingActionButton.extended(
                   heroTag: null,
                   backgroundColor: AppColors.indigo,
@@ -228,8 +228,8 @@ class _WrongList extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
                   ),
-                  icon: const Icon(Icons.replay),
-                  label: const Text('重新練習'),
+                  icon: Icon(Icons.replay),
+                  label: Text('重新練習'),
                   onPressed: onRetrain,
                 ),
               ],

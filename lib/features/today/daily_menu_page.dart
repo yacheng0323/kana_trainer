@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -104,7 +104,7 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Text('🎉 今日任務完成！'),
+        title: Text('🎉 今日任務完成！'),
         content: Text('答對 $_correct/${_questions.length}，明天見！'),
         actions: [
           FilledButton(
@@ -112,7 +112,7 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
               Navigator.pop(ctx);
               Navigator.of(context).pop();
             },
-            child: const Text('完成'),
+            child: Text('完成'),
           ),
         ],
       ),
@@ -124,8 +124,8 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
     if (_questions.isEmpty) {
       // 理論上不會發生（新內容永遠補得滿），保險
       return Scaffold(
-        appBar: AppBar(title: const Text('今日任務')),
-        body: const Center(child: Text('今天沒有任務，太棒了！')),
+        appBar: AppBar(title: Text('今日任務')),
+        body: Center(child: Text('今天沒有任務，太棒了！')),
       );
     }
     final q = _questions[_index];
@@ -143,7 +143,7 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
           ),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(18, 20, 18, 24),
+              padding: EdgeInsets.fromLTRB(18, 20, 18, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -154,19 +154,19 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                       _ => '句子克漏字',
                     }}',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppColors.indigoFaded,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
+                    duration: Duration(milliseconds: 200),
+                    padding: EdgeInsets.symmetric(
                         vertical: 28, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(AppTheme.radius),
                       border: Border.all(
                         color: !answered
@@ -196,11 +196,11 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                         ),
                         if (q.subtitle != null)
                           Padding(
-                            padding: const EdgeInsets.only(top: 8),
+                            padding: EdgeInsets.only(top: 8),
                             child: Text(
                               q.subtitle!,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.gold,
@@ -210,11 +210,11 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(height: 18),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
                     childAspectRatio: 2.4,
@@ -229,11 +229,11 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                     ],
                   ),
                   if (answered) ...[
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(AppTheme.radius),
                         border: Border.all(
                           color: _chosen == q.correctIndex
@@ -244,7 +244,7 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                       ),
                       child: Text(
                         q.note,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           height: 1.6,
                           fontWeight: FontWeight.w700,
@@ -252,14 +252,14 @@ class _DailyMenuPageState extends ConsumerState<DailyMenuPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     FilledButton(
                       onPressed: _next,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         child: Text(
                           _index < _questions.length - 1 ? '下一題' : '完成任務',
-                          style: const TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ),

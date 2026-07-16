@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/data/static/grammar_data.dart';
@@ -66,16 +66,16 @@ class TopicsTab extends ConsumerWidget {
           subtitle: dueCount > 0 ? '今日待複習 $dueCount 個單字 🔔' : '單字・句子・文法',
         ),
         Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionTitle('練習等級'),
-              const SizedBox(height: 10),
+              SectionTitle('練習等級'),
+              SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: SegmentedButton<int>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(value: 5, label: Text('N5')),
                     ButtonSegment(value: 4, label: Text('N4')),
                     ButtonSegment(value: 3, label: Text('N3')),
@@ -88,9 +88,9 @@ class TopicsTab extends ConsumerWidget {
                       .update((s) => s.copyWith(jlptLevel: sel.first)),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SectionTitle('單字（N${ref.watch(settingsProvider).jlptLevel}）'),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   EntryCard(
@@ -99,7 +99,7 @@ class TopicsTab extends ConsumerWidget {
                     iconColor: AppColors.gold,
                     label: '聽力測驗',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ListeningPage()),
+                      MaterialPageRoute(builder: (_) => ListeningPage()),
                     ),
                   ),
                   for (final pool in VocabPool.values)
@@ -109,7 +109,7 @@ class TopicsTab extends ConsumerWidget {
                       EntryCard(
                         icon: _vocabIcons[pool]!,
                         iconBg: AppColors.gold,
-                        iconColor: AppColors.indigo,
+                        iconColor: AppColors.indigoSurface,
                         label: pool.label,
                         badge: pool == VocabPool.wrongReview
                             ? '${vocabWrong.length}'
@@ -124,9 +124,9 @@ class TopicsTab extends ConsumerWidget {
                       ),
                 ],
               ),
-              const SizedBox(height: 22),
-              const SectionTitle('情境句子（40 句）'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('情境句子（40 句）'),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   for (final pool in ScenePool.values)
@@ -147,14 +147,14 @@ class TopicsTab extends ConsumerWidget {
                       ),
                 ],
               ),
-              const SizedBox(height: 22),
-              const SectionTitle('文法'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('文法'),
+              SizedBox(height: 10),
               _GrammarEntryCard(
                 doneCount: grammarDone,
                 total: allGrammar.length,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   EntryCard(
@@ -162,23 +162,23 @@ class TopicsTab extends ConsumerWidget {
                     iconBg: AppColors.red,
                     label: '動詞變化訓練',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const VerbDrillPage()),
+                      MaterialPageRoute(builder: (_) => VerbDrillPage()),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 22),
-              const SectionTitle('AI 功能'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('AI 功能'),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   EntryCard(
                     icon: Icons.auto_awesome,
                     iconBg: AppColors.gold,
-                    iconColor: AppColors.indigo,
+                    iconColor: AppColors.indigoSurface,
                     label: 'AI 全新題目',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AiQuizPage()),
+                      MaterialPageRoute(builder: (_) => AiQuizPage()),
                     ),
                   ),
                   EntryCard(
@@ -187,7 +187,7 @@ class TopicsTab extends ConsumerWidget {
                     iconColor: AppColors.gold,
                     label: 'AI 情境對話',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AiChatPage()),
+                      MaterialPageRoute(builder: (_) => AiChatPage()),
                     ),
                   ),
                   EntryCard(
@@ -195,7 +195,7 @@ class TopicsTab extends ConsumerWidget {
                     iconBg: AppColors.green,
                     label: 'AI 弱點分析',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AiAnalysisPage()),
+                      MaterialPageRoute(builder: (_) => AiAnalysisPage()),
                     ),
                   ),
                 ],
@@ -218,15 +218,15 @@ class _GrammarEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(AppTheme.radius),
       child: InkWell(
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const GrammarListPage()),
+          MaterialPageRoute(builder: (_) => GrammarListPage()),
         ),
         borderRadius: BorderRadius.circular(AppTheme.radius),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 2),
@@ -241,15 +241,15 @@ class _GrammarEntryCard extends StatelessWidget {
                   color: AppColors.red,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Icon(Icons.menu_book,
+                child: Icon(Icons.menu_book,
                     color: Colors.white, size: 18),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       '文法課程',
                       style: TextStyle(
                         fontSize: 13,
@@ -257,23 +257,23 @@ class _GrammarEntryCard extends StatelessWidget {
                         color: AppColors.indigo,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(3),
                       child: LinearProgressIndicator(
                         value: total == 0 ? 0 : doneCount / total,
                         minHeight: 6,
-                        backgroundColor: const Color(0x1422254A),
+                        backgroundColor: Color(0x1422254A),
                         color: AppColors.red,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Text(
                 '$doneCount/$total',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: AppColors.indigo,

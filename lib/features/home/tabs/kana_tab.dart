@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/data/static/kana_data.dart';
@@ -42,19 +42,19 @@ class KanaTab extends ConsumerWidget {
           subtitle: '總熟練度 ${(overall * 100).toStringAsFixed(1)}%',
         ),
         Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionTitle('分類進度'),
-              const SizedBox(height: 10),
+              SectionTitle('分類進度'),
+              SizedBox(height: 10),
               _CategoryRow(
                 name: '清音',
                 detail: 'あ〜ん・92 字',
                 progress: catProgress((k) => k.category == KanaCategory.seion),
                 color: AppColors.red,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _CategoryRow(
                 name: '濁音／半濁音',
                 detail: 'が〜ぽ・50 字',
@@ -63,16 +63,16 @@ class KanaTab extends ConsumerWidget {
                     k.category == KanaCategory.handakuon),
                 color: AppColors.green,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _CategoryRow(
                 name: '拗音',
                 detail: 'きゃ〜ぴょ・66 字',
                 progress: catProgress((k) => k.category == KanaCategory.youon),
                 color: AppColors.gold,
               ),
-              const SizedBox(height: 22),
-              const SectionTitle('練習模式'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('練習模式'),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   for (final mode in PracticeMode.values)
@@ -121,9 +121,9 @@ class _CategoryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final pct = (progress * 100).round();
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.indigo, width: 2),
       ),
@@ -147,14 +147,14 @@ class _CategoryRow extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     color: AppColors.indigo,
@@ -162,19 +162,19 @@ class _CategoryRow extends StatelessWidget {
                 ),
                 Text(
                   detail,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
                     color: AppColors.indigoFaded,
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(3),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: 6,
-                    backgroundColor: const Color(0x1422254A),
+                    backgroundColor: Color(0x1422254A),
                     color: color,
                   ),
                 ),

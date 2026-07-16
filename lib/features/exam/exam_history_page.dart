@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
@@ -15,14 +15,14 @@ class ExamHistoryPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('成績歷史')),
+      appBar: AppBar(title: Text('成績歷史')),
       body: records.isEmpty
-          ? const Center(child: Text('還沒有測驗紀錄，先來一場模擬測驗吧！'))
+          ? Center(child: Text('還沒有測驗紀錄，先來一場模擬測驗吧！'))
           : ListView(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               children: [
                 _TrendChart(records: records.take(10).toList().reversed.toList()),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 for (final r in records) _RecordTile(record: r),
               ],
             ),
@@ -39,9 +39,9 @@ class _TrendChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.indigo, width: 3),
         boxShadow: AppShadows.hardSmall,
@@ -49,7 +49,7 @@ class _TrendChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '最近成績趨勢',
             style: TextStyle(
               fontSize: 13,
@@ -57,7 +57,7 @@ class _TrendChart extends StatelessWidget {
               color: AppColors.indigo,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           SizedBox(
             height: 120,
             child: Row(
@@ -66,26 +66,26 @@ class _TrendChart extends StatelessWidget {
                 for (final r in records)
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      padding: EdgeInsets.symmetric(horizontal: 3),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
                             '${(r.percent * 100).round()}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
                               color: AppColors.indigoFaded,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Container(
                             height: 90 * r.percent + 4,
                             decoration: BoxDecoration(
                               color: r.percent >= 0.7
                                   ? AppColors.green
                                   : AppColors.gold,
-                              borderRadius: const BorderRadius.vertical(
+                              borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(3)),
                             ),
                           ),
@@ -117,9 +117,9 @@ class _RecordTile extends StatelessWidget {
     final percent = (record.percent * 100).round();
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 10),
       child: ListTile(
-        tileColor: Colors.white,
+        tileColor: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTheme.radius),
           side: BorderSide(
@@ -139,13 +139,13 @@ class _RecordTile extends StatelessWidget {
             '$percent',
             style: TextStyle(
               fontWeight: FontWeight.w900,
-              color: percent >= 70 ? Colors.white : AppColors.indigo,
+              color: percent >= 70 ? Colors.white : AppColors.indigoSurface,
             ),
           ),
         ),
         title: Text(
           'N${record.level}・${record.score}/${record.total} 分',
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w800,
             color: AppColors.indigo,
           ),

@@ -14,7 +14,7 @@ class GrowthChart extends StatelessWidget {
   /// 近 [days] 天資料，按日期排序（缺日不補，線直接相連）。
   static List<(String, VocabSnapshot)> recent(
       Map<String, VocabSnapshot> history, String today) {
-    final cutoff = DateTime.parse(today).subtract(const Duration(days: days));
+    final cutoff = DateTime.parse(today).subtract(Duration(days: days));
     final entries = history.entries
         .where((e) => DateTime.parse(e.key).isAfter(cutoff))
         .map((e) => (e.key, e.value))
@@ -32,7 +32,7 @@ class GrowthChart extends StatelessWidget {
         : entries;
 
     if (data.length < 2) {
-      return const SizedBox(
+      return SizedBox(
         height: 140,
         child: Center(
           child: Text(

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/data/ai/ai_chat_service.dart';
@@ -24,7 +24,7 @@ class _Msg {
   final String translation; // AI 訊息的繁中
   final String correction; // 對使用者上一句的糾正
 
-  const _Msg({
+  _Msg({
     required this.isUser,
     required this.text,
     this.translation = '',
@@ -96,7 +96,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
       if (_scroll.hasClients) {
         _scroll.animateTo(
           _scroll.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 250),
+          duration: Duration(milliseconds: 250),
           curve: Curves.easeOut,
         );
       }
@@ -120,7 +120,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
           if (_scenario != null)
             IconButton(
               tooltip: '換情境',
-              icon: const Icon(Icons.swap_horiz),
+              icon: Icon(Icons.swap_horiz),
               onPressed: () => setState(() {
                 _scenario = null;
                 _messages.clear();
@@ -136,21 +136,21 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
   Widget _buildPicker() {
     final hasKey = ref.watch(apiKeyProvider).isNotEmpty;
     return ListView(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
             boxShadow: AppShadows.hardSmall,
           ),
           child: Column(
             children: [
-              const Text('💬', style: TextStyle(fontSize: 36)),
-              const SizedBox(height: 8),
-              const Text(
+              Text('💬', style: TextStyle(fontSize: 36)),
+              SizedBox(height: 8),
+              Text(
                 '和 AI 用日語對話',
                 style: TextStyle(
                   fontSize: 16,
@@ -158,33 +158,33 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                   color: AppColors.indigo,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 hasKey
                     ? 'AI 扮演店員，用 N5 日語回覆＋繁中翻譯；你的日語有錯會溫和糾正。中文也能聊！'
                     : '需要 Claude API Key（設定頁貼上）',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.indigoFaded,
                 ),
               ),
               if (!hasKey) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 FilledButton.icon(
-                  icon: const Icon(Icons.key, size: 18),
-                  label: const Text('前往設定 API Key'),
+                  icon: Icon(Icons.key, size: 18),
+                  label: Text('前往設定 API Key'),
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    MaterialPageRoute(builder: (_) => SettingsPage()),
                   ),
                 ),
               ],
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        const Text(
+        SizedBox(height: 20),
+        Text(
           '選擇情境',
           style: TextStyle(
             fontSize: 14,
@@ -192,12 +192,12 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
             color: AppColors.indigo,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         for (final (emoji, name) in chatScenarios)
           Padding(
-            padding: const EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.only(bottom: 10),
             child: Material(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               child: InkWell(
                 onTap: hasKey
@@ -208,15 +208,15 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                     : null,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 child: Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
                     border: Border.all(color: AppColors.indigo, width: 2),
                   ),
                   child: Row(
                     children: [
-                      Text(emoji, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
+                      Text(emoji, style: TextStyle(fontSize: 24)),
+                      SizedBox(width: 12),
                       Text(
                         name,
                         style: TextStyle(
@@ -243,11 +243,11 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
         Expanded(
           child: ListView.builder(
             controller: _scroll,
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             itemCount: _messages.length + (_sending ? 1 : 0),
             itemBuilder: (context, i) {
               if (i == _messages.length) {
-                return const Padding(
+                return Padding(
                   padding: EdgeInsets.all(12),
                   child: Center(
                     child: SizedBox(
@@ -267,8 +267,8 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
         ),
         if (_error != null)
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 14),
-            padding: const EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(horizontal: 14),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: AppColors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -276,7 +276,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
             ),
             child: Text(
               _error!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppColors.red,
@@ -285,20 +285,20 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
           ),
         SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+            padding: EdgeInsets.fromLTRB(14, 8, 14, 12),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(AppTheme.radius),
                       border: Border.all(color: AppColors.indigo, width: 2),
                     ),
                     child: TextField(
                       controller: _input,
                       enabled: !_sending,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: '打日文（或中文）…',
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(
@@ -308,14 +308,14 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Material(
-                  color: AppColors.indigo,
+                  color: AppColors.indigoSurface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   child: InkWell(
                     onTap: _sending ? null : _send,
                     borderRadius: BorderRadius.circular(AppTheme.radius),
-                    child: const SizedBox(
+                    child: SizedBox(
                       width: 44,
                       height: 44,
                       child: Icon(Icons.send, color: AppColors.gold, size: 20),
@@ -335,18 +335,18 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
       return Align(
         alignment: Alignment.centerRight,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 10, left: 60),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          margin: EdgeInsets.only(bottom: 10, left: 60),
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.gold,
             borderRadius: BorderRadius.circular(AppTheme.radius),
           ),
           child: Text(
             m.text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w800,
-              color: AppColors.indigo,
+              color: AppColors.indigoSurface,
             ),
           ),
         ),
@@ -355,10 +355,10 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10, right: 40),
-        padding: const EdgeInsets.all(12),
+        margin: EdgeInsets.only(bottom: 10, right: 40),
+        padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppTheme.radius),
           border: Border.all(color: AppColors.indigo, width: 2),
         ),
@@ -371,7 +371,7 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                 Flexible(
                   child: Text(
                     m.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       height: 1.5,
                       fontWeight: FontWeight.w800,
@@ -379,31 +379,31 @@ class _AiChatPageState extends ConsumerState<AiChatPage> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 SpeakButton(text: m.text, size: 28),
               ],
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               m.translation,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppColors.indigoFaded,
               ),
             ),
             if (m.correction.isNotEmpty) ...[
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 decoration: BoxDecoration(
                   color: AppColors.gold.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   '💡 ${m.correction}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
                     height: 1.5,
                     fontWeight: FontWeight.w700,

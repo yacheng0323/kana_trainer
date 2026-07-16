@@ -1,4 +1,4 @@
-﻿import 'dart:math';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,14 +96,14 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
                   _chosen = null;
                 });
               },
-              child: const Text('重新測驗'),
+              child: Text('重新測驗'),
             ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               Navigator.of(context).pop();
             },
-            child: const Text('回課程列表'),
+            child: Text('回課程列表'),
           ),
         ],
       ),
@@ -116,7 +116,7 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
       backgroundColor: AppColors.cream,
       appBar: AppBar(title: Text(widget.point.title)),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         child: _quizStarted ? _buildQuiz() : _buildLesson(),
       ),
     );
@@ -127,16 +127,16 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
             boxShadow: AppShadows.hardSmall,
           ),
           child: Text(
             widget.point.explanation,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               height: 1.7,
               fontWeight: FontWeight.w700,
@@ -144,8 +144,8 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        const Text(
+        SizedBox(height: 16),
+        Text(
           '例句',
           style: TextStyle(
             fontSize: 14,
@@ -153,13 +153,13 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
             color: AppColors.indigo,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         for (final ex in widget.point.examples)
           Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.all(14),
+            margin: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               border: Border.all(color: AppColors.indigo, width: 2),
             ),
@@ -168,16 +168,16 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
               children: [
                 Text(
                   ex.jp,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.indigo,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   ex.zh,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.indigoFaded,
@@ -186,10 +186,10 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
               ],
             ),
           ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         FilledButton(
           onPressed: () => setState(() => _quizStarted = true),
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Text('開始練習（3 題）', style: TextStyle(fontSize: 16)),
           ),
@@ -206,17 +206,17 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
         Text(
           '第 ${_quizIndex + 1}/3 題・選出正確的答案',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: AppColors.indigoFaded,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(
               color: !_answered
@@ -231,7 +231,7 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
           child: Text(
             q.question,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               height: 1.5,
               fontWeight: FontWeight.w900,
@@ -239,11 +239,11 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
             ),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          physics: NeverScrollableScrollPhysics(),
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
           childAspectRatio: 2.4,
@@ -258,13 +258,13 @@ class _GrammarLessonPageState extends ConsumerState<GrammarLessonPage> {
           ],
         ),
         if (_answered) ...[
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           FilledButton(
             onPressed: _nextOrFinish,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(_lastQuestion ? '看結果' : '下一題',
-                  style: const TextStyle(fontSize: 16)),
+                  style: TextStyle(fontSize: 16)),
             ),
           ),
         ],

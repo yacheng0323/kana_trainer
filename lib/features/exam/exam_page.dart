@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,7 +31,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
 
   void _start() {
     setState(() => _started = true);
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _remaining--);
       if (_remaining <= 0) {
@@ -81,20 +81,20 @@ class _ExamPageState extends ConsumerState<ExamPage> {
       appBar: AppBar(title: Text('N$level 模擬測驗')),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   border: Border.all(color: AppColors.indigo, width: 3),
                   boxShadow: AppShadows.hard,
                 ),
-                child: const Column(
+                child: Column(
                   children: [
                     Text('📝', style: TextStyle(fontSize: 48)),
                     SizedBox(height: 12),
@@ -121,9 +121,9 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                 ),
               ),
               if (!readiness.ready) ...[
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AppColors.red.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -135,7 +135,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                     '${readiness.vocabGap > 0 && readiness.grammarGap > 0 ? '、' : ''}'
                     '${readiness.grammarGap > 0 ? '文法題還差 ${readiness.grammarGap} 題' : ''}'
                     '。\n先到主題學習練單字、文法頁生成課程來累積。',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       height: 1.6,
                       fontWeight: FontWeight.w700,
@@ -144,10 +144,10 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                   ),
                 ),
               ],
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               FilledButton(
                 onPressed: readiness.ready ? _start : null,
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
                   child: Text('開始測驗', style: TextStyle(fontSize: 17)),
                 ),
@@ -171,7 +171,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
         actions: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.only(right: 16),
+              padding: EdgeInsets.only(right: 16),
               child: Text(
                 '⏱ $_clock',
                 style: TextStyle(
@@ -185,7 +185,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -206,27 +206,27 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                             ? AppColors.gold
                             : state.answers[i] != null
                                 ? AppColors.indigo
-                                : const Color(0x3322254A),
+                                : Color(0x3322254A),
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Text(
               q.sub ?? '',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppColors.indigoFaded,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 16),
+              padding: EdgeInsets.symmetric(vertical: 30, horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 border: Border.all(color: AppColors.indigo, width: 4),
                 boxShadow: AppShadows.hard,
@@ -242,11 +242,11 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: NeverScrollableScrollPhysics(),
               mainAxisSpacing: 10,
               crossAxisSpacing: 10,
               childAspectRatio: 2.4,
@@ -259,22 +259,22 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Row(
               children: [
                 if (state.index > 0)
                   Expanded(
                     child: OutlinedButton(
                       onPressed: notifier.previous,
-                      child: const Text('上一題'),
+                      child: Text('上一題'),
                     ),
                   ),
-                if (state.index > 0) const SizedBox(width: 10),
+                if (state.index > 0) SizedBox(width: 10),
                 Expanded(
                   child: state.index < state.questions.length - 1
                       ? FilledButton(
                           onPressed: notifier.next,
-                          child: const Text('下一題'),
+                          child: Text('下一題'),
                         )
                       : FilledButton(
                           style: FilledButton.styleFrom(
@@ -282,7 +282,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () => _confirmSubmit(state),
-                          child: const Text('交卷'),
+                          child: Text('交卷'),
                         ),
                 ),
               ],
@@ -298,16 +298,16 @@ class _ExamPageState extends ConsumerState<ExamPage> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('確定交卷？'),
+        title: Text('確定交卷？'),
         content: Text(unanswered > 0 ? '還有 $unanswered 題未作答。' : '已全部作答。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('繼續作答'),
+            child: Text('繼續作答'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('交卷'),
+            child: Text('交卷'),
           ),
         ],
       ),
@@ -324,14 +324,14 @@ class _ExamPageState extends ConsumerState<ExamPage> {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('測驗結果')),
+      appBar: AppBar(title: Text('測驗結果')),
       body: ListView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         children: [
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               border: Border.all(
                 color: percent >= 70 ? AppColors.green : AppColors.red,
@@ -342,11 +342,11 @@ class _ExamPageState extends ConsumerState<ExamPage> {
             child: Column(
               children: [
                 Text(percent >= 70 ? '🎉 合格！' : '💪 再接再厲',
-                    style: const TextStyle(fontSize: 28)),
-                const SizedBox(height: 8),
+                    style: TextStyle(fontSize: 28)),
+                SizedBox(height: 8),
                 Text(
                   '${state.score}/${state.questions.length}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.w900,
                     color: AppColors.indigo,
@@ -354,7 +354,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                 ),
                 Text(
                   '正確率 $percent%・用時 ${state.durationSec ~/ 60} 分 ${state.durationSec % 60} 秒',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.indigoFaded,
@@ -364,8 +364,8 @@ class _ExamPageState extends ConsumerState<ExamPage> {
             ),
           ),
           if (wrongIndices.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            const Text(
+            SizedBox(height: 20),
+            Text(
               '錯題檢討',
               style: TextStyle(
                 fontSize: 14,
@@ -373,13 +373,13 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                 color: AppColors.indigo,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             for (final i in wrongIndices)
               Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(14),
+                margin: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   border: Border.all(color: AppColors.red, width: 2),
                 ),
@@ -388,16 +388,16 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                   children: [
                     Text(
                       state.questions[i].prompt,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.indigo,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       '你的答案：${state.answers[i] == null ? '未作答' : state.questions[i].options[state.answers[i]!]}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.red,
@@ -405,7 +405,7 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                     ),
                     Text(
                       '正解：${state.questions[i].answerNote}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.green,
@@ -415,10 +415,10 @@ class _ExamPageState extends ConsumerState<ExamPage> {
                 ),
               ),
           ],
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           FilledButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text('完成'),
             ),
@@ -444,7 +444,7 @@ class _SelectableOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: selected ? AppColors.indigo : Colors.white,
+      color: selected ? AppColors.indigoSurface : AppColors.surface,
       borderRadius: BorderRadius.circular(AppTheme.radius),
       child: InkWell(
         onTap: onTap,
@@ -455,7 +455,7 @@ class _SelectableOption extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 6),
+          padding: EdgeInsets.symmetric(horizontal: 6),
           child: Text(
             label,
             textAlign: TextAlign.center,

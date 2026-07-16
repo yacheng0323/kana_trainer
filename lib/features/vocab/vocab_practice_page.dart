@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,7 +85,7 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
         SystemSound.play(SystemSoundType.click);
       }
       if (fb.correct && settings.autoNext) {
-        _autoNextTimer = Timer(const Duration(milliseconds: 900), () {
+        _autoNextTimer = Timer(Duration(milliseconds: 900), () {
           if (mounted) _next();
         });
       }
@@ -133,7 +133,7 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 20, 18, 110),
+                  padding: EdgeInsets.fromLTRB(18, 20, 18, 110),
                   child: Column(
                     children: [
                       Text(
@@ -142,21 +142,21 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                           VocabMode.zhJp => '日文怎麼說？',
                           VocabMode.reading => '這個單字怎麼念？',
                         }}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1,
                           color: AppColors.indigoFaded,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: Duration(milliseconds: 200),
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             vertical: 36, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(AppTheme.radius),
                           border: Border.all(color: borderColor, width: 4),
                           boxShadow: AppShadows.hard,
@@ -175,10 +175,10 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                             ),
                             if (showReading)
                               Padding(
-                                padding: const EdgeInsets.only(top: 10),
+                                padding: EdgeInsets.only(top: 10),
                                 child: Text(
                                   state.current.reading,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.gold,
@@ -186,10 +186,10 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                                 ),
                               ),
                             Padding(
-                              padding: const EdgeInsets.only(top: 6),
+                              padding: EdgeInsets.only(top: 6),
                               child: Text(
                                 'N${state.current.jlpt}・${mode.label}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.indigoFaded,
@@ -198,13 +198,13 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                             ),
                             // 讀音輸入模式聽發音等於作弊，答題後才顯示
                             if (mode != VocabMode.reading || answered) ...[
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                               SpeakButton(text: state.current.jp),
                             ],
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       if (mode == VocabMode.reading)
                         _ReadingInput(
                           controller: _inputController,
@@ -218,7 +218,7 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                         GridView.count(
                           crossAxisCount: 2,
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: NeverScrollableScrollPhysics(),
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
                           childAspectRatio: 2.2,
@@ -248,12 +248,12 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
             right: 18,
             bottom: 18,
             child: AnimatedSlide(
-              offset: answered ? Offset.zero : const Offset(0, 0.4),
-              duration: const Duration(milliseconds: 250),
+              offset: answered ? Offset.zero : Offset(0, 0.4),
+              duration: Duration(milliseconds: 250),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 opacity: answered ? 1 : 0,
-                duration: const Duration(milliseconds: 250),
+                duration: Duration(milliseconds: 250),
                 child: answered
                     ? FeedbackBanner(
                         correct: feedback.correct,
@@ -265,7 +265,7 @@ class _VocabPracticePageState extends ConsumerState<VocabPracticePage> {
                         onRetry: _retry,
                         onNext: _next,
                       )
-                    : const SizedBox(height: 0),
+                    : SizedBox(height: 0),
               ),
             ),
           ),
@@ -303,7 +303,7 @@ class _ReadingInput extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
           ),
@@ -313,12 +313,12 @@ class _ReadingInput extends StatelessWidget {
             enabled: enabled,
             autofocus: true,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: AppColors.indigo,
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: '輸入讀音（假名或羅馬拼音）',
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -326,12 +326,12 @@ class _ReadingInput extends StatelessWidget {
             onSubmitted: (_) => onSubmit(),
           ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         SizedBox(
           width: double.infinity,
           child: FilledButton(
             onPressed: enabled ? onSubmit : null,
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
               child: Text('確認', style: TextStyle(fontSize: 17)),
             ),

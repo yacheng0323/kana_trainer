@@ -48,23 +48,23 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
       backgroundColor: AppColors.cream,
       appBar: AppBar(title: Text('詞彙量（N$level）')),
       body: ListView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         children: [
           Row(
             children: [
               _Stat(value: vocab.length, label: '池內總數', color: AppColors.gold),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _Stat(value: learned, label: '已學會', color: AppColors.green),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _Stat(value: learning, label: '學習中', color: AppColors.indigo),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _Stat(value: unseen, label: '未見過', color: AppColors.red),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _Card(
             title: '成長曲線（30 天・全等級）',
-            trailing: const Row(
+            trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _LegendDot(color: AppColors.gold, label: '池內'),
@@ -74,15 +74,15 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
             ),
             child: GrowthChart(history: history),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _Card(
             title: '本週新學',
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 '+$weekly 字',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 34,
                   fontWeight: FontWeight.w900,
                   color: AppColors.green,
@@ -90,7 +90,7 @@ class _VocabStatsPageState extends ConsumerState<VocabStatsPage> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _Card(
             title: '主題進度（已學會 / 池內）',
             child: Column(
@@ -124,9 +124,9 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppTheme.radius),
           border: Border.all(color: AppColors.indigo, width: 2),
         ),
@@ -142,7 +142,7 @@ class _Stat extends StatelessWidget {
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
                 color: AppColors.indigoFaded,
@@ -165,9 +165,9 @@ class _Card extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.indigo, width: 3),
         boxShadow: AppShadows.hardSmall,
@@ -180,7 +180,7 @@ class _Card extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: AppColors.indigo,
@@ -189,7 +189,7 @@ class _Card extends StatelessWidget {
               ?trailing,
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           child,
         ],
       ),
@@ -213,10 +213,10 @@ class _LegendDot extends StatelessWidget {
           height: 10,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 4),
+        SizedBox(width: 4),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: AppColors.indigoFaded,
@@ -239,36 +239,36 @@ class _TopicRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final ratio = total == 0 ? 0.0 : learned / total;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
           SizedBox(
             width: 44,
             child: Text(
               topic.label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 color: AppColors.indigo,
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: ratio,
                 minHeight: 10,
-                backgroundColor: const Color(0x1422254A),
-                valueColor: const AlwaysStoppedAnimation(AppColors.green),
+                backgroundColor: Color(0x1422254A),
+                valueColor: AlwaysStoppedAnimation(AppColors.green),
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Text(
             '$learned/$total',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w800,
               color: AppColors.indigoFaded,
