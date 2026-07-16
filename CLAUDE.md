@@ -41,6 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.8.1 | fix 出題重複感（使用者實測回饋）：①近期 8 題不重複窗口（`RecentKeys`，四練習 VM 全掛）；②補貨加「池 <30 就補」條件 — 修全新主題 15 字全未見過（≥門檻 10）永不觸發擴充的設計漏洞。162 tests |
 | v2.9.0 | **N1~N5 全等級**：`Settings.jlptLevel` + 主題學習 tab 等級選擇器；單字/句子各等級獨立池（N4~N1 從零 AI 生成，prompt 鎖等級）；文法 N5 維持人審線性課、N4~N1 = AI 生成課（`DynamicGrammarLesson`，badge+可刪黑名單+手動「生成下一課」）；儀表板按等級。exam 維持 N5。178 tests |
 | v2.10.0 | 全等級一致性收尾：各等級模擬測驗（等級池組卷 + `ExamReadiness` 可考性 gate + `ExamRecord.level`）、AI 出題/對話等級化（prompt N$level、快取 key `ai_cache_n<level>_<主題>`、N2/N1 對話敬語）、今日菜單新內容按等級（`lookupPool` 保跨等級複習）。187 tests |
+| v2.11.0 | **深色模式**：`AppColors` const→getter（`AppColors.dark` 開關）+ 2c 夜間色票；新語意 token `surface`（卡片底）/`indigoSurface`（深靛填色，兩模式恆深）；`Settings.themeMode` 三態（跟隨系統/亮/暗，設定頁「外觀」區）；切換以 root ValueKey 重掛（回首頁，同 Android 系統深色行為）。194 tests |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -72,7 +73,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 cd C:\Users\a0920\Desktop\kana_trainer
 flutter pub get
 dart analyze lib test        # zero-issue gate
-flutter test                 # 187 tests
+flutter test                 # 194 tests
 flutter build apk --release  # APK: build\app\outputs\flutter-apk\app-release.apk
 flutter build web --release
 ```
@@ -126,7 +127,7 @@ lib/
 - 色票：暖米白 `#F4E9DA`、深靛藍 `#22254A`、金黃 `#E8B04B`、答對綠 `#2E9E7C`、答錯紅 `#D65B5B`
 - 造型：8px 方正圓角、2–4px 實線邊框、`6px 6px 0` 無模糊硬陰影（貼紙感）
 - 字體：Zen Kaku Gothic New 400/500/700/900（bundled `assets/fonts/`，Google Fonts 下載）
-- 單一亮色設計（無深色模式）
+- ~~單一亮色設計~~ v2.11.0 起支援深色（token getter 化；**新程式碼規則：卡片底用 `AppColors.surface` 不用 `Colors.white`、深靛填色用 `indigoSurface` 不用 `indigo`、`AppColors` 引用處不能上 `const`**）
 - 共用互動元件在 `features/practice/widgets/quiz_widgets.dart`：`PracticeHeader`（靛藍頂欄+連對+5段進度）、`OptionButton`（對✓綠/錯✕紅晃動/其餘淡化）、`FeedbackBanner`（底部上滑橫幅）、`SpeakButton`
 
 ### 學習引擎共通規則

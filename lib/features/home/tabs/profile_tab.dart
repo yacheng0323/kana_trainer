@@ -117,7 +117,7 @@ class ProfileTab extends ConsumerWidget {
               SizedBox(height: 30),
               Center(
                 child: Text(
-                  'kana_trainer v2.10.0',
+                  'kana_trainer v2.11.0',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
