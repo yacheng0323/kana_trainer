@@ -195,6 +195,9 @@ void main() {
 
   group('每日提醒設定', () {
     testWidgets('開啟 → 要權限 + 排程；關閉 → 取消', (tester) async {
+      tester.view.physicalSize = const Size(800, 2800); // 設定頁變長（外觀區）
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final prefs = await SharedPreferences.getInstance();
       final fake = FakeNotificationService();
       await tester.pumpWidget(
@@ -223,6 +226,9 @@ void main() {
     });
 
     testWidgets('權限被拒 → 不開啟', (tester) async {
+      tester.view.physicalSize = const Size(800, 2800); // 設定頁變長（外觀區）
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
       final prefs = await SharedPreferences.getInstance();
       final fake = FakeNotificationService()..permissionGranted = false;
       await tester.pumpWidget(

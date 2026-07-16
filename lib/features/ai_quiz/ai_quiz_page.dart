@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,14 +127,14 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
               Navigator.pop(ctx);
               setState(() => _phase = _Phase.pickTopic);
             },
-            child: const Text('換主題'),
+            child: Text('換主題'),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               _startQuiz(_questions, fromCache: _fromCache);
             },
-            child: const Text('再玩一次'),
+            child: Text('再玩一次'),
           ),
         ],
       ),
@@ -145,7 +145,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('AI 出題')),
+      appBar: AppBar(title: Text('AI 出題')),
       body: switch (_phase) {
         _Phase.pickTopic => _buildPicker(),
         _Phase.loading => _buildLoading(),
@@ -157,21 +157,21 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
   Widget _buildPicker() {
     final hasKey = ref.watch(apiKeyProvider).isNotEmpty;
     return ListView(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
             boxShadow: AppShadows.hardSmall,
           ),
           child: Column(
             children: [
-              const Text('✨', style: TextStyle(fontSize: 36)),
-              const SizedBox(height: 8),
-              const Text(
+              Text('✨', style: TextStyle(fontSize: 36)),
+              SizedBox(height: 8),
+              Text(
                 'AI 每次出全新 N5 題目',
                 style: TextStyle(
                   fontSize: 16,
@@ -179,25 +179,25 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
                   color: AppColors.indigo,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 hasKey
                     ? '單字意思・克漏字・讀音混合出題，出過的主題可離線重玩'
                     : '需要 Claude API Key 才能出題（僅存在本機，不會被備份匯出）',
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.indigoFaded,
                 ),
               ),
               if (!hasKey) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 FilledButton.icon(
-                  icon: const Icon(Icons.key, size: 18),
-                  label: const Text('前往設定 API Key'),
+                  icon: Icon(Icons.key, size: 18),
+                  label: Text('前往設定 API Key'),
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const SettingsPage()),
+                    MaterialPageRoute(builder: (_) => SettingsPage()),
                   ),
                 ),
               ],
@@ -205,9 +205,9 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
           ),
         ),
         if (_error != null) ...[
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: AppColors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -215,7 +215,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
             ),
             child: Text(
               _error!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColors.red,
@@ -223,8 +223,8 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
             ),
           ),
         ],
-        const SizedBox(height: 20),
-        const Text(
+        SizedBox(height: 20),
+        Text(
           '選擇主題',
           style: TextStyle(
             fontSize: 14,
@@ -232,7 +232,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
             color: AppColors.indigo,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -244,24 +244,24 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
                 selectedColor: AppColors.gold,
                 labelStyle: TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: _topic == t ? AppColors.indigo : AppColors.indigoFaded,
+                  color: _topic == t ? AppColors.indigoSurface : AppColors.indigoFaded,
                 ),
                 onSelected: (_) => setState(() => _topic = t),
               ),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         FilledButton(
           onPressed: hasKey ? () => _generate() : null,
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Text('開始出題', style: TextStyle(fontSize: 17)),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         OutlinedButton.icon(
-          icon: const Icon(Icons.refresh, size: 18),
-          label: const Text('忽略快取，重新出全新題目'),
+          icon: Icon(Icons.refresh, size: 18),
+          label: Text('忽略快取，重新出全新題目'),
           onPressed: hasKey ? () => _generate(forceRefresh: true) : null,
         ),
       ],
@@ -269,7 +269,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
   }
 
   Widget _buildLoading() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -292,7 +292,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
     final q = _questions[_index];
     final answered = _chosen != null;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -300,18 +300,18 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
             '$_topic・第 ${_index + 1}/${_questions.length} 題'
             '${_fromCache ? '（快取題組）' : ''}・答對 $_correct',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColors.indigoFaded,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+            duration: Duration(milliseconds: 200),
+            padding: EdgeInsets.symmetric(vertical: 28, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               border: Border.all(
                 color: !answered
@@ -334,11 +334,11 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
             childAspectRatio: 2.4,
@@ -353,11 +353,11 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
             ],
           ),
           if (answered) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 border: Border.all(
                   color: _chosen == q.correctIndex
@@ -368,7 +368,7 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
               ),
               child: Text(
                 q.note,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.6,
                   fontWeight: FontWeight.w700,
@@ -376,14 +376,14 @@ class _AiQuizPageState extends ConsumerState<AiQuizPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             FilledButton(
               onPressed: _next,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text(
                   _index < _questions.length - 1 ? '下一題' : '看結果',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ),

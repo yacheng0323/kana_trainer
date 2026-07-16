@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
@@ -34,7 +34,7 @@ class ProfileTab extends ConsumerWidget {
           subtitle: '🔥 最佳連對 ${stats.bestStreak}・連續達標 ${stats.goalStreakDays} 天',
         ),
         Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,7 +49,7 @@ class ProfileTab extends ConsumerWidget {
                       color: AppColors.red,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: _StatCard(
                       value: '$learned',
@@ -57,7 +57,7 @@ class ProfileTab extends ConsumerWidget {
                       color: AppColors.green,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: _StatCard(
                       value: '${stats.todayTotal}',
@@ -67,21 +67,21 @@ class ProfileTab extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               GoalCard(stats: stats, goal: dailyGoal),
-              const SizedBox(height: 22),
-              const SectionTitle('學習管理'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('學習管理'),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   EntryCard(
                     icon: Icons.menu_book_outlined,
                     iconBg: AppColors.gold,
-                    iconColor: AppColors.indigo,
+                    iconColor: AppColors.indigoSurface,
                     label: '錯題本',
                     badge: wrongCount > 0 ? '$wrongCount' : null,
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const WrongListPage()),
+                      MaterialPageRoute(builder: (_) => WrongListPage()),
                     ),
                   ),
                   EntryCard(
@@ -91,7 +91,7 @@ class ProfileTab extends ConsumerWidget {
                     label: '詞彙量',
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (_) => const VocabStatsPage()),
+                          builder: (_) => VocabStatsPage()),
                     ),
                   ),
                   EntryCard(
@@ -100,7 +100,7 @@ class ProfileTab extends ConsumerWidget {
                     iconColor: Colors.white,
                     label: '我的題庫',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const LibraryPage()),
+                      MaterialPageRoute(builder: (_) => LibraryPage()),
                     ),
                   ),
                   EntryCard(
@@ -109,15 +109,15 @@ class ProfileTab extends ConsumerWidget {
                     iconColor: AppColors.gold,
                     label: '設定與備份',
                     onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const SettingsPage()),
+                      MaterialPageRoute(builder: (_) => SettingsPage()),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 30),
-              const Center(
+              SizedBox(height: 30),
+              Center(
                 child: Text(
-                  'kana_trainer v2.10.0',
+                  'kana_trainer v2.11.0',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -147,9 +147,9 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: EdgeInsets.symmetric(vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.indigo, width: 3),
       ),
@@ -165,7 +165,7 @@ class _StatCard extends StatelessWidget {
           ),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: AppColors.indigoFaded,

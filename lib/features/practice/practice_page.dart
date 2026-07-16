@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +69,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
         SystemSound.play(SystemSoundType.click);
       }
       if (fb.correct && settings.autoNext) {
-        _autoNextTimer = Timer(const Duration(milliseconds: 900), () {
+        _autoNextTimer = Timer(Duration(milliseconds: 900), () {
           if (mounted) _next();
         });
       }
@@ -83,7 +83,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
             ? AppColors.green
             : AppColors.red;
     final others =
-        feedback == null ? const <String>[] : feedback.accepted.skip(1).toList();
+        feedback == null ? <String>[] : feedback.accepted.skip(1).toList();
 
     return Scaffold(
       backgroundColor: AppColors.cream,
@@ -99,27 +99,27 @@ class _PracticePageState extends ConsumerState<PracticePage> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 20, 18, 110),
+                  padding: EdgeInsets.fromLTRB(18, 20, 18, 110),
                   child: Column(
                     children: [
                       Text(
                         '${_categoryLabel(state.current.category)}・這個假名怎麼念？',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1,
                           color: AppColors.indigoFaded,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       // 假名卡片：白底、8px 圓角、4px 狀態邊框、硬陰影
                       AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: Duration(milliseconds: 200),
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             vertical: 32, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(AppTheme.radius),
                           border: Border.all(color: borderColor, width: 4),
                           boxShadow: AppShadows.hard,
@@ -128,7 +128,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                           children: [
                             Text(
                               state.current.kana,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 92,
                                 height: 1,
                                 fontWeight: FontWeight.w900,
@@ -137,29 +137,29 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                             ),
                             if (!isChoice && (settings.romajiHint || _hintShown))
                               Padding(
-                                padding: const EdgeInsets.only(top: 8),
+                                padding: EdgeInsets.only(top: 8),
                                 child: Text(
                                   settings.romajiHint
                                       ? state.current.romaji
                                       : '提示：${state.current.romaji[0]}...',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.gold,
                                   ),
                                 ),
                               ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: 14),
                             SpeakButton(text: state.current.kana),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       if (isChoice)
                         GridView.count(
                           crossAxisCount: 2,
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: NeverScrollableScrollPhysics(),
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
                           childAspectRatio: 2.2,
@@ -201,12 +201,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
             right: 18,
             bottom: 18,
             child: AnimatedSlide(
-              offset: answered ? Offset.zero : const Offset(0, 0.4),
-              duration: const Duration(milliseconds: 250),
+              offset: answered ? Offset.zero : Offset(0, 0.4),
+              duration: Duration(milliseconds: 250),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 opacity: answered ? 1 : 0,
-                duration: const Duration(milliseconds: 250),
+                duration: Duration(milliseconds: 250),
                 child: answered
                     ? FeedbackBanner(
                         correct: feedback.correct,
@@ -218,7 +218,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         onRetry: _retry,
                         onNext: _next,
                       )
-                    : const SizedBox(height: 0),
+                    : SizedBox(height: 0),
               ),
             ),
           ),
@@ -260,7 +260,7 @@ class _InputArea extends StatelessWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
           ),
@@ -270,12 +270,12 @@ class _InputArea extends StatelessWidget {
             enabled: enabled,
             autofocus: true,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: AppColors.indigo,
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: '輸入羅馬拼音',
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: 14),
@@ -283,28 +283,28 @@ class _InputArea extends StatelessWidget {
             onSubmitted: (_) => onSubmit(),
           ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         Row(
           children: [
             if (showHintButton) ...[
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.indigo,
+                  color: AppColors.indigoSurface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                 ),
                 child: IconButton(
                   tooltip: '提示',
                   onPressed: onHint,
-                  icon: const Icon(Icons.lightbulb_outline,
+                  icon: Icon(Icons.lightbulb_outline,
                       color: AppColors.gold),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
             ],
             Expanded(
               child: FilledButton(
                 onPressed: enabled ? onSubmit : null,
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
                   child: Text('確認', style: TextStyle(fontSize: 17)),
                 ),

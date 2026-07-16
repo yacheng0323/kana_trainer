@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
@@ -30,43 +30,43 @@ class ExamTab extends ConsumerWidget {
               : '最佳成績 ${(best.percent * 100).round()}%・共 ${records.length} 次',
         ),
         Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 主 CTA：開始模擬測驗
               Material(
-                color: AppColors.indigo,
+                color: AppColors.indigoSurface,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 child: InkWell(
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const ExamPage()),
+                    MaterialPageRoute(builder: (_) => ExamPage()),
                   ),
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(AppTheme.radius),
                       boxShadow: AppShadows.hard,
                     ),
                     child: Row(
                       children: [
-                        const Text('📝', style: TextStyle(fontSize: 36)),
-                        const SizedBox(width: 14),
+                        Text('📝', style: TextStyle(fontSize: 36)),
+                        SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'N$level 模擬測驗',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              const Text(
+                              SizedBox(height: 2),
+                              Text(
                                 '單字 10＋假名 5＋文法 5・限時 10 分鐘',
                                 style: TextStyle(
                                   fontSize: 12,
@@ -77,16 +77,16 @@ class ExamTab extends ConsumerWidget {
                             ],
                           ),
                         ),
-                        const Icon(Icons.play_circle_fill,
+                        Icon(Icons.play_circle_fill,
                             color: AppColors.gold, size: 36),
                       ],
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 22),
-              const SectionTitle('成績'),
-              const SizedBox(height: 10),
+              SizedBox(height: 22),
+              SectionTitle('成績'),
+              SizedBox(height: 10),
               EntryGrid(
                 children: [
                   EntryCard(
@@ -96,22 +96,22 @@ class ExamTab extends ConsumerWidget {
                     badge: records.isEmpty ? null : '${records.length}',
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (_) => const ExamHistoryPage()),
+                          builder: (_) => ExamHistoryPage()),
                     ),
                   ),
                 ],
               ),
               if (records.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                const SectionTitle('最近三次'),
-                const SizedBox(height: 10),
+                SizedBox(height: 16),
+                SectionTitle('最近三次'),
+                SizedBox(height: 10),
                 for (final r in records.take(3))
                   Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.symmetric(
                         horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(AppTheme.radius),
                       border: Border.all(color: AppColors.indigo, width: 2),
                     ),
@@ -127,11 +127,11 @@ class ExamTab extends ConsumerWidget {
                                 : AppColors.red,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             'N${r.level}・${r.score}/${r.total} 分・${_dateText(r.dateIso)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: AppColors.indigoFaded,

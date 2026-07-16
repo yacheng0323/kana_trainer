@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -111,12 +111,12 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
 
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('AI 弱點分析')),
+      appBar: AppBar(title: Text('AI 弱點分析')),
       body: ListView(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         children: [
           if (_loading)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(40),
               child: Center(
                 child: Column(
@@ -138,7 +138,7 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
           else ...[
             if (_error != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.red.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -146,29 +146,29 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
                 ),
                 child: Text(
                   _error!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     color: AppColors.red,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
             ],
             if (_report == null)
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(AppTheme.radius),
                   border: Border.all(color: AppColors.indigo, width: 3),
                   boxShadow: AppShadows.hardSmall,
                 ),
                 child: Column(
                   children: [
-                    const Text('🔍', style: TextStyle(fontSize: 36)),
-                    const SizedBox(height: 8),
-                    const Text(
+                    Text('🔍', style: TextStyle(fontSize: 36)),
+                    SizedBox(height: 8),
+                    Text(
                       '讓 AI 找出你的弱點',
                       style: TextStyle(
                         fontSize: 16,
@@ -176,7 +176,7 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
                         color: AppColors.indigo,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       !hasKey
                           ? '需要 Claude API Key（設定頁貼上）'
@@ -184,20 +184,20 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
                               ? '先累積至少 20 題作答紀錄再來分析'
                               : '分析錯題本與熟練度，找出弱點模式並給練習建議',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         color: AppColors.indigoFaded,
                       ),
                     ),
                     if (!hasKey) ...[
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       FilledButton.icon(
-                        icon: const Icon(Icons.key, size: 18),
-                        label: const Text('前往設定 API Key'),
+                        icon: Icon(Icons.key, size: 18),
+                        label: Text('前往設定 API Key'),
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (_) => const SettingsPage()),
+                              builder: (_) => SettingsPage()),
                         ),
                       ),
                     ],
@@ -207,24 +207,24 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
             else ...[
               Text(
                 '分析日期：$_reportDate',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: AppColors.indigoFaded,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _section('📝 總評', [_report!.summary]),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               _section('🎯 弱點模式', _report!.weakPoints,
                   color: AppColors.red),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               _section('💪 練習建議', _report!.suggestions,
                   color: AppColors.green),
             ],
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             FilledButton.icon(
-              icon: const Icon(Icons.auto_awesome, size: 18),
+              icon: Icon(Icons.auto_awesome, size: 18),
               label: Text(_report == null ? '開始分析' : '重新分析'),
               onPressed: hasKey && hasData ? _analyze : null,
             ),
@@ -236,9 +236,9 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
 
   Widget _section(String title, List<String> items, {Color? color}) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: color ?? AppColors.indigo, width: 2),
       ),
@@ -247,19 +247,19 @@ class _AiAnalysisPageState extends ConsumerState<AiAnalysisPage> {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w900,
               color: AppColors.indigo,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           for (final item in items)
             Padding(
-              padding: const EdgeInsets.only(bottom: 6),
+              padding: EdgeInsets.only(bottom: 6),
               child: Text(
                 items.length > 1 ? '• $item' : item,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.6,
                   fontWeight: FontWeight.w700,

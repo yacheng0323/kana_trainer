@@ -104,6 +104,12 @@
 > 不遷移重生即可）；③ AI 情境對話難度跟等級（N2/N1 敬語＋進階句型）；
 > ④ 今日菜單新內容按目前等級抽（等級池 <15 退全池），`lookupPool` 保
 > 跨等級 SRS/錯題複習。187 tests。
+> **v2.11.0（2026-07-16）＝ 深色模式**（使用者要求）：2c 夜間色票（深夜靛底
+> `#14162B`、亮靛卡片、薰衣草文字、黑硬陰影）。技術：`AppColors` const→getter
+> （全域 `dark` 開關）+ 新語意 token `surface`/`indigoSurface`（填色恆深）；
+> 27 檔 356 處引用 const 拆除（`dart fix` 補回合法者）+ 白底/靛填色/金底文字
+> 語意 sweep。`Settings.themeMode` 三態，root ValueKey 重掛套用（回首頁，
+> 等同 Android 系統深色重建 activity）。194 tests。
 > **v2.1.0（2026-07-10）＝ 資訊架構重構**：單頁長捲軸 → Bottom NavigationBar 四 tab
 > （50音基礎 / 主題學習 / 檢定 / 我的），IndexedStack 保留各 tab 狀態，
 > 共用 TabHeader / EntryCard / EntryGrid（`lib/features/home/widgets/home_cards.dart`）。

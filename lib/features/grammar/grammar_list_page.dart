@@ -54,10 +54,10 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
       backgroundColor: AppColors.cream,
       appBar: AppBar(title: Text('N$level 文法（${lessons.length} 課・AI 生成）')),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         children: [
           if (lessons.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 30),
               child: Text(
                 'N 級文法課由 AI 生成（未人審，教學卡有 AI 標示）。\n'
@@ -84,14 +84,14 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
                   context: context,
                   builder: (ctx) => AlertDialog(
                     title: Text('刪除「${l.title}」？'),
-                    content: const Text('會加入黑名單，AI 不會再生成同名課程。'),
+                    content: Text('會加入黑名單，AI 不會再生成同名課程。'),
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(ctx, false),
-                          child: const Text('取消')),
+                          child: Text('取消')),
                       FilledButton(
                           onPressed: () => Navigator.pop(ctx, true),
-                          child: const Text('刪除')),
+                          child: Text('刪除')),
                     ],
                   ),
                 );
@@ -101,21 +101,21 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
                 }
               },
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
           ],
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           FilledButton.icon(
             onPressed: _generating ? null : () => _generateLesson(level),
             icon: _generating
-                ? const SizedBox(
+                ? SizedBox(
                     width: 16,
                     height: 16,
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: AppColors.gold),
                   )
-                : const Icon(Icons.auto_awesome, size: 18),
+                : Icon(Icons.auto_awesome, size: 18),
             label: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(_generating ? '生成中…（約 10-20 秒）' : 'AI 生成下一課'),
             ),
           ),
@@ -131,9 +131,9 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
       appBar: AppBar(
           title: Text('N5 文法（${done.length}/${allGrammar.length}）')),
       body: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         itemCount: allGrammar.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 10),
+        separatorBuilder: (_, _) => SizedBox(height: 10),
         itemBuilder: (context, i) {
           final g = allGrammar[i];
           final unlocked = progress.isUnlocked(i);
@@ -141,7 +141,7 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
           return Opacity(
             opacity: unlocked ? 1 : 0.4,
             child: ListTile(
-              tileColor: Colors.white,
+              tileColor: AppColors.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 side: BorderSide(
@@ -157,15 +157,15 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
                   color: isDone
                       ? AppColors.green
                       : unlocked
-                          ? AppColors.indigo
+                          ? AppColors.indigoSurface
                           : AppColors.indigoFaded,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: isDone
-                    ? const Icon(Icons.check, color: Colors.white, size: 18)
+                    ? Icon(Icons.check, color: Colors.white, size: 18)
                     : Text(
                         '${i + 1}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: AppColors.gold,
                           fontWeight: FontWeight.w900,
                         ),
@@ -173,17 +173,17 @@ class _GrammarListPageState extends ConsumerState<GrammarListPage> {
               ),
               title: Text(
                 g.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w800,
-                  color: AppColors.indigo,
+                  color: AppColors.indigoSurface,
                 ),
               ),
               subtitle:
                   Text(isDone ? '已完成 ✓ 可重新複習' : unlocked ? '可開始' : '完成上一課解鎖'),
               trailing: unlocked
-                  ? const Icon(Icons.arrow_forward_ios,
+                  ? Icon(Icons.arrow_forward_ios,
                       size: 14, color: AppColors.indigo)
-                  : const Icon(Icons.lock_outline,
+                  : Icon(Icons.lock_outline,
                       size: 18, color: AppColors.indigoFaded),
               onTap: unlocked
                   ? () => Navigator.of(context).push(
@@ -216,7 +216,7 @@ class _LessonTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor: Colors.white,
+      tileColor: AppColors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radius),
         side: BorderSide(
@@ -225,23 +225,23 @@ class _LessonTile extends StatelessWidget {
         ),
       ),
       leading: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: AppColors.gold,
           borderRadius: BorderRadius.circular(6),
         ),
-        child: const Text(
+        child: Text(
           'AI',
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w900,
-            color: AppColors.indigo,
+            color: AppColors.indigoSurface,
           ),
         ),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontWeight: FontWeight.w800,
           color: AppColors.indigo,
         ),
@@ -252,10 +252,10 @@ class _LessonTile extends StatelessWidget {
         children: [
           IconButton(
             tooltip: '刪除此課',
-            icon: const Icon(Icons.delete_outline, color: AppColors.red),
+            icon: Icon(Icons.delete_outline, color: AppColors.red),
             onPressed: onDelete,
           ),
-          const Icon(Icons.arrow_forward_ios,
+          Icon(Icons.arrow_forward_ios,
               size: 14, color: AppColors.indigo),
         ],
       ),
