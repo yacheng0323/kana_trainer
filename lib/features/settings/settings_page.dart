@@ -35,6 +35,51 @@ class SettingsPage extends ConsumerWidget {
           Padding(
             padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
             child: Text(
+              '外觀',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w900,
+                color: AppColors.indigo.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: SegmentedButton<String>(
+              segments: const [
+                ButtonSegment(
+                    value: 'system',
+                    label: Text('跟隨系統'),
+                    icon: Icon(Icons.brightness_auto)),
+                ButtonSegment(
+                    value: 'light',
+                    label: Text('亮色'),
+                    icon: Icon(Icons.light_mode)),
+                ButtonSegment(
+                    value: 'dark',
+                    label: Text('深色'),
+                    icon: Icon(Icons.dark_mode)),
+              ],
+              selected: {settings.themeMode},
+              onSelectionChanged: (sel) =>
+                  notifier.update((s) => s.copyWith(themeMode: sel.first)),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 6, 16, 0),
+            child: Text(
+              '切換主題後畫面會回到首頁',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: AppColors.indigoFaded,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 12, 16, 6),
+            child: Text(
               '作答方式',
               style: TextStyle(
                 fontSize: 13,
