@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -69,14 +69,14 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
               Navigator.pop(ctx);
               setState(() => _questions = null);
             },
-            child: const Text('換題型'),
+            child: Text('換題型'),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(ctx);
               _start();
             },
-            child: const Text('再一輪'),
+            child: Text('再一輪'),
           ),
         ],
       ),
@@ -87,24 +87,24 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.cream,
-      appBar: AppBar(title: const Text('動詞變化訓練')),
+      appBar: AppBar(title: Text('動詞變化訓練')),
       body: _questions == null ? _buildPicker() : _buildQuiz(),
     );
   }
 
   Widget _buildPicker() {
     return ListView(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(AppTheme.radius),
             border: Border.all(color: AppColors.indigo, width: 3),
             boxShadow: AppShadows.hardSmall,
           ),
-          child: const Column(
+          child: Column(
             children: [
               Text('💪', style: TextStyle(fontSize: 36)),
               SizedBox(height: 8),
@@ -129,8 +129,8 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
-        const Text(
+        SizedBox(height: 20),
+        Text(
           '選擇題型',
           style: TextStyle(
             fontSize: 14,
@@ -138,13 +138,13 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
             color: AppColors.indigo,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
             ChoiceChip(
-              label: const Text('混合'),
+              label: Text('混合'),
               selected: _form == null,
               selectedColor: AppColors.gold,
               onSelected: (_) => setState(() => _form = null),
@@ -158,10 +158,10 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
               ),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         FilledButton(
           onPressed: _start,
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Text('開始訓練', style: TextStyle(fontSize: 17)),
           ),
@@ -174,25 +174,25 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
     final q = _questions![_index];
     final answered = _chosen != null;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             '第 ${_index + 1}/${_questions!.length} 題・答對 $_correct',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColors.indigoFaded,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+            duration: Duration(milliseconds: 200),
+            padding: EdgeInsets.symmetric(vertical: 28, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               border: Border.all(
                 color: !answered
@@ -208,7 +208,7 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
               children: [
                 Text(
                   q.verb.dict,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 44,
                     fontWeight: FontWeight.w900,
                     color: AppColors.indigo,
@@ -216,23 +216,23 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
                 ),
                 Text(
                   '${q.verb.reading}・${q.verb.zh}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.gold,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.indigo,
+                    color: AppColors.indigoSurface,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     '${q.form.label}？',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: AppColors.gold,
@@ -242,11 +242,11 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           GridView.count(
             crossAxisCount: 2,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
             childAspectRatio: 2.4,
@@ -261,11 +261,11 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
             ],
           ),
           if (answered) ...[
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 border: Border.all(
                   color: _chosen == q.correctIndex
@@ -278,7 +278,7 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
                 '${q.verb.group.label}｜'
                 'ます形 ${q.verb.masu}・て形 ${q.verb.te}・'
                 'ない形 ${q.verb.nai}・た形 ${q.verb.ta}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.6,
                   fontWeight: FontWeight.w700,
@@ -286,14 +286,14 @@ class _VerbDrillPageState extends ConsumerState<VerbDrillPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             FilledButton(
               onPressed: _next,
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 child: Text(
                   _index < _questions!.length - 1 ? '下一題' : '看結果',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ),

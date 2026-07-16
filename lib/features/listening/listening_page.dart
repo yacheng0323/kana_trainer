@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,7 +57,7 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
         fb.correct ? HapticFeedback.lightImpact() : HapticFeedback.heavyImpact();
       }
       if (fb.correct && settings.autoNext) {
-        _autoNextTimer = Timer(const Duration(milliseconds: 1100), () {
+        _autoNextTimer = Timer(Duration(milliseconds: 1100), () {
           if (mounted) _next();
         });
       }
@@ -85,10 +85,10 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 20, 18, 110),
+                  padding: EdgeInsets.fromLTRB(18, 20, 18, 110),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         '聽發音，選出正確的單字',
                         style: TextStyle(
                           fontSize: 12,
@@ -97,14 +97,14 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                           color: AppColors.indigoFaded,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: Duration(milliseconds: 200),
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             vertical: 40, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(AppTheme.radius),
                           border: Border.all(color: borderColor, width: 4),
                           boxShadow: AppShadows.hard,
@@ -113,12 +113,12 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                           children: [
                             // 大播放按鈕（題目本體）
                             Material(
-                              color: AppColors.indigo,
+                              color: AppColors.indigoSurface,
                               borderRadius: BorderRadius.circular(16),
                               child: InkWell(
                                 onTap: _speak,
                                 borderRadius: BorderRadius.circular(16),
-                                child: const SizedBox(
+                                child: SizedBox(
                                   width: 96,
                                   height: 96,
                                   child: Icon(Icons.volume_up,
@@ -126,8 +126,8 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            const Text(
+                            SizedBox(height: 12),
+                            Text(
                               '點喇叭重聽',
                               style: TextStyle(
                                 fontSize: 12,
@@ -137,10 +137,10 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                             ),
                             if (answered)
                               Padding(
-                                padding: const EdgeInsets.only(top: 12),
+                                padding: EdgeInsets.only(top: 12),
                                 child: Text(
                                   '${state.current.jp}（${state.current.reading}）',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w900,
                                     color: AppColors.indigo,
@@ -150,11 +150,11 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       GridView.count(
                         crossAxisCount: 2,
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: NeverScrollableScrollPhysics(),
                         mainAxisSpacing: 10,
                         crossAxisSpacing: 10,
                         childAspectRatio: 2.2,
@@ -183,12 +183,12 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
             right: 18,
             bottom: 18,
             child: AnimatedSlide(
-              offset: answered ? Offset.zero : const Offset(0, 0.4),
-              duration: const Duration(milliseconds: 250),
+              offset: answered ? Offset.zero : Offset(0, 0.4),
+              duration: Duration(milliseconds: 250),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 opacity: answered ? 1 : 0,
-                duration: const Duration(milliseconds: 250),
+                duration: Duration(milliseconds: 250),
                 child: answered
                     ? FeedbackBanner(
                         correct: feedback.correct,
@@ -197,7 +197,7 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                             '${state.current.zh}',
                         onNext: _next,
                       )
-                    : const SizedBox(height: 0),
+                    : SizedBox(height: 0),
               ),
             ),
           ),

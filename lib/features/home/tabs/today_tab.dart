@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
@@ -44,7 +44,7 @@ class TodayTab extends ConsumerWidget {
           subtitle: '🔥 連續達標 ${stats.goalStreakDays} 天・今日 ${stats.todayTotal} 題',
         ),
         Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -52,9 +52,9 @@ class TodayTab extends ConsumerWidget {
               doneToday
                   ? _DoneCard(menuDone: menuDone)
                   : _MenuCard(preview: preview),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               GoalCard(stats: stats, goal: dailyGoal),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               StudyHeatmap(history: history, today: DateTime.now()),
             ],
           ),
@@ -73,16 +73,16 @@ class _MenuCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: AppColors.indigo,
+        color: AppColors.indigoSurface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         boxShadow: AppShadows.hard,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
+          Text(
             '📋 今日任務',
             style: TextStyle(
               fontSize: 18,
@@ -90,26 +90,26 @@ class _MenuCard extends ConsumerWidget {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             '待複習 ${preview.due}・錯題 ${preview.wrong}・新內容 ${preview.fresh}'
             '，共 ${preview.total} 題',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: AppColors.gold,
             ),
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.gold,
               foregroundColor: AppColors.indigo,
             ),
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const DailyMenuPage()),
+              MaterialPageRoute(builder: (_) => DailyMenuPage()),
             ),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(
                 '開始今日任務',
@@ -132,31 +132,31 @@ class _DoneCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.green, width: 3),
         boxShadow: AppShadows.hardSmall,
       ),
       child: Column(
         children: [
-          const Text('🎉', style: TextStyle(fontSize: 36)),
-          const SizedBox(height: 6),
+          Text('🎉', style: TextStyle(fontSize: 36)),
+          SizedBox(height: 6),
           Text(
             '今日任務完成！答對 ${menuDone.score}/${menuDone.total}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w900,
               color: AppColors.green,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           OutlinedButton(
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const DailyMenuPage()),
+              MaterialPageRoute(builder: (_) => DailyMenuPage()),
             ),
-            child: const Text('再練一輪'),
+            child: Text('再練一輪'),
           ),
         ],
       ),

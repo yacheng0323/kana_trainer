@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,7 +75,7 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
         SystemSound.play(SystemSoundType.click);
       }
       if (fb.correct && settings.autoNext) {
-        _autoNextTimer = Timer(const Duration(milliseconds: 1100), () {
+        _autoNextTimer = Timer(Duration(milliseconds: 1100), () {
           if (mounted) _next();
         });
       }
@@ -104,27 +104,27 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(18, 20, 18, 120),
+                  padding: EdgeInsets.fromLTRB(18, 20, 18, 120),
                   child: Column(
                     children: [
                       Text(
                         '${state.current.scene.label}・${isCloze ? '選出空格的詞' : '把語塊排成正確的句子'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1,
                           color: AppColors.indigoFaded,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       // 題目卡
                       AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: Duration(milliseconds: 200),
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             vertical: 28, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(AppTheme.radius),
                           border: Border.all(color: borderColor, width: 4),
                           boxShadow: AppShadows.hard,
@@ -135,7 +135,7 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
                               Text(
                                 state.current.clozeText,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 24,
                                   height: 1.5,
                                   fontWeight: FontWeight.w900,
@@ -144,11 +144,11 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
                               )
                             else
                               _ReorderSlots(state: state, notifier: notifier),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             Text(
                               state.current.zh,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.indigoFaded,
@@ -156,18 +156,18 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
                             ),
                             // 答題後可聽完整句發音
                             if (answered) ...[
-                              const SizedBox(height: 12),
+                              SizedBox(height: 12),
                               SpeakButton(text: state.current.jp),
                             ],
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       if (isCloze)
                         GridView.count(
                           crossAxisCount: 2,
                           shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: NeverScrollableScrollPhysics(),
                           mainAxisSpacing: 10,
                           crossAxisSpacing: 10,
                           childAspectRatio: 2.6,
@@ -196,12 +196,12 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
             right: 18,
             bottom: 18,
             child: AnimatedSlide(
-              offset: answered ? Offset.zero : const Offset(0, 0.4),
-              duration: const Duration(milliseconds: 250),
+              offset: answered ? Offset.zero : Offset(0, 0.4),
+              duration: Duration(milliseconds: 250),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 opacity: answered ? 1 : 0,
-                duration: const Duration(milliseconds: 250),
+                duration: Duration(milliseconds: 250),
                 child: answered
                     ? FeedbackBanner(
                         correct: feedback.correct,
@@ -210,7 +210,7 @@ class _SentencePracticePageState extends ConsumerState<SentencePracticePage> {
                         onRetry: notifier.retryReorder,
                         onNext: _next,
                       )
-                    : const SizedBox(height: 0),
+                    : SizedBox(height: 0),
               ),
             ),
           ),
@@ -243,7 +243,7 @@ class _ReorderSlots extends StatelessWidget {
       runSpacing: 6,
       children: [
         if (state.picked.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Text(
               '點下方語塊組句…',
@@ -256,7 +256,7 @@ class _ReorderSlots extends StatelessWidget {
           ),
         for (var p = 0; p < state.picked.length; p++)
           Material(
-            color: AppColors.indigo,
+            color: AppColors.indigoSurface,
             borderRadius: BorderRadius.circular(6),
             child: InkWell(
               onTap: state.feedback == null
@@ -265,10 +265,10 @@ class _ReorderSlots extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Text(
                   state.shuffled[state.picked[p]],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -300,7 +300,7 @@ class _ChunkPool extends StatelessWidget {
           Opacity(
             opacity: state.picked.contains(i) ? 0.3 : 1,
             child: Material(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppTheme.radius),
               child: InkWell(
                 onTap: state.feedback == null && !state.picked.contains(i)
@@ -308,7 +308,7 @@ class _ChunkPool extends StatelessWidget {
                     : null,
                 borderRadius: BorderRadius.circular(AppTheme.radius),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                       horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -316,7 +316,7 @@ class _ChunkPool extends StatelessWidget {
                   ),
                   child: Text(
                     state.shuffled[i],
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: AppColors.indigo,

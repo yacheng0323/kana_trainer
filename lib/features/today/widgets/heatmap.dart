@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'package:kana_trainer/core/theme/app_theme.dart';
 
@@ -12,8 +12,8 @@ class StudyHeatmap extends StatelessWidget {
   static const _weeks = 15;
 
   static Color colorFor(int count) {
-    if (count <= 0) return const Color(0x1422254A);
-    if (count < 10) return const Color(0x66E8B04B); // 淡金
+    if (count <= 0) return Color(0x1422254A);
+    if (count < 10) return Color(0x66E8B04B); // 淡金
     if (count < 20) return AppColors.gold;
     if (count < 40) return AppColors.green;
     return AppColors.indigo;
@@ -28,19 +28,19 @@ class StudyHeatmap extends StatelessWidget {
   Widget build(BuildContext context) {
     // 欄 = 週（左舊右新），列 = 週一..週日
     final thisMonday = today.subtract(Duration(days: today.weekday - 1));
-    final start = thisMonday.subtract(const Duration(days: 7 * (_weeks - 1)));
+    final start = thisMonday.subtract(Duration(days: 7 * (_weeks - 1)));
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppTheme.radius),
         border: Border.all(color: AppColors.indigo, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '學習足跡（最近 15 週）',
             style: TextStyle(
               fontSize: 13,
@@ -48,7 +48,7 @@ class StudyHeatmap extends StatelessWidget {
               color: AppColors.indigo,
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           LayoutBuilder(
             builder: (context, constraints) {
               final cell = ((constraints.maxWidth - (_weeks - 1) * 3) / _weeks)
@@ -57,7 +57,7 @@ class StudyHeatmap extends StatelessWidget {
                 children: [
                   for (var row = 0; row < 7; row++)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 3),
+                      padding: EdgeInsets.only(bottom: 3),
                       child: Row(
                         children: [
                           for (var col = 0; col < _weeks; col++) ...[
@@ -65,7 +65,7 @@ class StudyHeatmap extends StatelessWidget {
                               start.add(Duration(days: col * 7 + row)),
                               cell,
                             ),
-                            if (col < _weeks - 1) const SizedBox(width: 3),
+                            if (col < _weeks - 1) SizedBox(width: 3),
                           ],
                         ],
                       ),
@@ -74,11 +74,11 @@ class StudyHeatmap extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const Text(
+              Text(
                 '少 ',
                 style: TextStyle(fontSize: 10, color: AppColors.indigoFaded),
               ),
@@ -86,14 +86,14 @@ class StudyHeatmap extends StatelessWidget {
                 Container(
                   width: 10,
                   height: 10,
-                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                  margin: EdgeInsets.symmetric(horizontal: 1.5),
                   decoration: BoxDecoration(
                     color: colorFor(c),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ],
-              const Text(
+              Text(
                 ' 多',
                 style: TextStyle(fontSize: 10, color: AppColors.indigoFaded),
               ),

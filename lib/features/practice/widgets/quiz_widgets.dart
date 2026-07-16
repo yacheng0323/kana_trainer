@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:kana_trainer/data/services/tts_service.dart';
@@ -15,7 +15,7 @@ class SpeakButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Material(
-      color: AppColors.indigo,
+      color: AppColors.indigoSurface,
       borderRadius: BorderRadius.circular(AppTheme.radius),
       child: InkWell(
         onTap: () => ref.read(ttsProvider).speak(text),
@@ -50,11 +50,11 @@ class PracticeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final filled = sessionTotal % 5;
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.indigo,
+      decoration: BoxDecoration(
+        color: AppColors.indigoSurface,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
       ),
-      padding: const EdgeInsets.fromLTRB(6, 0, 18, 22),
+      padding: EdgeInsets.fromLTRB(6, 0, 18, 22),
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -63,13 +63,13 @@ class PracticeHeader extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: () => Navigator.of(context).maybePop(),
-                  icon: const Icon(Icons.arrow_back_ios_new,
+                  icon: Icon(Icons.arrow_back_ios_new,
                       color: Colors.white, size: 20),
                 ),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w900,
@@ -78,16 +78,16 @@ class PracticeHeader extends StatelessWidget {
                 ),
                 Text(
                   '🔥 $streak',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.gold,
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Text(
                   '$sessionCorrect/$sessionTotal',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white70,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -95,15 +95,15 @@ class PracticeHeader extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.only(left: 12),
+              padding: EdgeInsets.only(left: 12),
               child: Row(
                 children: [
                   for (var i = 0; i < 5; i++) ...[
                     Expanded(
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
+                        duration: Duration(milliseconds: 200),
                         height: 5,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(2),
@@ -115,7 +115,7 @@ class PracticeHeader extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (i < 4) const SizedBox(width: 5),
+                    if (i < 4) SizedBox(width: 5),
                   ],
                 ],
               ),
@@ -173,7 +173,7 @@ class OptionButton extends StatelessWidget {
       active: state == OptionState.wrong,
       child: AnimatedOpacity(
         opacity: state == OptionState.dimmed ? 0.35 : 1,
-        duration: const Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 200),
         child: Material(
           color: bg,
           borderRadius: BorderRadius.circular(AppTheme.radius),
@@ -189,7 +189,7 @@ class OptionButton extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    padding: EdgeInsets.symmetric(horizontal: 6),
                     child: Text(
                       label,
                       textAlign: TextAlign.center,
@@ -243,11 +243,11 @@ class FeedbackBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(18, 14, 12, 14),
+      padding: EdgeInsets.fromLTRB(18, 14, 12, 14),
       decoration: BoxDecoration(
         color: correct ? AppColors.green : AppColors.red,
         borderRadius: BorderRadius.circular(AppTheme.radius),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(color: Color(0x4022254A), offset: Offset(6, 6)),
         ],
       ),
@@ -259,7 +259,7 @@ class FeedbackBanner extends StatelessWidget {
               children: [
                 Text(
                   correct ? '答對了！' : '再試一次，你可以的！',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
@@ -267,7 +267,7 @@ class FeedbackBanner extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -278,7 +278,7 @@ class FeedbackBanner extends StatelessWidget {
           ),
           if (showRetry && onRetry != null) ...[
             BannerButton(label: '再試一次', onTap: onRetry!),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
           ],
           BannerButton(label: '下一題', onTap: onNext),
         ],
@@ -302,10 +302,10 @@ class BannerButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.w800,
