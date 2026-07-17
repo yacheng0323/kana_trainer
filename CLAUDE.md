@@ -42,6 +42,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | v2.9.0 | **N1~N5 全等級**：`Settings.jlptLevel` + 主題學習 tab 等級選擇器；單字/句子各等級獨立池（N4~N1 從零 AI 生成，prompt 鎖等級）；文法 N5 維持人審線性課、N4~N1 = AI 生成課（`DynamicGrammarLesson`，badge+可刪黑名單+手動「生成下一課」）；儀表板按等級。exam 維持 N5。178 tests |
 | v2.10.0 | 全等級一致性收尾：各等級模擬測驗（等級池組卷 + `ExamReadiness` 可考性 gate + `ExamRecord.level`）、AI 出題/對話等級化（prompt N$level、快取 key `ai_cache_n<level>_<主題>`、N2/N1 對話敬語）、今日菜單新內容按等級（`lookupPool` 保跨等級複習）。187 tests |
 | v2.11.0 | **深色模式**：`AppColors` const→getter（`AppColors.dark` 開關）+ 2c 夜間色票；新語意 token `surface`（卡片底）/`indigoSurface`（深靛填色，兩模式恆深）；`Settings.themeMode` 三態（跟隨系統/亮/暗，設定頁「外觀」區）；切換以 root ValueKey 重掛（回首頁，同 Android 系統深色行為）。194 tests |
+| v2.11.1 | **fix：release APK 無法連網**（使用者真機實測「輸入 Key 後一直無網路連線」）— main AndroidManifest 缺 `INTERNET` 權限；debug manifest 自帶所以開發期從未發現，release 全面斷網 → 所有 AI 功能 SocketException 被映射成「網路連線失敗」。v2.2.0 起 release 的 AI 從未通過 |
 
 > 詳細規劃與範圍調整紀錄：`docs/ROADMAP.md`
 
@@ -182,6 +183,7 @@ lib/
 5b. **release APK 需 core library desugaring**（`android/app/build.gradle.kts`：`isCoreLibraryDesugaringEnabled = true` + `desugar_jdk_libs`）— flutter_local_notifications 要求；拿掉會在 CheckAarMetadata 炸掉。另注意：build 失敗時 `build\...\app-release.apk` 仍是**上一次成功的舊檔**，複製前先確認 build 成功。
 6. **APK 是 debug key 簽名** — 自用 OK；上 Google Play 前要建正式 keystore。
 7. **假名/單字/句子資料維護**：假名只改平假名表（片假名自動生成）；句子只改 chunks + blankIndex；jp/key 全庫唯一由測試把關。
+8. **Android 權限：debug manifest 會騙人** — Flutter debug/profile manifest 自帶 `INTERNET`，main manifest 沒宣告的話 **release APK 全面斷網**（所有 HTTP 直接 SocketException，被 ClaudeClient 映射成「網路連線失敗」）。v2.11.1 已補；之後加任何需要權限的功能，一律在 `android/app/src/main/AndroidManifest.xml` 宣告並用 release build 驗證。
 
 ## 未落地（需使用者決策）
 

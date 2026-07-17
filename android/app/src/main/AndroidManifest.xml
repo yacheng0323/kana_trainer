@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Claude API（AI 出題/對話/擴充）。debug manifest 自帶此權限、
+         release 不帶 → 沒宣告的話 release APK 全面斷網（SocketException） -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- 每日提醒（flutter_local_notifications） -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
